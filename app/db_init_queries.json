@@ -1,0 +1,25 @@
+[
+	"DROP TABLE IF EXISTS restaurant;",
+	"CREATE TABLE restaurant (restaurant_id BIGINT NOT NULL, restaurant_name TEXT DEFAULT NULL, contact INTEGER DEFAULT NULL, email TEXT DEFAULT NULL, website TEXT DEFAULT NULL, PRIMARY KEY (restaurant_id));",
+
+	"DROP TABLE IF EXISTS restaurant_authentication;",
+	"CREATE TABLE restaurant_authentication (restaurant_id BIGINT NOT NULL, username VARCHAR(10) NOT NULL UNIQUE, password TEXT NOT NULL, FOREIGN KEY (restaurant_id) REFERENCES restaurant(restaurant_id));",
+
+	"DROP TABLE IF EXISTS address;",
+	"CREATE TABLE address (address_id BIGINT NOT NULL, line_1 TEXT NOT NULL, line_2 TEXT, city TEXT NOT NULL, state TEXT NOT NULL, zipcode INTEGER NOT NULL, PRIMARY KEY (address_id));",
+
+	"DROP TABLE IF EXISTS outlet;",
+	"CREATE TABLE outlet (outlet_id BIGINT NOT NULL, outlet_name TEXT NOT NULL, outlet_address BIGINT NOT NULL, outlet_contact TEXT DEFAULT NULL, restaurant_id BIGINT NOT NULL, FOREIGN KEY (outlet_address) REFERENCES address(address_id), FOREIGN KEY (restaurant_id) REFERENCES restaurant(restaurant_id), PRIMARY KEY(outlet_id));",
+	
+	"DROP TABLE IF EXISTS timing;",
+	"CREATE TABLE timing (timing_id BIGINT NOT NULL, outlet_id BIGINT NOT NULL, day VARCHAR(9) NOT NULL, start_hour NUMERIC NOT NULL, end_hour NUMERIC NOT NULL, PRIMARY KEY (timing_id), FOREIGN KEY (outlet_id) REFERENCES outlet(outlet_id));",
+
+	"DROP TABLE IF EXISTS category;",
+	"CREATE TABLE category (category_id BIGINT NOT NULL, category_name TEXT NOT NULL, restaurant_id BIGINT NOT NULL, PRIMARY KEY (category_id), FOREIGN KEY (restaurant_id) REFERENCES restaurant(restaurant_id));",
+
+	"DROP TABLE IF EXISTS item;",
+	"CREATE TABLE item (item_id BIGINT NOT NULL, item_name TEXT NOT NULL, description TEXT NOT NULL, price NUMERIC NOT NULL, category_id BIGINT NOT NULL, PRIMARY KEY (item_id), FOREIGN KEY (category_id) REFERENCES category(category_id));",
+
+	"DROP TABLE IF EXISTS item_outlet;",
+	"CREATE TABLE item_outlet (item_id BIGINT NOT NULL, outlet_id BIGINT NOT NULL, FOREIGN KEY (item_id) REFERENCES item(item_id), FOREIGN KEY (outlet_id) REFERENCES outlet(outlet_id));"
+]
