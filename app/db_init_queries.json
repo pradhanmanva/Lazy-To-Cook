@@ -21,5 +21,20 @@
 	"CREATE TABLE item (item_id BIGINT NOT NULL, item_name TEXT NOT NULL, description TEXT NOT NULL, price NUMERIC NOT NULL, category_id BIGINT NOT NULL, PRIMARY KEY (item_id), FOREIGN KEY (category_id) REFERENCES category(category_id));",
 
 	"DROP TABLE IF EXISTS item_outlet;",
-	"CREATE TABLE item_outlet (item_id BIGINT NOT NULL, outlet_id BIGINT NOT NULL, FOREIGN KEY (item_id) REFERENCES item(item_id), FOREIGN KEY (outlet_id) REFERENCES outlet(outlet_id));"
+	"CREATE TABLE item_outlet (item_id BIGINT NOT NULL, outlet_id BIGINT NOT NULL, FOREIGN KEY (item_id) REFERENCES item(item_id), FOREIGN KEY (outlet_id) REFERENCES outlet(outlet_id));",
+
+	"DROP TABLE IF EXISTS user;",
+	"CREATE TABLE user (user_id BIGINT NOT NULL, first_name VARCHAR(50) NOT NULL, middle_name VARCHAR(50) DEFAULT '', last_name VARCHAR(50) DEFAULT '', date_of_birth VARCHAR(10), email_address TEXT NOT NULL, PRIMARY KEY(user_id));",
+
+	"DROP TABLE IF EXISTS user_authentication;",
+	"CREATE TABLE user_authentication (user_id BIGINT NOT NULL, password TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES user(user_id));",
+	
+	"DROP TABLE IF EXISTS user_address",
+	"CREATE TABLE user_address (user_id BIGINT NOT NULL, user_address BIGINT NOT NULL, FOREIGN KEY (user_id) REFERENCES user(user_id), FOREIGN KEY (user_address) REFERENCES address(address_id));",
+
+	"DROP TABLE IF EXISTS cart;",
+	"CREATE TABLE cart (cart_id BIGINT NOT NULL, cart_name VARCHAR(20) NOT NULL DEFAULT 'CART', user_id BIGINT NOT NULL, PRIMARY KEY (cart_id), FOREIGN KEY(user_id) REFERENCES user(user_id));",
+
+	"DROP TABLE IF EXISTS cart_item;",
+	"CREATE TABLE cart_item (cart_id BIGINT NOT NULL, item_id BIGINT NOT NULL, quantity NUMERIC DEFAULT 1, FOREIGN KEY (cart_id) REFERENCES cart(cart_id), FOREIGN KEY (item_id) REFERENCES item(item_id));"
 ]

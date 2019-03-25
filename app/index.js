@@ -1,4 +1,5 @@
 var mysql = require("mysql");
+var colors = require("colors");
 var queries = require("./db_init_queries.json");
 
 var host = 'localhost';
@@ -20,10 +21,10 @@ var runQueries = function(connection, index) {
 		connection.end();
 		return;
 	}
-	console.log("Executing: "+queries[index]);
+	console.log("Executing: "+queries[index].bold);
 	connection.query(queries[index], function (err, results) {
 	  if (err) throw err;
-	  console.log("Done.");
+	  console.log("Done.".green);
 	  runQueries(connection, index+1);
 	});
 } 
@@ -33,7 +34,7 @@ var createDatabase = function() {
 		if (err) {
 			throw err;
 		}
-		console.log("Database created.");
+		console.log("Database created.".green);
 		connection.query("USE "+db_name+";");
 		runQueries(connection, 0);
 		// connection.end();
@@ -53,7 +54,7 @@ connection.connect(function(err) {
   if (err) {
   	throw err;
   }
-  console.log("Connected to MySQL!");
+  console.log("Connected to MySQL!".green);
   dropExistingDatabase();
 });
 
