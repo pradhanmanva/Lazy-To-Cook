@@ -9,15 +9,13 @@ const NO_ENDPOINT = "Endpoint unavailable.";
 class Router {
     constructor(app) {
         this.app = app;
-        this.BASE_URL = "/api";
+        this.entity = "";
+        this.parentEntity = "";
+        this.urlPattern = "/api";
     }
 
-    getBaseUrl() {
-        return this.BASE_URL;
-    }
-
-    setBaseUrl(url) {
-        this.BASE_URL = url;
+    getUrlPattern() {
+        return this.urlPattern;
     }
 
     getAll(request, response) {
@@ -55,15 +53,19 @@ class Router {
     wire() {
         const self = this;
         this.app
-        .get(this.getBaseUrl(), this.getAll)
-        .get(this.getBaseUrl()+"/:id", (request, response) => {
+        .get(this.getUrlPattern(), (request, response) => { 
+            self.getAll(request, response);
+        })
+        .get(this.getUrlPattern()+"/:id", (request, response) => {
             self.get(request.params["id"], request, response);
         })
-        .post(this.getBaseUrl(), this.add)
-        .put(this.getBaseUrl()+"/:id", (request, response) => {
+        .post(this.getUrlPattern(), (request, response) => { 
+            self.add(request, response);
+        })
+        .put(this.getUrlPattern()+"/:id", (request, response) => {
             self.update(request.params["id"], request, response);
         })
-        .delete(this.getBaseUrl()+"/:id", (request, response) => {
+        .delete(this.getUrlPattern()+"/:id", (request, response) => {
             self.delete(request.params["id"], request, response);
         });
     }
