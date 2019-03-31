@@ -61,7 +61,6 @@ class Router {
      * 
      * Note: If you want to provide a custom route that differs from normal pattern, 
      * extend this class, implement wire method and DO NOT call super.wire() in the derived class wire() method.
-     * @param {*} routes 
      */
     wire() {
         const self = this;
