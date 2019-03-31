@@ -1,4 +1,4 @@
-const Router = require("./Router");
+const Router = require("../framework/Router");
 
 /**
  * Router class for setting up the routes of restaurant entity.
