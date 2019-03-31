@@ -1,4 +1,7 @@
 {
     "restaurant" : "restaurants",
-    "outlet" : "outlets"
+    "outlet" : "outlets",
+    "item" : "items",
+    "cart" : "carts",
+    "user" : "users"
 }
