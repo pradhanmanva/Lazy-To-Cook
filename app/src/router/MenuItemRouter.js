@@ -1,6 +1,6 @@
 const OutletRouter = require("./OutletRouter");
 
-class ItemRouter extends OutletRouter {
+class MenuItemRouter extends OutletRouter {
     constructor(app) {
         super(app);
         this.init("item", "outlet");
@@ -54,4 +54,4 @@ class ItemRouter extends OutletRouter {
 
 }
 
-module.exports = ItemRouter;
+module.exports = MenuItemRouter;
