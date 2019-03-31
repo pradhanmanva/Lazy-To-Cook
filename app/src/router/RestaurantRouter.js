@@ -1,6 +1,4 @@
 const Router = require("./Router");
-const UrlUtil = require("../utils/UrlUtil");
-const AppUtil = require("../utils/Apputil");
 
 /**
  * Router class for setting up the routes of restaurant entity.
@@ -11,8 +9,7 @@ const AppUtil = require("../utils/Apputil");
 class RestaurantRouter extends Router {
     constructor(app) {
         super(app);
-        this.entity = "restaurant";
-        this.urlPattern = UrlUtil.appendPart(this.urlPattern, AppUtil.pluralize(this.entity));
+        this.init("restaurant", "");
     }
 
     /**

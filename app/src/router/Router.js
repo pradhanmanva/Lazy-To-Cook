@@ -1,3 +1,6 @@
+const UrlUtil = require("../utils/UrlUtil");
+const AppUtil = require("../utils/AppUtil");
+
 /**
  * Base router class that takes care of basic routing capabilities.
  * 
@@ -9,9 +12,19 @@ const NO_ENDPOINT = "Endpoint unavailable.";
 class Router {
     constructor(app) {
         this.app = app;
-        this.entity = "";
-        this.parentEntity = "";
+        this.init("", "");
         this.urlPattern = "/api";
+    }
+
+    init(entity, parentEntity) {
+        this.parentEntity = parentEntity;
+        this.entity = entity;
+        if (parentEntity && parentEntity.length) {
+            this.urlPattern = UrlUtil.appendPart(this.urlPattern, AppUtil.getEntityIdPattern(this.parentEntity));
+        }
+        if (entity && entity.length) {
+            this.urlPattern = UrlUtil.appendPart(this.urlPattern, AppUtil.pluralize(this.entity));
+        }
     }
 
     getUrlPattern() {

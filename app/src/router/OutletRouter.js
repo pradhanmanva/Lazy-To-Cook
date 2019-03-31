@@ -1,21 +1,16 @@
 const RestaurantRouter = require("./RestaurantRouter");
-const UrlUtil = require("../utils/UrlUtil");
-const AppUtil = require("../utils/AppUtil");
 
 class OutletRouter extends RestaurantRouter {
     constructor(app) {
         super(app);
-        this.parentEntity = "restaurant";
-        this.entity = "outlet";
-        this.urlPattern = UrlUtil.appendPart(this.urlPattern, 
-            UrlUtil.appendPart(AppUtil.getEntityIdPattern(this.parentEntity), AppUtil.pluralize(this.entity)));
+        this.init("outlet", "restaurant");
     }
 
     /**
     * GET /api/restaurants/:restaurant_id/outlets
     */
     getAll(request, response) {
-        const restaurantId = request.params[AppUtil.getEntityIdStr(this.parentEntity)];
+        const restaurantId = request.params["restaurant_id"];
         response.send(`Get all outlets of restaurant ${restaurantId}`);
         response.end();
 
@@ -25,7 +20,7 @@ class OutletRouter extends RestaurantRouter {
     * GET /api/restaurants/:restaurant_id/outlets/:id
     */
     get(id, request, response) {
-        const restaurantId = request.params[AppUtil.getEntityIdStr(this.parentEntity)];
+        const restaurantId = request.params["restaurant_id"];
         response.send(`Get outlet ${id} of restaurant ${restaurantId}`);
         response.end();
     }

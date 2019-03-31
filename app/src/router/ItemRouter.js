@@ -1,14 +1,9 @@
 const OutletRouter = require("./OutletRouter");
-const UrlUtil = require("../utils/UrlUtil");
-const AppUtil = require("../utils/AppUtil");
 
 class ItemRouter extends OutletRouter {
     constructor(app) {
         super(app);
-        this.parentEntity = "outlet";
-        this.entity = "item";
-        this.urlPattern = UrlUtil.appendPart(this.urlPattern, 
-            UrlUtil.appendPart(AppUtil.getEntityIdPattern(this.parentEntity), AppUtil.pluralize(this.entity)));
+        this.init("item", "outlet");
     }
 
     /**
