@@ -1,4 +1,4 @@
-var mysql = require("mysql");
+let mysql = require("mysql");
 
 class Timing {
     constructor(timing_id, outlet_id, day, start_hour, end_hour) {
@@ -67,6 +67,6 @@ class Timing {
 }
 
 
-var obj = new Timing(1, 2, 3, 4, 5);
+let obj = new Timing(1, 2, 3, 4, 5);
 obj.get(['start_hour', 4, 'end_hour', 6, 'day', "'monday'"]);
 // obj.insert();
