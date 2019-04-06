@@ -29,7 +29,7 @@ class Outlet {
 
 }
 
-let obj = new Outlet(1, 'Subway Richardson', '515 W Campbell Rd #109, Richardson, TX 75080', 726428, 4);
+// let obj = new Outlet(1, 'Subway Richardson', '515 W Campbell Rd #109, Richardson, TX 75080', 726428, 4);
 // obj.getAll();
 // obj.get(['restaurant_id', 2]);
-obj.insert();
+// obj.insert();
