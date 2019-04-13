@@ -47,11 +47,6 @@ class MenuItemRouter extends OutletRouter {
     delete(id, request, response) {
 
     }
-
-    wire() {
-        super.wire();
-    }
-
 }
 
 module.exports = MenuItemRouter;

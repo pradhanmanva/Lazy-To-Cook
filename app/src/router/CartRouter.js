@@ -45,11 +45,6 @@ class CartRouter extends UserRouter {
     delete(id, request, response) {
 
     }
-
-    wire() {
-        super.wire();
-    }
-
 }
 
 module.exports = CartRouter;

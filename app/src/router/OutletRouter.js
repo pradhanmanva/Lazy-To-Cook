@@ -45,11 +45,6 @@ class OutletRouter extends RestaurantRouter {
     delete(id, request, response) {
 
     }
-
-    wire() {
-        super.wire();
-    }
-
 }
 
 module.exports = OutletRouter;

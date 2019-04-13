@@ -48,12 +48,7 @@ class UserRouter extends Router {
     */
     delete(id, request, response) {
 
-    }
-
-    wire() {
-        super.wire();
-    }
-    
+    }    
 }
 
 module.exports = UserRouter;

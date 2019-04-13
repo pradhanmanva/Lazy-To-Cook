@@ -47,11 +47,6 @@ class CartItemRouter extends CartRouter {
     delete(id, request, response) {
 
     }
-
-    wire() {
-        super.wire();
-    }
-
 }
 
 module.exports = CartItemRouter;

@@ -40,11 +40,6 @@ class RestaurantRouter extends Router {
     delete(id, request, response) {
 
     }
-
-    wire() {
-        super.wire();
-    }
-    
 }
 
 module.exports = RestaurantRouter;
