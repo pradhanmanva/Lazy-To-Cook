@@ -17,4 +17,4 @@ App that lets people order food from restaurants and get it delivered at their d
 
 Now, all the required backend dependencies will the installed and the database will be created.
 
-**Note:** Please use this command only for first installation. Do not use it on production database as it drops existing tables from database and re-creates them.
+**Note:** Please use this command only for first installation. Do not use it on production database as it drops existing tables from database and re-creates them. If you are adding a new dependency, use `npm install` command to update dependencies.
