@@ -1,4 +1,3 @@
-let mysql = require("mysql");
 let conn = require("./Connection.js");
 
 class User {
@@ -31,6 +30,6 @@ class User {
 
 }
 
-// let obj = new User(1, 'Manva', '', 'Pradhan', '03/04/1995', 'pradhanmanva@gmail.com');
+// let obj = new User(3, 'Tarang', '', 'Patel', '03/08/1994', 'tarangpatel@gmail.com');
 // obj.getAll();
 // obj.insert();

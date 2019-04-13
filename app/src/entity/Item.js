@@ -1,4 +1,3 @@
-let mysql = require("mysql");
 let conn = require("./Connection.js");
 
 class Item {
