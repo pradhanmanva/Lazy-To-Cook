@@ -1,4 +1,4 @@
-const Model = require("../../framework/Model");
+const Model = require("../framework/Model");
 
 class UserModel extends Model {
     constructor(/* string */ id, 
