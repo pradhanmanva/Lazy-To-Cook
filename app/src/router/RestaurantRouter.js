@@ -13,15 +13,6 @@ class RestaurantRouter extends Router {
     }
 
     /**
-    * GET /api/restaurants
-    */
-    getAll(request, response) {
-        response.send(`Get restaurants`);
-        response.end();
-
-    }
-
-    /**
     * GET /api/restaurants/:id
     */
     get(id, request, response) {

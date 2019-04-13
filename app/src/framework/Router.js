@@ -32,23 +32,23 @@ class Router {
     }
 
     getAll(request, response) {
-        response.status(404).send(NO_ENDPOINT);
+        response.status(501).send(NO_ENDPOINT);
     }
 
     get(id, request, response) {
-        response.status(404).send(NO_ENDPOINT);
+        response.status(501).send(NO_ENDPOINT);
     }
 
     add(request, response) {
-        response.status(404).send(NO_ENDPOINT);
+        response.status(501).send(NO_ENDPOINT);
     }
 
     update(id, request, response) {
-        response.status(404).send(NO_ENDPOINT);
+        response.status(501).send(NO_ENDPOINT);
     }
 
     delete(id, request, response) {
-        response.status(404).send(NO_ENDPOINT);
+        response.status(501).send(NO_ENDPOINT);
     }
 
     /**
