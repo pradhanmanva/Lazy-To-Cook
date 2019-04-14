@@ -1,4 +1,2 @@
-app/node_modules
 .DS_Store
-app/package-lock.json
 .idea*
