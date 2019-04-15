@@ -41,7 +41,7 @@ class DBUtil {
         });
     }
 
-    commitTransaction(connection)  /* : returns Promise */ {
+    commitTransaction(connection, result)  /* : returns Promise */ {
         return new Promise(function(resolve, reject) {
             connection.commit(function(err) {
                 if (err) {
@@ -50,7 +50,7 @@ class DBUtil {
                         connection : connection
                     });
                 }
-                resolve(connection);
+                resolve(result);
             })
         });
     }
