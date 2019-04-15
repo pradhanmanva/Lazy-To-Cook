@@ -3,7 +3,7 @@ const Model = require("../framework/Model");
 class OutletModel extends Model {
     constructor(/* string */ id, 
                 /* string */ name, 
-                /* string */ address, 
+                /* AddressModel */ address, 
                 /* string */ contact, 
                 /* RestaurantModel */ restaurant) {
         super(id);
