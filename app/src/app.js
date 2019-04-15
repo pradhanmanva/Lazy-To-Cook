@@ -1,4 +1,5 @@
 const express = require("express");
+var bodyParser = require('body-parser');
 const RestaurantRouter = require("./router/RestaurantRouter");
 const OutletRouter = require("./router/OutletRouter");
 const MenuItemRouter = require("./router/MenuItemRouter");
@@ -9,6 +10,11 @@ const CartItemRouter = require("./router/CartItemRouter");
 const lazyToCookApp = express();
 const HOST = "localhost";
 const PORT = 8000;
+
+lazyToCookApp.use(bodyParser.json());
+lazyToCookApp.use(bodyParser.urlencoded({
+    extended: true
+}));
 
 new RestaurantRouter(lazyToCookApp).wire();
 new OutletRouter(lazyToCookApp).wire();
