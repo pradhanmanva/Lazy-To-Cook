@@ -1,7 +1,7 @@
 const RestaurantModel = require('../models/RestaurantModel');
 const DBUtil = require('../utils/DBUtil');
 
-const TABLE = require('../tables/AddressTable');
+const RESTAURANT_TABLE = require('../tables/RestaurantTable');
 
 class RestaurantHandler {
     constructor() {}
@@ -9,7 +9,7 @@ class RestaurantHandler {
     fetch(restaurant /* : RestaurantModel */) {
         if (restaurant && restaurant.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${TABLE.NAME} WHERE ${TABLE.COLUMNS.ID} = ?`
+            const selectQuery = `SELECT * FROM ${RESTAURANT_TABLE.NAME} WHERE ${RESTAURANT_TABLE.COLUMNS.ID} = ?`
             return dbUtil.getConnection().then(function(connection) {
                 if (!connection) {
                     throw Error('connection not available.');
@@ -17,7 +17,7 @@ class RestaurantHandler {
                 return dbUtil.query(connection, selectQuery, restaurant.id);
             }).then(function(result) {
                 return result.results.map(function(result, index, arr) {
-                    return new RestaurantModel(new String(result[TABLE.COLUMNS.ID]), result[TABLE.COLUMNS.NAME], new String(result[TABLE.COLUMNS.CONTACT]), result[TABLE.COLUMNS.EMAIL], result[TABLE.COLUMNS.WEBSITE]);
+                    return new RestaurantModel(new String(result[RESTAURANT_TABLE.COLUMNS.ID]), result[RESTAURANT_TABLE.COLUMNS.NAME], new String(result[RESTAURANT_TABLE.COLUMNS.CONTACT]), result[RESTAURANT_TABLE.COLUMNS.EMAIL], result[RESTAURANT_TABLE.COLUMNS.WEBSITE]);
                 })[0];
             });
         }
@@ -26,12 +26,12 @@ class RestaurantHandler {
 
     insert(restaurant /* : RestaurantModel */) {
         const dbUtil = new DBUtil();
-        const insertQuery = `INSERT INTO ${TABLE.NAME} SET ?`;
+        const insertQuery = `INSERT INTO ${RESTAURANT_TABLE.NAME} SET ?`;
         const columnValues = {
-            [TABLE.COLUMNS.NAME] : restaurant.name,
-            [TABLE.COLUMNS.CONTACT] : restaurant.contact,
-            [TABLE.COLUMNS.EMAIL] : restaurant.email,
-            [TABLE.COLUMNS.WEBSITE] : restaurant.website   
+            [RESTAURANT_TABLE.COLUMNS.NAME] : restaurant.name,
+            [RESTAURANT_TABLE.COLUMNS.CONTACT] : restaurant.contact,
+            [RESTAURANT_TABLE.COLUMNS.EMAIL] : restaurant.email,
+            [RESTAURANT_TABLE.COLUMNS.WEBSITE] : restaurant.website   
         }
         return dbUtil.getConnection().then(function(connection) {
             if (!connection) {
@@ -45,7 +45,7 @@ class RestaurantHandler {
 
     update(restaurant /* : RestaurantModel */) {
         const dbUtil = new DBUtil();
-        const updateQuery = `UPDATE ${TABLE.NAME} SET ${TABLE.COLUMNS.NAME} = ?, ${TABLE.COLUMNS.CONTACT} = ?, ${TABLE.COLUMNS.EMAIL} = ?, ${TABLE.COLUMNS.WEBSITE} = ? WHERE ${TABLE.COLUMNS.ID} = ?`;
+        const updateQuery = `UPDATE ${RESTAURANT_TABLE.NAME} SET ${RESTAURANT_TABLE.COLUMNS.NAME} = ?, ${RESTAURANT_TABLE.COLUMNS.CONTACT} = ?, ${RESTAURANT_TABLE.COLUMNS.EMAIL} = ?, ${RESTAURANT_TABLE.COLUMNS.WEBSITE} = ? WHERE ${RESTAURANT_TABLE.COLUMNS.ID} = ?`;
         const columnValues = [
             restaurant.name,
             restaurant.contact,
@@ -65,7 +65,7 @@ class RestaurantHandler {
 
     delete(restaurant /* : RestaurantModel */) {
         const dbUtil = new DBUtil();
-        const deleteQuery = `DELETE FROM ${TABLE.NAME} WHERE ${TABLE.COLUMNS.ID} = ?`
+        const deleteQuery = `DELETE FROM ${RESTAURANT_TABLE.NAME} WHERE ${RESTAURANT_TABLE.COLUMNS.ID} = ?`
         return dbUtil.getConnection().then(function(connection) {
             if (!connection) {
                 throw Error('connection not available.');
