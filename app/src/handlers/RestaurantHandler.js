@@ -1,16 +1,8 @@
 const RestaurantModel = require('../models/RestaurantModel');
 const DBUtil = require('../utils/DBUtil');
 
-const TABLE = {
-    NAME: 'restaurant',
-    COLUMNS : {
-        ID : 'restaurant_id', 
-        NAME : 'restaurant_name', 
-        CONTACT : 'contact', 
-        EMAIL : 'email',
-        WEBSITE: 'website'
-    }
-};
+const TABLE = require('../tables/AddressTable');
+
 class RestaurantHandler {
     constructor() {}
 
