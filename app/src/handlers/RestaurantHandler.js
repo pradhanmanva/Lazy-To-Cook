@@ -39,10 +39,7 @@ class RestaurantHandler {
             }
             return dbUtil.query(connection, insertQuery, columnValues);
         }).then(function(result) {
-            return {
-                ... columnValues,
-                id : new String(result.results.insertId)
-            }
+            return new RestaurantModel(new String(result.results.insertId), restaurant.name, restaurant.contact, restaurant.email, restaurant.website);
         });
     }
 
