@@ -5,11 +5,12 @@ class Model {
 
     toJSON() {
         let result = {};
-        for (let key in Object.keys(this)) {
-            if (this[key] instanceof Model) {
-                result[key] = this[key].toJSON();
+        const props = Object.keys(this);
+        for (let prop of props) {
+            if (this[prop] instanceof Model) {
+                result[prop] = this[prop].toJSON();
             } else {
-                result[key] = this[key];
+                result[prop] = this[prop];
             }
         }
         return result;

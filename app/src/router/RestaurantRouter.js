@@ -21,6 +21,7 @@ class RestaurantRouter extends Router {
         const restaurantModel = new RestaurantModel(id, null, null, null, null);
         new RestaurantHandler().fetch(restaurantModel).then(function(foundRestaurant) {
             if (foundRestaurant) {
+                foundRestaurant = foundRestaurant.toJSON();
                 foundRestaurant = self.addHateoas(foundRestaurant);
                 response.status(200).json(foundRestaurant).end();
             }
@@ -47,6 +48,7 @@ class RestaurantRouter extends Router {
         const self = this;
         const restaurantModel = new RestaurantModel(null, request.body.name, request.body.contact, request.body.email, request.body.website);
         new RestaurantHandler().insert(restaurantModel).then(function(insertedRestaraunt) {
+            insertedRestaraunt = insertedRestaraunt.toJSON();
             insertedRestaraunt = self.addHateoas(insertedRestaraunt);
             response.status(200).json(insertedRestaraunt).end();
         }).catch(function(error) {
@@ -70,6 +72,7 @@ class RestaurantRouter extends Router {
         const self = this;
         const restaurantModel = new RestaurantModel(id, request.body.name, request.body.contact, request.body.email, request.body.website);
         new RestaurantHandler().update(restaurantModel).then(function(updatedRestaurant) {
+            updatedRestaurant = updatedRestaurant.toJSON();
             updatedRestaurant = self.addHateoas(updatedRestaurant);
             response.status(200).json(updatedRestaurant).end();
         }).catch(function(error) {
