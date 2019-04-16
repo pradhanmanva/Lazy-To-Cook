@@ -83,6 +83,19 @@ class OutletRouter extends RestaurantRouter {
 
     /**
     * PUT /api/restaurants/:restaurant_id/outlets/:id
+    * 
+    * @requires request.body {
+    *   "name" : "", 
+    *   "contact" : "", 
+    *   "address" : {
+    *       "id" : "", 
+    *       "line1" : "", 
+    *       "line2" : "", 
+    *       "city" : "", 
+    *       "state" : "", 
+    *       "zipcode" : zip
+    *   }
+    * }
     */
     update(id, request, response) {
         const self = this;
@@ -102,19 +115,6 @@ class OutletRouter extends RestaurantRouter {
 
     /**
     * DELETE /api/restaurants/:restaurant_id/outlets/:id
-    * 
-    * @requires request.body {
-    *   "name" : "", 
-    *   "contact" : "", 
-    *   "address" : {
-    *       "id" : "", 
-    *       "line1" : "", 
-    *       "line2" : "", 
-    *       "city" : "", 
-    *       "state" : "", 
-    *       "zipcode" : zip
-    *   }
-    * }
     */
     delete(id, request, response) {
         const outletModel = new OutletModel(id, null, null, null, null);
