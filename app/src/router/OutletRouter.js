@@ -39,10 +39,15 @@ class OutletRouter extends RestaurantRouter {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
         const outletId = request.params["id"];
-        const outletModel = new OutletModel(outletId.toString(), null, null, null, null);
+        const restaurantModel = new RestaurantModel(restaurantId.toString(),null, null, null, null);
+        const outletModel = new OutletModel(outletId.toString(), null, null, null, restaurantModel);
         new OutletHandler().fetch(outletModel).then(function(outlet) {
-            outlet = outlet.toJSON();
-            outlet = self.addHateoas(outlet);
+            if (outlet) {
+                outlet = outlet.toJSON();
+                outlet = self.addHateoas(outlet);
+            } else {
+                outlet = {}
+            }
             response.status(200).json(outlet).end();
         }).catch(function(error) {
             console.error(error);
@@ -117,7 +122,9 @@ class OutletRouter extends RestaurantRouter {
     * DELETE /api/restaurants/:restaurant_id/outlets/:id
     */
     delete(id, request, response) {
-        const outletModel = new OutletModel(id, null, null, null, null);
+        const restaurantId = request.params["restaurant_id"];
+        const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
+        const outletModel = new OutletModel(id, null, null, null, restaurantModel);
         new OutletHandler().delete(outletModel).then(function(result) {
             response.status(200).send("Success").end();
         }).catch(function(error) {

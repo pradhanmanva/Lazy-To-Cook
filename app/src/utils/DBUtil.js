@@ -55,6 +55,20 @@ class DBUtil {
         });
     }
 
+    rollbackTransaction(connection) {
+        return new Promise(function(resolve, reject) {
+            connection.rollback(function(err) {
+                if (err) {
+                    reject({
+                        error: err,
+                        connection : connection
+                    });
+                }
+                resolve();
+            })
+        });
+    }
+
     query(connection, query, value) /* : returns Promise */ {
         return new Promise(function(resolve, reject) {
             connection.query(query, value, function(error, results, fields) {

@@ -47,14 +47,14 @@ class OutletHandler {
     }
 
     fetch(outlet /* : OutletModel */) {
-        if (outlet && outlet.id) {
+        if (outlet && outlet.id && outlet.restaurant && outlet.restaurant.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${OUTLET_TABLE.NAME} LEFT JOIN ${ADDRESS_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ADDRESS} = ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.ID} LEFT JOIN  ${RESTAURANT_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID} WHERE ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} = ?`
+            const selectQuery = `SELECT * FROM ${OUTLET_TABLE.NAME} LEFT JOIN ${ADDRESS_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ADDRESS} = ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.ID} LEFT JOIN  ${RESTAURANT_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID} WHERE ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`
             return dbUtil.getConnection().then(function(connection) {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
-                return dbUtil.query(connection, selectQuery, outlet.id);
+                return dbUtil.query(connection, selectQuery, [outlet.id, outlet.restaurant.id]);
             }).then(function(result) {
                 return result.results.map(function(result, index, arr) {
                     const address = new AddressModel(
@@ -135,6 +135,9 @@ class OutletHandler {
     }
 
     update(outlet /* : OutletModel */) {
+        if (!outlet || !outlet.id || !outlet.restaurant || !outlet.restaurant.id) {
+            throw new Error("Insufficient input.");
+        }
         const dbUtil = new DBUtil();
         const addressUpdateQuery = `UPDATE ${ADDRESS_TABLE.NAME} SET ${ADDRESS_TABLE.COLUMNS.LINE1} = ? , ${ADDRESS_TABLE.COLUMNS.LINE2} = ?, ${ADDRESS_TABLE.COLUMNS.CITY} = ?, ${ADDRESS_TABLE.COLUMNS.STATE} = ?, ${ADDRESS_TABLE.COLUMNS.ZIPCODE} = ? WHERE ${ADDRESS_TABLE.COLUMNS.ID} = ?`;
         const addressColumnValues = [
@@ -146,11 +149,12 @@ class OutletHandler {
             outlet.address.id
         ]
 
-        const outletUpdateQuery = `UPDATE ${OUTLET_TABLE.NAME} SET ${OUTLET_TABLE.COLUMNS.NAME} = ?, ${OUTLET_TABLE.COLUMNS.CONTACT} = ? WHERE ${OUTLET_TABLE.COLUMNS.ID} = ?`;
+        const outletUpdateQuery = `UPDATE ${OUTLET_TABLE.NAME} SET ${OUTLET_TABLE.COLUMNS.NAME} = ?, ${OUTLET_TABLE.COLUMNS.CONTACT} = ? WHERE ${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`;
         const outletColumnValues = [
             outlet.name,
             outlet.contact,
-            outlet.id
+            outlet.id,
+            outlet.restaurant.id
         ]
 
         return dbUtil.getConnection().then(function(connection) {
@@ -159,9 +163,15 @@ class OutletHandler {
             }
             return dbUtil.beginTransaction(connection);
         }).then(function(connection) {
-            return dbUtil.query(connection, addressUpdateQuery, addressColumnValues);
+            return dbUtil.query(connection, outletUpdateQuery, outletColumnValues);
         }).then(function(result) {
-            return dbUtil.query(result.connection, outletUpdateQuery, outletColumnValues);
+            if (result.results.affectedRows == 0) {
+                return dbUtil.rollbackTransaction(result.connection).then(function(){
+                    console.log("rolling back...");
+                    throw Error("Unauthorized update.");
+                });
+            }
+            return dbUtil.query(result.connection, addressUpdateQuery, addressColumnValues);
         }).then(function(result) {
             return {
                 connection: result.connection,
@@ -170,25 +180,20 @@ class OutletHandler {
         }).then(function(result) {
             return dbUtil.commitTransaction(result.connection, result.result);
         });
-
-        return dbUtil.getConnection().then(function(connection) {
-            if (!connection) {
-                throw Error('connection not available.');
-            }
-            return dbUtil.query(connection, updateQuery, columnValues);
-        }).then(function(result) {
-            return restaurant;
-        });
     }
 
     delete(outlet /* : OutletMode */) {
         const dbUtil = new DBUtil();
-        const deleteQuery = `DELETE FROM ${OUTLET_TABLE.NAME} WHERE ${OUTLET_TABLE.COLUMNS.ID} = ?`
+        const deleteQuery = `DELETE FROM ${OUTLET_TABLE.NAME} WHERE ${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`
         return dbUtil.getConnection().then(function(connection) {
             if (!connection) {
                 throw Error('connection not available.');
             }
-            return dbUtil.query(connection, deleteQuery, outlet.id);
+            return dbUtil.query(connection, deleteQuery, [outlet.id, outlet.restaurant.id]);
+        }).then(function(result) {
+            if (result.results.affectedRows == 0) {
+                throw new Error("Unauthorized delete.");
+            }
         });
     }
 }
