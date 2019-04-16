@@ -7,10 +7,12 @@ class Model {
         let result = {};
         const props = Object.keys(this);
         for (let prop of props) {
-            if (this[prop] instanceof Model) {
-                result[prop] = this[prop].toJSON();
-            } else {
-                result[prop] = this[prop];
+            if (this[prop]) {
+                if (this[prop] instanceof Model) {
+                    result[prop] = this[prop].toJSON();
+                } else {
+                    result[prop] = this[prop];
+                }
             }
         }
         return result;
