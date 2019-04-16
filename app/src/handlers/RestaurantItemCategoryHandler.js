@@ -32,16 +32,20 @@ class RestaurantItemCategoryHandler {
     fetch(category /* : RestaurantItemCategoryModel */) {
         if (category && category.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${CATEGORY_TABLE.NAME} WHERE ${CATEGORY_TABLE.COLUMNS.ID} = ?`
+            const selectQuery = `SELECT * FROM ${CATEGORY_TABLE.NAME} WHERE ${CATEGORY_TABLE.COLUMNS.ID} = ? AND ${CATEGORY_TABLE.COLUMNS.RESTAURANT} = ?`
             return dbUtil.getConnection().then(function(connection) {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
-                return dbUtil.query(connection, selectQuery, category.id);
+                return dbUtil.query(connection, selectQuery, [category.id, category.restaurant.id]);
             }).then(function(result) {
-                return result.results.map(function(result, index, arr) {
+                const categories = result.results.map(function(result, index, arr) {
                     return new RestaurantItemCategoryModel(new String(result[CATEGORY_TABLE.COLUMNS.ID]), result[CATEGORY_TABLE.COLUMNS.NAME], new RestaurantModel(result[CATEGORY_TABLE.COLUMNS.RESTAURANT], null, null, null, null));
-                })[0];
+                });
+                if (categories && categories.length) {
+                    return categories[0];
+                }
+                return null;
             });
         }
         return new RestaurantItemCategoryModel(null, null, null);
@@ -66,10 +70,11 @@ class RestaurantItemCategoryHandler {
 
     update(category /* : RestaurantItemCategoryModel */) {
         const dbUtil = new DBUtil();
-        const updateQuery = `UPDATE ${CATEGORY_TABLE.NAME} SET ${CATEGORY_TABLE.COLUMNS.NAME} = ? WHERE ${CATEGORY_TABLE.COLUMNS.ID} = ?`;
+        const updateQuery = `UPDATE ${CATEGORY_TABLE.NAME} SET ${CATEGORY_TABLE.COLUMNS.NAME} = ? WHERE ${CATEGORY_TABLE.COLUMNS.ID} = ? AND ${CATEGORY_TABLE.COLUMNS.RESTAURANT} = ?`;
         const columnValues = [
             category.name,
-            category.id
+            category.id,
+            category.restaurant.id
         ]
         return dbUtil.getConnection().then(function(connection) {
             if (!connection) {
@@ -77,18 +82,25 @@ class RestaurantItemCategoryHandler {
             }
             return dbUtil.query(connection, updateQuery, columnValues);
         }).then(function(result) {
+            if (result.results.affectedRows == 0) {
+                throw new Error("Unauthorized update or no such record found.");
+            }
             return category;
         });
     }
 
     delete(category /* : RestaurantItemCategoryModel */) {
         const dbUtil = new DBUtil();
-        const deleteQuery = `DELETE FROM ${CATEGORY_TABLE.NAME} WHERE ${CATEGORY_TABLE.COLUMNS.ID} = ?`
+        const deleteQuery = `DELETE FROM ${CATEGORY_TABLE.NAME} WHERE ${CATEGORY_TABLE.COLUMNS.ID} = ? AND ${CATEGORY_TABLE.COLUMNS.RESTAURANT} = ?`
         return dbUtil.getConnection().then(function(connection) {
             if (!connection) {
                 throw Error('connection not available.');
             }
-            return dbUtil.query(connection, deleteQuery, category.id);
+            return dbUtil.query(connection, deleteQuery, [category.id, category.restaurant.id]);
+        }).then(function(result) {
+            if (result.results.affectedRows == 0) {
+                throw new Error("Unauthorized delete or no matching record found.");
+            }
         });
     }
 }

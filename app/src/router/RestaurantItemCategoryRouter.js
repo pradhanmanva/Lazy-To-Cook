@@ -19,11 +19,16 @@ class RestaurantItemCategoryRouter extends RestaurantRouter {
         const restaurantId = request.params["restaurant_id"];
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         new RestaurantItemCategoryHandler().fetchAll(restaurantModel).then(function(categories) {
-            categories = categories.map(function(category, index, arr) {
-                category = category.toJSON();
-                category = self.addHateoas(category);
-                return category;
-            });
+            if (categories) {
+                categories = categories.map(function(category, index, arr) {
+                    category = category.toJSON();
+                    category = self.addHateoas(category);
+                    return category;
+                });
+            }
+            else {
+                categories = [];
+            }
             response.status(200).json(categories).end();
         }).catch(function(error) {
             console.error(error);
@@ -38,10 +43,16 @@ class RestaurantItemCategoryRouter extends RestaurantRouter {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
         const categoryId = request.params["id"];
-        const categoryModel = new RestaurantItemCategoryModel(categoryId.toString(), null, null);
+        const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
+        const categoryModel = new RestaurantItemCategoryModel(categoryId.toString(), null, restaurantModel);
         new RestaurantItemCategoryHandler().fetch(categoryModel).then(function(category) {
-            category = category.toJSON();
-            category = self.addHateoas(category);
+            if (category) {
+                category = category.toJSON();
+                category = self.addHateoas(category);
+            }
+            else {
+                category = {};
+            }
             response.status(200).json(category).end();
         }).catch(function(error) {
             console.error(error);
@@ -97,7 +108,9 @@ class RestaurantItemCategoryRouter extends RestaurantRouter {
     * DELETE /api/restaurants/:restaurant_id/categories/:id
     */
     delete(id, request, response) {
-        const categoryModel = new RestaurantItemCategoryModel(id, null, null, null, null);
+        const restaurantId = request.params["restaurant_id"];
+        const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
+        const categoryModel = new RestaurantItemCategoryModel(id, null, restaurantModel);
         new RestaurantItemCategoryHandler().delete(categoryModel).then(function(result) {
             response.status(200).send("Success").end();
         }).catch(function(error) {
