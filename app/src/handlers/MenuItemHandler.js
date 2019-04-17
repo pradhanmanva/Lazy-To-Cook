@@ -3,6 +3,7 @@ const RestaurantItemCategoryModel = require("../models/RestaurantItemCategoryMod
 
 const DBUtil = require("../utils/DBUtil");
 
+const OUTLET_TABLE = require("../tables/OutletTable");
 const CATEGORY_TABLE = require('../tables/RestaurantItemCategoryTable');
 const ITEM_TABLE = require("../tables/ItemTable");
 const ITEMOUTLET_TABLE = require("../tables/ItemOutletTable");
@@ -13,12 +14,12 @@ class MenuItemHandler {
     fetchAll(outlet /* : OutletModel */) {
         if (outlet && outlet.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${ITEMOUTLET_TABLE.NAME} LEFT JOIN ${ITEM_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} LEFT JOIN ${CATEGORY_TABLE.NAME} ON ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.CATEGORY} = ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} WHERE ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.OUTLET} = ?`
+            const selectQuery = `SELECT * FROM ${ITEMOUTLET_TABLE.NAME} INNER JOIN ${OUTLET_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.OUTLET}=${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} INNER JOIN ${ITEM_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} INNER JOIN ${CATEGORY_TABLE.NAME} ON ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.CATEGORY} = ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} WHERE ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.OUTLET} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`
             return dbUtil.getConnection().then(function(connection) {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
-                return dbUtil.query(connection, selectQuery, outlet.id);
+                return dbUtil.query(connection, selectQuery, [outlet.id, outlet.restaurant.id]);
             }).then(function(result) {
                 return result.results.map(function(result, index, arr) {
                     return new ItemModel(result[ITEM_TABLE.COLUMNS.ID].toString(), result[ITEM_TABLE.COLUMNS.NAME], result[ITEM_TABLE.COLUMNS.DESCRIPTION], result[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(result[CATEGORY_TABLE.COLUMNS.ID], result[CATEGORY_TABLE.COLUMNS.NAME], null));
@@ -28,15 +29,15 @@ class MenuItemHandler {
         throw new Error('Error: Cannot GET all items.');
     }
 
-    fetch(item /* : ItemModel */) {
+    fetch(item /* : ItemModel */, outlet /* : OutletModel */) {
         if (item && item.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${ITEMOUTLET_TABLE.NAME} LEFT JOIN ${ITEM_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} LEFT JOIN ${CATEGORY_TABLE.NAME} ON ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.CATEGORY} = ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} WHERE ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ?`
+            const selectQuery = `SELECT * FROM ${ITEMOUTLET_TABLE.NAME} INNER JOIN ${OUTLET_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.OUTLET}=${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} INNER JOIN ${ITEM_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} INNER JOIN ${CATEGORY_TABLE.NAME} ON ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.CATEGORY} = ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} WHERE ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`
             return dbUtil.getConnection().then(function(connection) {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
-                return dbUtil.query(connection, selectQuery, item.id);
+                return dbUtil.query(connection, selectQuery, [item.id, outlet.id, outlet.restaurant.id]);
             }).then(function(result) {
                 return result.results.map(function(result, index, arr) {
                     return new ItemModel(result[ITEM_TABLE.COLUMNS.ID].toString(), result[ITEM_TABLE.COLUMNS.NAME], result[ITEM_TABLE.COLUMNS.DESCRIPTION], result[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(result[CATEGORY_TABLE.COLUMNS.ID], result[CATEGORY_TABLE.COLUMNS.NAME], null));
@@ -68,7 +69,18 @@ class MenuItemHandler {
             }
             return dbUtil.beginTransaction(connection);
         }).then(function(connection) {
-            return dbUtil.query(connection, itemInsertQuery, itemColumnValues);
+            const outletValidationQuery = `SELECT ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} FROM ${OUTLET_TABLE.NAME} WHERE ${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`;
+            return dbUtil.query(connection, outletValidationQuery, [outlet.id, outlet.restaurant.id]);
+        }).then(function(result) {
+            if (!result || !result.results || result.results.length == 0) {
+                return dbUtil.rollbackTransaction(result.connection).then(function(){
+                    console.log()
+                    throw Error("Unauthorized insertion.");
+                });
+            }
+            return result;
+        }).then(function(result) {
+            return dbUtil.query(result.connection, itemInsertQuery, itemColumnValues);
         }).then(function(result) {
             itemOutletColumnValues[ITEMOUTLET_TABLE.COLUMNS.ITEM] = new String(result.results.insertId);
             return dbUtil.query(result.connection, itemOutletInsertQuery, itemOutletColumnValues);
@@ -83,7 +95,7 @@ class MenuItemHandler {
         });
     }
     
-    update(item /* : ItemModel */) {
+    update(item /* : ItemModel */, outlet /* : OutletModel */) {
         const dbUtil = new DBUtil();
         const itemUpdateQuery = `UPDATE ${ITEM_TABLE.NAME} SET ${ITEM_TABLE.COLUMNS.NAME} = ? , ${ITEM_TABLE.COLUMNS.DESCRIPTION} = ?, ${ITEM_TABLE.COLUMNS.PRICE} = ?, ${ITEM_TABLE.COLUMNS.CATEGORY} = ? WHERE ${ITEM_TABLE.COLUMNS.ID} = ?`;
         const itemColumnValues = [
@@ -98,20 +110,41 @@ class MenuItemHandler {
             if (!connection) {
                 throw Error('connection not available.');
             }
-            return dbUtil.query(connection, itemUpdateQuery, itemColumnValues);
+            const outletValidationQuery = `SELECT * FROM ${ITEMOUTLET_TABLE.NAME} INNER JOIN ${OUTLET_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.OUTLET}=${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} INNER JOIN ${ITEM_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} INNER JOIN ${CATEGORY_TABLE.NAME} ON ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.CATEGORY} = ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} WHERE ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`
+            return dbUtil.query(connection, outletValidationQuery, [item.id, outlet.id, outlet.restaurant.id]);
+        }).then(function(result) {
+            if (!result || !result.results || result.results.length == 0) {
+                return dbUtil.rollbackTransaction(result.connection).then(function(){
+                    throw Error("Unauthorized update.");
+                });
+            }
+            return result;
+        }).then(function(result) {
+            return dbUtil.query(result.connection, itemUpdateQuery, itemColumnValues);
         }).then(function(result) {
             return item;
         });
     }
     
-    delete(item /* : ItemModel */) {
+    delete(item /* : ItemModel */, outlet /* : OutletModel */) {
         const dbUtil = new DBUtil();
         const deleteQuery = `DELETE FROM ${ITEM_TABLE.NAME} WHERE ${ITEM_TABLE.COLUMNS.ID} = ?`
         return dbUtil.getConnection().then(function(connection) {
             if (!connection) {
                 throw Error('connection not available.');
             }
-            return dbUtil.query(connection, deleteQuery, item.id);
+            const outletValidationQuery = `SELECT * FROM ${ITEMOUTLET_TABLE.NAME} INNER JOIN ${OUTLET_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.OUTLET}=${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} INNER JOIN ${ITEM_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} INNER JOIN ${CATEGORY_TABLE.NAME} ON ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.CATEGORY} = ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} WHERE ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`
+            return dbUtil.query(connection, outletValidationQuery, [item.id, outlet.id, outlet.restaurant.id]);
+            
+        }).then(function(result) {
+            if (!result || !result.results || result.results.length == 0) {
+                return dbUtil.rollbackTransaction(result.connection).then(function(){
+                    throw Error("Unauthorized delete.");
+                });
+            }
+            return result;
+        }).then(function(result) {
+            return dbUtil.query(result.connection, deleteQuery, item.id);
         });
     }
 }

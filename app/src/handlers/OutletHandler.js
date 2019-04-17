@@ -167,7 +167,6 @@ class OutletHandler {
         }).then(function(result) {
             if (result.results.affectedRows == 0) {
                 return dbUtil.rollbackTransaction(result.connection).then(function(){
-                    console.log("rolling back...");
                     throw Error("Unauthorized update.");
                 });
             }

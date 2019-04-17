@@ -4,6 +4,7 @@ const MenuItemHandler = require("../handlers/MenuItemHandler");
 
 const ItemModel = require("../models/ItemModel");
 const OutletModel = require("../models/OutletModel");
+const RestaurantModel = require("../models/RestaurantModel");
 const RestaurantItemCategoryModel = require("../models/RestaurantItemCategoryModel");
 
 class MenuItemRouter extends OutletRouter {
@@ -19,7 +20,8 @@ class MenuItemRouter extends OutletRouter {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
         const outletId = request.params["outlet_id"];
-        const outletModel = new OutletModel(outletId, null, null, null, null);
+        const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
+        const outletModel = new OutletModel(outletId.toString(), null, null, null, restaurantModel);
         new MenuItemHandler().fetchAll(outletModel).then(function(items) {
             items = items.map(function(item, index, arr) {
                 item = item.toJSON();
@@ -41,9 +43,16 @@ class MenuItemRouter extends OutletRouter {
         const restaurantId = request.params["restaurant_id"];
         const outletId = request.params["outlet_id"];
         const itemModel = new ItemModel(id.toString(), null, null, null, null);
-        new MenuItemHandler().fetch(itemModel).then(function(item) {
-            item = item.toJSON();
-            item = self.addHateoas(restaurantId, outletId, item);
+        const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
+        const outletModel = new OutletModel(outletId.toString(), null, null, null, restaurantModel);
+        new MenuItemHandler().fetch(itemModel, outletModel).then(function(item) {
+            if (item) {
+                item = item.toJSON();
+                item = self.addHateoas(restaurantId, outletId, item);
+            }
+            else {
+                item = {};
+            }
             response.status(200).json(item).end();
         }).catch(function(error) {
             console.error(error);
@@ -70,10 +79,15 @@ class MenuItemRouter extends OutletRouter {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
         const outletId = request.params["outlet_id"];
+        const outletModel = new OutletModel(outletId.toString(), null, null, null, new RestaurantModel(restaurantId.toString(), null, null, null, null));
         const menuItem = new ItemModel(null, request.body.name, request.body.description, request.body.price, new RestaurantItemCategoryModel(request.body.category.id, null, null));
-        new MenuItemHandler().insert(menuItem, new OutletModel(outletId.toString(), null, null, null, null)).then(function(insertedItem) {
-            insertedItem = insertedItem.toJSON();
-            insertedItem = self.addHateoas(restaurantId, outletId, insertedItem);
+        new MenuItemHandler().insert(menuItem, outletModel).then(function(insertedItem) {
+            if (insertedItem) {
+                insertedItem = insertedItem.toJSON();
+                insertedItem = self.addHateoas(restaurantId, outletId, insertedItem);
+            } else {
+                insertedItem = {};
+            }
             response.status(200).json(insertedItem).end();
         }).catch(function(error) {
             console.error(error);
@@ -98,9 +112,14 @@ class MenuItemRouter extends OutletRouter {
         const restaurantId = request.params["restaurant_id"];
         const outletId = request.params["outlet_id"];
         const itemModel = new ItemModel(id, request.body.name, request.body.description, request.body.price, new RestaurantItemCategoryModel(request.body.category.id, null, null));
-        new MenuItemHandler().update(itemModel).then(function(updatedItem) {
-            updatedItem = updatedItem.toJSON();
-            updatedItem = self.addHateoas(restaurantId, outletId, updatedItem);
+        const outletModel = new OutletModel(outletId.toString(), null, null, null, new RestaurantModel(restaurantId.toString(), null, null, null, null));
+        new MenuItemHandler().update(itemModel, outletModel).then(function(updatedItem) {
+            if (updatedItem) {
+                updatedItem = updatedItem.toJSON();
+                updatedItem = self.addHateoas(restaurantId, outletId, updatedItem);
+            } else {
+                updatedItem = {};
+            }
             response.status(200).json(updatedItem).end();
         }).catch(function(error) {
             console.error(error);
@@ -115,7 +134,8 @@ class MenuItemRouter extends OutletRouter {
         const restaurantId = request.params["restaurant_id"];
         const outletId = request.params["outlet_id"];
         const menuItem = new ItemModel(id, null,null, null, null);
-        new MenuItemHandler().delete(menuItem).then(function(result) {
+        const outletModel = new OutletModel(outletId.toString(), null, null, null, new RestaurantModel(restaurantId.toString(), null, null, null, null));
+        new MenuItemHandler().delete(menuItem, outletModel).then(function(result) {
             response.status(200).send("Success").end();
         }).catch(function(error) {
             console.error(error);
