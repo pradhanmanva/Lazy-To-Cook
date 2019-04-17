@@ -6,13 +6,15 @@ class UserModel extends Model {
                 /* string */ middleName, 
                 /* string */ lastName, 
                 /* string */ dateOfBirth, 
-                /* string */ email) {
+                /* string */ email,
+                /* AddressModel */ address) {
         super(id);
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
         this.email = email;
+        this.address = address;
     }
 
     fullName() {

@@ -17,6 +17,7 @@ class RestaurantRouter extends Router {
     * GET /api/restaurants/:id
     */
     get(id, request, response) {
+        console.log(request.isAuthenticated());
         const self = this;
         const restaurantModel = new RestaurantModel(id, null, null, null, null);
         new RestaurantHandler().fetch(restaurantModel).then(function(foundRestaurant) {
@@ -31,32 +32,32 @@ class RestaurantRouter extends Router {
         });
     }
 
-    /**
-    * POST /api/restaurants
-    * 
-    * @requires request.body {
-    *   name : "",
-    *   contact : "",
-    *   email : "",
-    *   website : "",
-    *   password : "",
-    *   username : ""
-    * }
-    */
-    add(request, response) {
-        // TODO: store username, hash and store password in RestaurantAuthentication
-        const self = this;
-        const restaurantModel = new RestaurantModel(null, request.body.name, request.body.contact, request.body.email, request.body.website);
-        new RestaurantHandler().insert(restaurantModel).then(function(insertedRestaraunt) {
-            insertedRestaraunt = insertedRestaraunt.toJSON();
-            insertedRestaraunt = self.addHateoas(insertedRestaraunt);
-            response.status(200).json(insertedRestaraunt).end();
-        }).catch(function(error) {
-            console.error(error);
-            response.status(500).send("Error occurred while creating a restaurant. Please check logs for details.").end();
-        });
+    // /**
+    // * POST /api/restaurants
+    // * 
+    // * @requires request.body {
+    // *   name : "",
+    // *   contact : "",
+    // *   email : "",
+    // *   website : "",
+    // *   password : "",
+    // *   username : ""
+    // * }
+    // */
+    // add(request, response) {
+    //     // TODO: store username, hash and store password in RestaurantAuthentication
+    //     const self = this;
+    //     const restaurantModel = new RestaurantModel(null, request.body.name, request.body.contact, request.body.email, request.body.website);
+    //     new RestaurantHandler().insert(restaurantModel).then(function(insertedRestaraunt) {
+    //         insertedRestaraunt = insertedRestaraunt.toJSON();
+    //         insertedRestaraunt = self.addHateoas(insertedRestaraunt);
+    //         response.status(200).json(insertedRestaraunt).end();
+    //     }).catch(function(error) {
+    //         console.error(error);
+    //         response.status(500).send("Error occurred while creating a restaurant. Please check logs for details.").end();
+    //     });
         
-    }
+    // }
 
     /**
     * PUT /api/restaurants/:id

@@ -2,6 +2,9 @@ const RestaurantModel = require('../models/RestaurantModel');
 const DBUtil = require('../utils/DBUtil');
 
 const RESTAURANT_TABLE = require('../tables/RestaurantTable');
+const RESTAURANT_AUTH_TABLE = require('../tables/RestaurantAuthenticationTable');
+
+const bcrypt = require('bcrypt');
 
 class RestaurantHandler {
     constructor() {}
@@ -24,8 +27,14 @@ class RestaurantHandler {
         throw new Error('Invalid Operation: Cannot GET all restaurants.');
     }
 
-    insert(restaurant /* : RestaurantModel */) {
+    register(authCredentials /* : RestaurantAuthenticationModel */) {
+        const restaurant = authCredentials.restaurant;
         const dbUtil = new DBUtil();
+        const authenticationInsertQuery = `INSERT INTO ${RESTAURANT_AUTH_TABLE.NAME} SET ?`;
+        let authenticationColumnValues = {
+            [RESTAURANT_AUTH_TABLE.COLUMNS.USERNAME] : authCredentials.username,
+            [RESTAURANT_AUTH_TABLE.COLUMNS.PASSWORD] : authCredentials.password
+        }
         const insertQuery = `INSERT INTO ${RESTAURANT_TABLE.NAME} SET ?`;
         const columnValues = {
             [RESTAURANT_TABLE.COLUMNS.NAME] : restaurant.name,
@@ -37,10 +46,42 @@ class RestaurantHandler {
             if (!connection) {
                 throw Error('connection not available.');
             }
+            return dbUtil.beginTransaction(connection);
+        }).then(function(connection) {
+            if (!connection) {
+                throw Error('connection not available.');
+            }
             return dbUtil.query(connection, insertQuery, columnValues);
         }).then(function(result) {
-            return new RestaurantModel(new String(result.results.insertId), restaurant.name, restaurant.contact, restaurant.email, restaurant.website);
+            authenticationColumnValues[RESTAURANT_AUTH_TABLE.COLUMNS.ID] = result.results.insertId.toString();
+            return result;
+        }).then(function(result) {
+            return dbUtil.query(result.connection, authenticationInsertQuery, authenticationColumnValues);
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
+        }).then(function(result) {
+            restaurant.id = authenticationColumnValues[RESTAURANT_AUTH_TABLE.COLUMNS.ID];
+            return restaurant;
         });
+    }
+
+    validate(authCredentials /* : RestaurantAuthenticationModel */) {
+        if (authCredentials && authCredentials.username && authCredentials.password) {
+            const dbUtil = new DBUtil();
+            const selectQuery = `SELECT ${RESTAURANT_AUTH_TABLE.COLUMNS.ID}, ${RESTAURANT_AUTH_TABLE.COLUMNS.PASSWORD} FROM ${RESTAURANT_AUTH_TABLE.NAME} WHERE ${RESTAURANT_AUTH_TABLE.COLUMNS.USERNAME} = ?`;
+            return dbUtil.getConnection().then(function(connection) {
+                if (!connection) {
+                    throw Error('connection not available.');
+                }
+                return dbUtil.query(connection, selectQuery, authCredentials.username);
+            }).then(function(result) {
+                if (result && result.results && result.results.length && bcrypt.compareSync(authCredentials.password, result.results[0][RESTAURANT_AUTH_TABLE.COLUMNS.PASSWORD])) {
+                    return result.results[0][RESTAURANT_AUTH_TABLE.COLUMNS.ID].toString();
+                }
+                throw new Error("Invalid credentials.");
+            });
+        }
+        throw new Error('Insufficient data to validate.');
     }
 
     update(restaurant /* : RestaurantModel */) {
