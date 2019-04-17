@@ -5,7 +5,7 @@ App that lets people order food from restaurants and get it delivered at their d
 1. Node.js
 2. MySQL
 3. Express.js
-4. React.js
+4. Angular.js
 
 ##### Steps To Setup Project:
 1.  Install [Node](https://nodejs.org/en/), NPM and [MySQL](https://dev.mysql.com/downloads/) in your machine.
