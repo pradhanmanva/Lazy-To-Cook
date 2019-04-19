@@ -18,7 +18,7 @@ class Navbar extends Component {
                 }
             }).then(function (result) {
                 if (result.status === 200) {
-                    window.location = "/app";
+                    window.location = "/app/";
                 } else {
                     alert("Error logging out.");
                 }
