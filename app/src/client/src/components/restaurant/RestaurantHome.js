@@ -2,6 +2,7 @@ import React from "react";
 import AuthenticatedRoutes from "../commons/AuthenticatedRoutes";
 import Restaurant from "./Restaurant";
 import OutletHome from "./outlet/OutletHome";
+import CategoryHome from "./category/CategoryHome";
 import { BrowserRouter, Route, Link } from "react-router-dom";
 import Navbar from "../commons/Navbar";
 import "../../styles/restaurant/RestaurantHome.css";
@@ -18,7 +19,7 @@ class RestaurantHome extends AuthenticatedRoutes {
                 <div>
                     <Navbar shouldShowLogout={this.state.isLoggedIn} />
                     <div className="ContentArea-container">
-                    <BrowserRouter basename="/app">    
+                    <BrowserRouter forceRefresh={true} basename="/app">    
                         <nav className="nav-tray">
                             <ul className="nav-tray-items">
                                 <li className="nav-tray-item">
@@ -33,11 +34,18 @@ class RestaurantHome extends AuthenticatedRoutes {
                                         <div>Outlets</div>
                                     </Link>
                                 </li>
+                                <li className="nav-tray-item">
+                                    <Link to={`${this.props.match.url}/categories`}>
+                                    <i className="fas fa-columns nav-tray-item-icon"></i>
+                                        <div>Categories</div>
+                                    </Link>
+                                </li>
                             </ul>
                         </nav>
                         <div>
                             <Route exact path={`${this.props.match.path}`} component={Restaurant} />
                             <Route path={`${this.props.match.path}/outlets`} component={OutletHome} />
+                            <Route path={`${this.props.match.path}/categories`} component={CategoryHome} />
                         </div>
                     </BrowserRouter>
                     </div>

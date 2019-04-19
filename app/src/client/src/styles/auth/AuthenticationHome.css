@@ -1,9 +1,11 @@
 .authentication-form {
-    position:absolute;
+    position:fixed;
     top:60px;
     bottom:40px;
     left:0;
     right:0;
+    overflow-y: scroll;
+    margin-bottom:20px;
 }
 .authentication-form .radio-selection {
     position:absolute;

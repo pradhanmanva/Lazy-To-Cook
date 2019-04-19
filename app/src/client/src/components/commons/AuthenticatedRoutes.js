@@ -23,7 +23,7 @@ class AuthenticatedRoutes extends Component {
                 isLoggedIn : result.status
             })
             if (!result.status) {
-                window.location = "/app";
+                window.location = "/app/";
             }
         });
     }

@@ -1,4 +1,6 @@
 import {Component} from 'react';
+import 'react-notifications/lib/notifications.css';
+import {NotificationManager} from 'react-notifications';
 
 class Signup extends Component { 
     constructor(props) {
@@ -20,7 +22,7 @@ class Signup extends Component {
     handleSubmit(event) {
         event.preventDefault();
         const data = this.collectData();
-
+        const self = this;
         if (data) {
             fetch(this.url, {
                 method: 'POST',
@@ -30,8 +32,14 @@ class Signup extends Component {
                 },
                 body: JSON.stringify(data)
             }).then(function (result) {
-                console.log(result);
-            })
+                console.log(result.status);
+                if (result.status !== 200) {
+                    NotificationManager.error("Some error occurred.");
+                } else {
+                    NotificationManager.success("Created Successfully! Please login now.");
+                    window.location = `/app/?type=${self.user_type}&mode=signin`;
+                }
+            });
         }
     }
     

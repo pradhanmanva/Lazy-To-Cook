@@ -2,6 +2,7 @@ import React from "react";
 import AuthenticatedRoutes from "../commons/AuthenticatedRoutes";
 import { BrowserRouter, Route, Link } from "react-router-dom";
 import Item from "./Item";
+import DeleteItem from "./DeleteItem";
 import "../../styles/item/ItemHome.css";
 
 class ItemHome extends AuthenticatedRoutes {
@@ -36,23 +37,36 @@ class ItemHome extends AuthenticatedRoutes {
         const self = this;
         return (
             <div className="item-list-tray">   
-                <h4 className="item-title">Items</h4>
-                <BrowserRouter basename="/app">    
+                <h4 className="item-title">
+                    <span>Items</span>
+                    <Link className="float-right" to={`${this.props.match.url}/add`} >
+                    <button className="operation-btn" title="Add New Item"><i className="fas fa-plus"></i></button>
+                    </Link>
+                </h4>
+                <BrowserRouter forceRefresh={true} basename="/app">    
                     <ul className="item-list">
                         {this.state.items.map(function(item, index) {
                             return (
                                 <li className="item-list-item" key={item.id} >
-                                    <Link to={`${self.props.match.url}/${item.id}`}>
-                                        <div>
-                                            <h3>{item.name}</h3>
-                                            <p className="item-list-item-description">{item.description}</p>
-                                        </div>
+                                    <Link className="item-list-item-detail float-left" to={`${self.props.match.url}/${item.id}/edit`}>
+                                        <h3>{item.name}</h3>
+                                        <p className="item-list-item-description">{item.description}</p>
                                     </Link>
+                                    <span className="float-right">
+                                        <Link className="float-right" to={`${self.props.match.url}/${item.id}/delete`} >
+                                            <button className="operation-btn" title="Delete"><i className="fas fa-trash"></i></button>
+                                        </Link>
+                                    </span>
+                                    <div className="clear-both"></div>
                                 </li>
                             ); 
                         })}
                     </ul>
-                    <Route exact path={`${this.props.match.path}/:item_id`} component={Item} />
+                    <div>
+                        <Route exact path={`${this.props.match.path}/add`} component={Item} />
+                        <Route path={`${this.props.match.path}/:item_id/delete`} component={DeleteItem} />
+                        <Route path={`${this.props.match.path}/:item_id/edit`} component={Item} />
+                    </div>
                 </BrowserRouter>    
             </div>
         );
