@@ -18,3 +18,13 @@ App that lets people order food from restaurants and get it delivered at their d
 Now, all the required backend dependencies will the installed and the database will be created.
 
 **Note:** Please use this command only for first installation. Do not use it on production database as it drops existing tables from database and re-creates them. If you are adding a new dependency, use `npm install` command to update dependencies.
+
+##### To install the client:
+1.  Open terminal and change current working directory to <root>/app/src/client
+2.  Run `npm install` and then `npm run build` (Use `sudo`, if required.)
+3.  Open browser and go to the url: http://localhost:<backend_port>/app/
+
+##### To run client in dev mode:
+1.  Open terminal and change current working directory to <root>/app/src/client
+2.  Run `npm install` and then `npm start` (Use `sudo`, if required.)
+3.  Open browser and go to the url: http://localhost:3000
