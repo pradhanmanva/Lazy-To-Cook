@@ -3,7 +3,7 @@
 	"CREATE TABLE restaurant (restaurant_id BIGINT NOT NULL AUTO_INCREMENT, restaurant_name TEXT DEFAULT NULL, contact INTEGER DEFAULT NULL, email TEXT DEFAULT NULL, website TEXT DEFAULT NULL, PRIMARY KEY (restaurant_id));",
 
 	"DROP TABLE IF EXISTS restaurant_authentication;",
-	"CREATE TABLE restaurant_authentication (restaurant_id BIGINT NOT NULL AUTO_INCREMENT, username VARCHAR(10) NOT NULL UNIQUE, password TEXT NOT NULL, FOREIGN KEY (restaurant_id) REFERENCES restaurant(restaurant_id));",
+	"CREATE TABLE restaurant_authentication (restaurant_id BIGINT NOT NULL AUTO_INCREMENT, username VARCHAR(10) NOT NULL UNIQUE, password TEXT NOT NULL, FOREIGN KEY (restaurant_id) REFERENCES restaurant(restaurant_id) ON DELETE CASCADE);",
 
 	"DROP TABLE IF EXISTS address;",
 	"CREATE TABLE address (address_id BIGINT NOT NULL AUTO_INCREMENT, line_1 TEXT NOT NULL, line_2 TEXT, city TEXT NOT NULL, state TEXT NOT NULL, zipcode INTEGER NOT NULL, PRIMARY KEY (address_id));",

@@ -23,3 +23,8 @@
     background-color: #585858;
     color: white;
 }
+
+.trash-btn {
+    background-color: #c50000;
+    margin: 10px 0;
+}

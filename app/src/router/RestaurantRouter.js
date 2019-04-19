@@ -88,6 +88,7 @@ class RestaurantRouter extends Router {
     delete(id, request, response) {
         const restaurantModel = new RestaurantModel(id, null, null, null, null);
         new RestaurantHandler().delete(restaurantModel).then(function(result) {
+            request.logout();
             response.status(200).send("Success").end();
         }).catch(function(error) {
             console.error(error);
