@@ -15,7 +15,7 @@ class OutletHandler {
     fetchAll(restaurant /* : RestaurantModel */) {
         if (restaurant && restaurant.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${OUTLET_TABLE.NAME} LEFT JOIN ${ADDRESS_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ADDRESS} = ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.ID} LEFT JOIN  ${RESTAURANT_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID} WHERE ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`
+            const selectQuery = `SELECT * FROM ${OUTLET_TABLE.NAME} LEFT JOIN ${ADDRESS_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ADDRESS} = ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.ID} LEFT JOIN  ${RESTAURANT_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID} WHERE ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`;
             return dbUtil.getConnection().then(function (connection) {
                 if (!connection) {
                     throw Error('connection not available.');
@@ -35,7 +35,7 @@ class OutletHandler {
                         result[RESTAURANT_TABLE.COLUMNS.NAME], null, null, null);
 
                     const outlet = new OutletModel(
-                        new String(result[OUTLET_TABLE.COLUMNS.ID]),
+                        String(result[OUTLET_TABLE.COLUMNS.ID]),
                         result[OUTLET_TABLE.COLUMNS.NAME],
                         address,
                         result[OUTLET_TABLE.COLUMNS.CONTACT],
@@ -70,7 +70,7 @@ class OutletHandler {
                         result[RESTAURANT_TABLE.COLUMNS.NAME], null, null, null);
 
                     const outlet = new OutletModel(
-                        new String(result[OUTLET_TABLE.COLUMNS.ID]),
+                        String(result[OUTLET_TABLE.COLUMNS.ID]),
                         result[OUTLET_TABLE.COLUMNS.NAME],
                         address,
                         result[OUTLET_TABLE.COLUMNS.CONTACT],
@@ -93,14 +93,14 @@ class OutletHandler {
             [ADDRESS_TABLE.COLUMNS.CITY]: outlet.address.city,
             [ADDRESS_TABLE.COLUMNS.STATE]: outlet.address.state,
             [ADDRESS_TABLE.COLUMNS.ZIPCODE]: outlet.address.zipcode
-        }
+        };
 
         const outletInsertQuery = `INSERT INTO ${OUTLET_TABLE.NAME} SET ?`;
         let outletColumnValues = {
             [OUTLET_TABLE.COLUMNS.NAME]: outlet.name,
             [OUTLET_TABLE.COLUMNS.CONTACT]: outlet.contact,
             [OUTLET_TABLE.COLUMNS.RESTAURANT]: outlet.restaurant.id
-        }
+        };
         return dbUtil.getConnection().then(function (connection) {
             if (!connection) {
                 throw Error('connection not available.');
@@ -109,7 +109,7 @@ class OutletHandler {
         }).then(function (connection) {
             return dbUtil.query(connection, addressInsertQuery, addressColumnValues);
         }).then(function (result) {
-            outletColumnValues[OUTLET_TABLE.COLUMNS.ADDRESS] = new String(result.results.insertId);
+            outletColumnValues[OUTLET_TABLE.COLUMNS.ADDRESS] = String(result.results.insertId);
             return dbUtil.query(result.connection, outletInsertQuery, outletColumnValues);
         }).then(function (result) {
             const address = new AddressModel(
@@ -148,7 +148,7 @@ class OutletHandler {
             outlet.address.state,
             outlet.address.zipcode,
             outlet.address.id
-        ]
+        ];
 
         const outletUpdateQuery = `UPDATE ${OUTLET_TABLE.NAME} SET ${OUTLET_TABLE.COLUMNS.NAME} = ?, ${OUTLET_TABLE.COLUMNS.CONTACT} = ? WHERE ${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`;
         const outletColumnValues = [
@@ -156,7 +156,7 @@ class OutletHandler {
             outlet.contact,
             outlet.id,
             outlet.restaurant.id
-        ]
+        ];
 
         return dbUtil.getConnection().then(function (connection) {
             if (!connection) {
@@ -166,7 +166,7 @@ class OutletHandler {
         }).then(function (connection) {
             return dbUtil.query(connection, outletUpdateQuery, outletColumnValues);
         }).then(function (result) {
-            if (result.results.affectedRows == 0) {
+            if (result.results.affectedRows === 0) {
                 return dbUtil.rollbackTransaction(result.connection).then(function () {
                     throw Error("Unauthorized update.");
                 });
@@ -191,7 +191,7 @@ class OutletHandler {
             }
             return dbUtil.query(connection, deleteQuery, [outlet.id, outlet.restaurant.id]);
         }).then(function (result) {
-            if (result.results.affectedRows == 0) {
+            if (result.results.affectedRows === 0) {
                 throw new Error("Unauthorized delete.");
             }
         });

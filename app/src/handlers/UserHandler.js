@@ -1,5 +1,7 @@
 const DBUtil = require('../utils/DBUtil');
 
+const UserModel = require('../models/UserModel');
+
 const USER_TABLE = require('../tables/UserTable');
 const ADDRESS_TABLE = require('../tables/AddressTable');
 const USER_AUTH_TABLE = require('../tables/UserAuthenticationTable');
@@ -77,6 +79,25 @@ class UserHandler {
             });
         }
         throw new Error('Insufficient data to validate.');
+    }
+
+    fetch(user /* :UserModel*/) {
+        if (user && user.id) {
+            const dbUtil = new DBUtil();
+            const selectQuery = `SELECT * FROM ${USER_TABLE.NAME} WHERE ${USER_TABLE.COLUMNS.ID} = ?`;
+            return dbUtil.getConnection().then(function (connection) {
+                if (!connection) {
+                    throw Error('connection not available.');
+                }
+                return dbUtil.query(connection, selectQuery, user.id);
+            }).then(function (result) {
+                return result.results.map(function (results, index, arr) {
+                        return new UserModel(String(result[USER_TABLE.COLUMNS.ID]), result[USER_TABLE.COLUMNS.FIRSTNAME], result[USER_TABLE.COLUMNS.MIDDLENAME], result[USER_TABLE.COLUMNS.LASTNAME], result[USER_TABLE.COLUMNS.DOB], result[USER_TABLE.COLUMNS.EMAIL], result[USER_TABLE.COLUMNS.ADDRESS]);
+                    }
+                )[0];
+            });
+        }
+        throw new Error('Invalid Operation: Cannot GET all users.');
     }
 
 
