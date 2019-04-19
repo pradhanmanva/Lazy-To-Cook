@@ -1,0 +1,45 @@
+.authentication-form {
+    position:absolute;
+    top:60px;
+    bottom:40px;
+    left:0;
+    right:0;
+}
+.authentication-form .radio-selection {
+    position:absolute;
+    height:40px;
+    left:0;
+    right:0;
+    text-align: center;
+}
+.authentication-form .usertype-selection {
+    top:20px;
+}
+.authentication-form .auth-type-selection {
+    top:70px;
+}
+.selection {
+    padding:10px 100px;
+    width:100px;
+    display:inline-block;
+    background-color: #eee;
+    cursor: pointer;
+}
+.selected {
+    background-color:#585858;
+    color:white;
+}
+.left-border-curved {
+    border-radius:10px 0px 0 10px;
+}
+.right-border-curved {
+    border-radius:0 10px 10px 0;
+}
+
+.auth-form {
+    position: absolute;
+    top: 150px;
+    left: 0;
+    right: 0;
+    text-align: center;
+}

@@ -1,0 +1,25 @@
+.field-row {
+    margin:20px 0;
+}
+
+.field-row > label {
+    font-weight:bold;
+    margin:0 10px;
+    width:150px;
+    display: inline-block;
+    text-align: left;
+}
+.field-row > input {
+    display: inline-block;
+    padding:5px;
+    width:250px;
+}
+
+.submit-btn {
+    padding: 15px 30px;
+    margin: 0;
+    border: none;
+    cursor: pointer;
+    background-color: #585858;
+    color: white;
+}

@@ -25,10 +25,16 @@ class AuthRouter {
         passport.authenticate('local', (err, user, info) => {
             if (user) {
                 request.login(user, (err) => {
-                    return response.status(200).send('Success!').end();
+                    return response.status(200).send({
+                        status : true,
+                        redirectTo: `/app/${user.type}/${user.user_id}`
+                    }).end();
                 })
             } else {
-                return response.status(500).send('Invalid credentials!').end();
+                return response.status(500).send({
+                    status : false,
+                    message: 'Invalid Credentials!'
+                }).end();
             }
         })(request, response, next);
     }
@@ -80,6 +86,19 @@ class AuthRouter {
         }
     }
 
+    _checkLogin(request, response) {
+        if (request.isAuthenticated()) {
+            response.status(200).send({
+                status : true,
+                redirectTo: `/app/${request.user.type}/${request.user.user_id}`
+            }).end();
+        } else {
+            response.status(200).send({
+                status : false
+            }).end();
+        }
+    }
+
     wire() {
         const self = this;
         const localStrategy = new LocalStrategy(
@@ -97,6 +116,7 @@ class AuthRouter {
         this.app.use(passport.session());
         this.app.post("/auth/login", self._login);
         this.app.get("/auth/logout", self._logout);
+        this.app.get("/auth/login", self._checkLogin);
     }
 }
 
