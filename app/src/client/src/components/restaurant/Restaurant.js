@@ -57,7 +57,9 @@ class Restaurant extends React.Component {
                 }
             }).then(function(response) {
                 if (!response || response.status !== 200) {
-                    return null;
+                    if (response.status === 401) {
+                        window.location = '/app/';
+                    }
                 }
                 return response.json();
             }).then(function(restaurantDetail) {

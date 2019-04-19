@@ -6,6 +6,7 @@ const ItemModel = require("../models/ItemModel");
 const OutletModel = require("../models/OutletModel");
 const RestaurantModel = require("../models/RestaurantModel");
 const RestaurantItemCategoryModel = require("../models/RestaurantItemCategoryModel");
+const AppUtil = require("../utils/AppUtil");
 
 class MenuItemRouter extends OutletRouter {
     constructor(app) {
@@ -19,6 +20,9 @@ class MenuItemRouter extends OutletRouter {
     getAll(request, response) {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
+        if (!request.isAuthenticated() || (AppUtil.isAdmin(request) && !AppUtil.isOwner(request, restaurantId))) {
+            return AppUtil.denyAccess(response);
+        }
         const outletId = request.params["outlet_id"];
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const outletModel = new OutletModel(outletId.toString(), null, null, null, restaurantModel);
@@ -41,6 +45,9 @@ class MenuItemRouter extends OutletRouter {
     get(id, request, response) {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
+        if (!request.isAuthenticated() || (AppUtil.isAdmin(request) && !AppUtil.isOwner(request, restaurantId))) {
+            return AppUtil.denyAccess(response);
+        }
         const outletId = request.params["outlet_id"];
         const itemModel = new ItemModel(id.toString(), null, null, null, null);
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
@@ -78,6 +85,9 @@ class MenuItemRouter extends OutletRouter {
     add(request, response) {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
+        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, restaurantId)) {
+            return AppUtil.denyAccess(response);
+        }
         const outletId = request.params["outlet_id"];
         const outletModel = new OutletModel(outletId.toString(), null, null, null, new RestaurantModel(restaurantId.toString(), null, null, null, null));
         const menuItem = new ItemModel(null, request.body.name, request.body.description, request.body.price, new RestaurantItemCategoryModel(request.body.category.id, null, null));
@@ -110,6 +120,9 @@ class MenuItemRouter extends OutletRouter {
     update(id, request, response) {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
+        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, restaurantId)) {
+            return AppUtil.denyAccess(response);
+        }
         const outletId = request.params["outlet_id"];
         const itemModel = new ItemModel(id, request.body.name, request.body.description, request.body.price, new RestaurantItemCategoryModel(request.body.category.id, null, null));
         const outletModel = new OutletModel(outletId.toString(), null, null, null, new RestaurantModel(restaurantId.toString(), null, null, null, null));
@@ -133,6 +146,9 @@ class MenuItemRouter extends OutletRouter {
     delete(id, request, response) {
         const restaurantId = request.params["restaurant_id"];
         const outletId = request.params["outlet_id"];
+        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, restaurantId)) {
+            return AppUtil.denyAccess(response);
+        }
         const menuItem = new ItemModel(id, null,null, null, null);
         const outletModel = new OutletModel(outletId.toString(), null, null, null, new RestaurantModel(restaurantId.toString(), null, null, null, null));
         new MenuItemHandler().delete(menuItem, outletModel).then(function(result) {
