@@ -83,6 +83,9 @@ class RestaurantItemCategoryRouter extends RestaurantRouter {
         }
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const categoryModel = new RestaurantItemCategoryModel(null, request.body.name, restaurantModel);
+        if (!categoryModel.isValid()) {
+            return AppUtil.badRequest(response);
+        }
         new RestaurantItemCategoryHandler().insert(categoryModel).then(function(insertedCategory) {
             insertedCategory = insertedCategory.toJSON();
             insertedCategory = self.addHateoas(insertedCategory);
@@ -108,6 +111,9 @@ class RestaurantItemCategoryRouter extends RestaurantRouter {
         }
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const categoryModel = new RestaurantItemCategoryModel(id.toString(), request.body.name, restaurantModel);
+        if (!categoryModel.isValid()) {
+            return AppUtil.badRequest(response);
+        }
         new RestaurantItemCategoryHandler().update(categoryModel).then(function(updatedCategory) {
             updatedCategory = updatedCategory.toJSON();
             updatedCategory = self.addHateoas(updatedCategory);

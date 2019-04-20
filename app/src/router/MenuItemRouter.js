@@ -96,6 +96,9 @@ class MenuItemRouter extends OutletRouter {
         const outletId = request.params["outlet_id"];
         const outletModel = new OutletModel(outletId.toString(), null, null, null, new RestaurantModel(restaurantId.toString(), null, null, null, null));
         const menuItem = new ItemModel(null, request.body.name, request.body.description, request.body.price, new RestaurantItemCategoryModel(request.body.category, null, null));
+        if (!request.body.category || !request.body.category.trim().length || !menuItem.isValid()) {
+            return AppUtil.badRequest(response);
+        }
         new MenuItemHandler().insert(menuItem, outletModel, request.file).then(function(insertedItem) {
             if (insertedItem) {
                 insertedItem = insertedItem.toJSON();
@@ -131,6 +134,9 @@ class MenuItemRouter extends OutletRouter {
         const outletId = request.params["outlet_id"];
         const itemModel = new ItemModel(id, request.body.name, request.body.description, request.body.price, new RestaurantItemCategoryModel(request.body.category, null, null));
         const outletModel = new OutletModel(outletId.toString(), null, null, null, new RestaurantModel(restaurantId.toString(), null, null, null, null));
+        if (!request.body.category || !request.body.category.trim().length || !itemModel.isValid()) {
+            return AppUtil.badRequest(response);
+        }
         new MenuItemHandler().update(itemModel, outletModel, request.file).then(function(updatedItem) {
             if (updatedItem) {
                 updatedItem = updatedItem.toJSON();

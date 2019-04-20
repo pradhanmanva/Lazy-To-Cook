@@ -78,6 +78,9 @@ class RestaurantRouter extends Router {
         }
         const self = this;
         const restaurantModel = new RestaurantModel(id, request.body.name, request.body.contact, request.body.email, request.body.website);
+        if (!restaurantModel.isValid()) {
+            return AppUtil.badRequest(response);
+        }
         new RestaurantHandler().update(restaurantModel).then(function(updatedRestaurant) {
             updatedRestaurant = updatedRestaurant.toJSON();
             updatedRestaurant = self.addHateoas(updatedRestaurant);

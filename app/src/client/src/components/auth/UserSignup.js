@@ -1,6 +1,7 @@
 import React from 'react';
 import Signup from './Signup';
 import "../../styles/auth/Form.css";
+import { NotificationContainer } from 'react-notifications';
 
 class UserSignup extends Signup { 
     constructor(props) {
@@ -114,6 +115,7 @@ class UserSignup extends Signup {
                     </div>
                     <input className="submit-btn" type="submit" value="Submit" />
                 </form>
+                <NotificationContainer />
             </div>
         );
     }

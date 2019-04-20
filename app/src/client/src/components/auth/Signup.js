@@ -32,9 +32,12 @@ class Signup extends Component {
                 },
                 body: JSON.stringify(data)
             }).then(function (result) {
-                console.log(result.status);
                 if (result.status !== 200) {
-                    NotificationManager.error("Some error occurred.");
+                    if (result.status === 400) {
+                        result.text().then(function(message){
+                            NotificationManager.error(message);
+                        })
+                    }
                 } else {
                     NotificationManager.success("Created Successfully! Please login now.");
                     window.location = `/app/?type=${self.user_type}&mode=signin`;
