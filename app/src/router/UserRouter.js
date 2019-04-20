@@ -18,14 +18,6 @@ class UserRouter extends Router {
     }
 
     /**
-     * GET /api/users
-     */
-    getAll(request, response) {
-        response.send(`Get users`);
-        response.end();
-    }
-
-    /**
      * GET /api/users/:id
      */
     get(id, request, response) {
@@ -34,7 +26,7 @@ class UserRouter extends Router {
         new UserHandler().fetch(userModel).then(function (foundUser) {
             if (foundUser) {
                 foundUser = foundUser.toJSON();
-                // foundUser = self.addHateoas(foundUser);
+                foundUser = self.addHateoas(foundUser);
                 response.status(200).json(foundUser).end();
             }
         }).catch(function (error) {
@@ -44,18 +36,12 @@ class UserRouter extends Router {
     }
 
     /**
-     * POST /api/users
-     */
-    add(request, response) {
-    }
-
-    /**
      * PUT /api/users/:id
      */
     update(id, request, response) {
         const self = this;
         const userId = request.params["user_id"];
-        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, userId)) {
+        if (!request.isAuthenticated() || !AppUtil.isUser(request) || !AppUtil.isOwner(request, userId)) {
             return AppUtil.denyAccess(response);
         }
         const addressModel = new AddressModel(request.body.address.id, request.body.address.line1, request.body.address.line2, request.body.address.city, request.body.address.state, request.body.address.zipcode);
@@ -76,7 +62,7 @@ class UserRouter extends Router {
      */
     delete(id, request, response) {
         const userId = request.params["user_id"];
-        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, userId)) {
+        if (!request.isAuthenticated() || !AppUtil.isUser(request) || !AppUtil.isOwner(request, userId)) {
             return AppUtil.denyAccess(response);
         }
         const userModel = new UserModel(userId.toString(), null, null, null, null, null, null);
