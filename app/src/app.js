@@ -12,6 +12,7 @@ const lazyToCookApp = express();
 const HOST = "localhost";
 const PORT = 8000;
 
+lazyToCookApp.set('app-name', 'Lazy To Cook');
 lazyToCookApp.use(bodyParser.json());
 lazyToCookApp.use(bodyParser.urlencoded({
     extended: true
@@ -34,6 +35,11 @@ lazyToCookApp.use(session({
     resave: false,
     saveUninitialized: true
 }));
+// lazyToCookApp.set('views', __dirname + '/client/views');
+// lazyToCookApp.set('view engine', 'pug');
+lazyToCookApp.use(express.static(__dirname + '/client/build'));
+lazyToCookApp.use(express.static(__dirname + '/../assets'));
+
 
 new AuthRouter(lazyToCookApp).wire();
 new RegistrationRouter(lazyToCookApp).wire();
@@ -46,6 +52,11 @@ new UserRouter(lazyToCookApp).wire();
 new CartRouter(lazyToCookApp).wire();
 new CartItemRouter(lazyToCookApp).wire();
 new RestaurantItemCategoryRouter(lazyToCookApp).wire();
+
+lazyToCookApp.get("/app/*", function(request, response) {
+    response.sendFile(__dirname+'/client/build/index.html');
+    // response.render('auth', { title: lazyToCookApp.get('app-name')});
+});
 
 lazyToCookApp.listen(PORT, () => {
     console.log(`Listening to port: http://${HOST}:${PORT}`);

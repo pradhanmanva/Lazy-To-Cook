@@ -1,0 +1,31 @@
+.nav-tray {
+    position:absolute;
+    left:0;
+    width:60px;
+    bottom:0;
+    top:0;
+    background-color: #a02233;
+}
+
+
+.nav-tray .nav-tray-items .nav-tray-item {
+    margin:0;
+    width: inherit;
+    text-align: center;
+    padding:15px 0;
+}
+
+.nav-tray .nav-tray-items .nav-tray-item:hover {
+    background-color:#c7384c;
+}
+
+.nav-tray .nav-tray-items .nav-tray-item * {
+    text-decoration: none !important;
+    color: #fff;
+    font-size:12px;
+}
+
+.nav-tray-item-icon {
+    font-size:24px !important;
+    margin:7px 0;
+}

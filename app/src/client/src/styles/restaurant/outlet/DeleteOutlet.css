@@ -1,0 +1,7 @@
+.delete-outlet-container {
+    position:fixed;
+    top:60px;
+    bottom:40px;
+    left:360px;
+    padding:10px;
+}

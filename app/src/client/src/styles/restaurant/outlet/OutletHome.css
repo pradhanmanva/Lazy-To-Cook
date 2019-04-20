@@ -1,0 +1,49 @@
+.outlet-list-tray {
+    position:fixed;
+    top:60px;
+    bottom:40px;
+    left: 60px;
+    width:300px;
+    background-color:#f9f6f6;
+}
+.outlet-title {
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height: 50px;
+    padding:0 10px;
+    line-height:50px;
+    z-index:999;
+    background-color: #d92a41;
+    color:white;
+    margin:0;
+    box-shadow: 0px 1px 2px #333;
+}
+
+.outlet-list {
+    position: absolute;
+    top:50px;
+    left:0;
+    right:0;
+    bottom:0;
+    overflow-y: auto;
+}
+.outlet-list-item {
+    padding:20px 10px;
+}
+
+.outlet-list-item:hover {
+    background-color:#d6d6d6;
+}
+
+.outlet-list-item * {
+    color : black;
+    margin: 0;
+    text-decoration: none;
+}
+
+.outlet-list-item-detail {
+    width: 200px;
+    display: inline-block;
+}
