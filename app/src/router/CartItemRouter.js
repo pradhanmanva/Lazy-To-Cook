@@ -3,6 +3,7 @@ const CartRouter = require("./CartRouter");
 const CartModel = require("../models/CartModel");
 const CartItemModel = require("../models/CartItemModel");
 
+const CartModelHandler = require("../handlers/CartItemHandler");
 
 class CartItemRouter extends CartRouter {
     constructor(app) {
@@ -20,8 +21,18 @@ class CartItemRouter extends CartRouter {
         // response.end();
 
         const self = this;
-        const CartModel = new CartModel()
-
+        const cartModel = new CartModel(cartId, null, new UserModel(userId, null, null, null, null, null, null));
+        new CartItemHandler().fetchAll(cartModel).then(function (items) {
+            items = items.map(function (item, index, arr) {
+                item = item.toJSON();
+                item = self.addHateoas(cartId, userId, item);
+                return item;
+            });
+            response.status(200).json(items).end();
+        }).catch(function (error) {
+            console.error(error);
+            response.status(500).send('error').end();
+        });
     }
 
     /**

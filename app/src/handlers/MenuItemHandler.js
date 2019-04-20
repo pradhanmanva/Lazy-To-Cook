@@ -60,12 +60,12 @@ class MenuItemHandler {
             [ITEM_TABLE.COLUMNS.DESCRIPTION] : item.description,
             [ITEM_TABLE.COLUMNS.PRICE] : item.price,
             [ITEM_TABLE.COLUMNS.CATEGORY] : item.category.id
-        }
+        };
 
         const itemOutletInsertQuery = `INSERT INTO ${ITEMOUTLET_TABLE.NAME} SET ?`;
         let itemOutletColumnValues = {
             [ITEMOUTLET_TABLE.COLUMNS.OUTLET] : outlet.id
-        }
+        };
         return dbUtil.getConnection().then(function(connection) {
             if (!connection) {
                 throw Error('connection not available.');
@@ -75,9 +75,9 @@ class MenuItemHandler {
             const outletValidationQuery = `SELECT ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} FROM ${OUTLET_TABLE.NAME} WHERE ${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`;
             return dbUtil.query(connection, outletValidationQuery, [outlet.id, outlet.restaurant.id]);
         }).then(function(result) {
-            if (!result || !result.results || result.results.length == 0) {
+            if (!result || !result.results || result.results.length === 0) {
                 return dbUtil.rollbackTransaction(result.connection).then(function(){
-                    console.log()
+                    console.log();
                     throw Error("Unauthorized insertion.");
                 });
             }
@@ -112,7 +112,7 @@ class MenuItemHandler {
             item.price,
             item.category.id,
             item.id
-        ]
+        ];
 
         return dbUtil.getConnection().then(function(connection) {
             if (!connection) {
@@ -121,7 +121,7 @@ class MenuItemHandler {
             const outletValidationQuery = `SELECT * FROM ${ITEMOUTLET_TABLE.NAME} INNER JOIN ${OUTLET_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.OUTLET}=${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} INNER JOIN ${ITEM_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} INNER JOIN ${CATEGORY_TABLE.NAME} ON ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.CATEGORY} = ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} WHERE ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`
             return dbUtil.query(connection, outletValidationQuery, [item.id, outlet.id, outlet.restaurant.id]);
         }).then(function(result) {
-            if (!result || !result.results || result.results.length == 0) {
+            if (!result || !result.results || result.results.length === 0) {
                 return dbUtil.rollbackTransaction(result.connection).then(function(){
                     throw Error("Unauthorized update.");
                 });
@@ -140,7 +140,7 @@ class MenuItemHandler {
     
     delete(item /* : ItemModel */, outlet /* : OutletModel */) {
         const dbUtil = new DBUtil();
-        const deleteQuery = `DELETE FROM ${ITEM_TABLE.NAME} WHERE ${ITEM_TABLE.COLUMNS.ID} = ?`
+        const deleteQuery = `DELETE FROM ${ITEM_TABLE.NAME} WHERE ${ITEM_TABLE.COLUMNS.ID} = ?`;
         return dbUtil.getConnection().then(function(connection) {
             if (!connection) {
                 throw Error('connection not available.');
@@ -149,7 +149,7 @@ class MenuItemHandler {
             return dbUtil.query(connection, outletValidationQuery, [item.id, outlet.id, outlet.restaurant.id]);
             
         }).then(function(result) {
-            if (!result || !result.results || result.results.length == 0) {
+            if (!result || !result.results || result.results.length === 0) {
                 return dbUtil.rollbackTransaction(result.connection).then(function(){
                     throw Error("Unauthorized delete.");
                 });
