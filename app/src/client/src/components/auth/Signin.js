@@ -40,8 +40,9 @@ class Signin extends React.Component {
                         response.text().then(function(message){
                             NotificationManager.error(message);
                         })
+                    } else {
+                        return response.json();
                     }
-                    return null;
                 } else {
                     return response.json();
                 }
