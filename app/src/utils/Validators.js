@@ -34,10 +34,10 @@ const USZipcodeValidator = (zipcodeStr) => {
 
 const UsernameValidator = (usernameStr) => {
     if (!usernameStr || !usernameStr.length) return false;
-    return ((/^[a-zA-Z0-9.]{10}$/.test(usernameStr)) && usernameStr.split(".").length == 2);
+    return ((/^[a-zA-Z0-9.]{4,10}$/.test(usernameStr)) && usernameStr.split(".").length == 2 && usernameStr[usernameStr.length-1] != '.');
 }
 
-const PasswordValidator = (passwordStr) => {
+const StrongPasswordValidator = (passwordStr) => {
     if (!passwordStr || !passwordStr.length) return false;
     return true; // TODO
 }
@@ -47,7 +47,25 @@ const PriceValidator = (priceStr) => {
         priceStr = new String(priceStr);
     }
     if (!priceStr || !priceStr.length) return false;
-    return (/^[0-9]*\.\d{2}|[0-9]*$/.test(priceStr));
+    let hist = {
+        uppercase : 0,
+        lowercase : 0,
+        numeric : 0,
+        specialchar : 0
+    }
+    for (let i = 0 ; i < priceStr.length ; i++) {
+        if (priceStr[i] >= 'a' && priceStr[i] <= 'z') {
+            hist.lowercase++;
+        }
+        else if (priceStr[i] >= 'A' && priceStr[i] <= 'Z') {
+            hist.uppercase++;
+        } else if (priceStr[i] >= '0' && priceStr[i] <= '9') {
+            hist.numeric++;
+        } else {
+            hist.specialchar++;
+        }
+    }
+    return (priceStr.length >= 8 && hist.uppercase > 0 && hist.lowercase > 0 && hist.numeric > 0 && hist.specialchar > 0);
 }
 
 module.exports = {
@@ -58,6 +76,6 @@ module.exports = {
     isUSState : USStateValidator,
     isZipcode : USZipcodeValidator,
     isUsername : UsernameValidator,
-    isPassword : PasswordValidator,
+    isStrongPassword : StrongPasswordValidator,
     isPrice : PriceValidator
 }

@@ -41,14 +41,17 @@ class Signin extends React.Component {
                             NotificationManager.error(message);
                         })
                     }
+                    return null;
                 } else {
                     return response.json();
                 }
             }).then(function(response) {
-                if (response.redirectTo) {
-                    window.location = response.redirectTo;
-                } else if (response.message) {
-                    alert(response.message);
+                if (response) {
+                    if (response.redirectTo) {
+                        window.location = response.redirectTo;
+                    } else if (response.message) {
+                        alert(response.message);
+                    }
                 }
             });
         }
