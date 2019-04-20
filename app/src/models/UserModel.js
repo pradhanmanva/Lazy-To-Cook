@@ -21,21 +21,33 @@ class UserModel extends Model {
 
     fullName() {
         if (this.middleName && this.middleName.length) {
-            return `${this.firstName} ${middleName} ${lastName}`.trim();
+            return `${this.firstName} ${this.middleName} ${this.lastName}`.trim();
         } else {
-            return `${this.firstName} ${lastName}`.trim();
+            return `${this.firstName} ${this.lastName}`.trim();
         }
     }
 
     isValid() {
         return (this.firstName 
-            && this.firstName.length
+            && this.firstName.length > 0
             && this.lastName
-            && this.lastName.length
+            && this.lastName.length > 0
             && isEmail(this.email)
-            && isDate(this.dob)
+            && isDate(this.dateOfBirth)
             && this.address
             && this.address.isValid());
+    }
+
+    toJSON() {
+        return {
+            first_name : this.firstName,
+            last_name : this.lastName,
+            middle_name : this.middleName,
+            dob : this.dateOfBirth,
+            email : this.email,
+            address : this.address.toJSON(),
+            full_name : this.fullName()
+        }
     }
 }
 
