@@ -1,7 +1,6 @@
 import React from "react";
 import AuthenticatedRoutes from "../commons/AuthenticatedRoutes";
 import Navbar from "../commons/Navbar";
-import ContentArea from "../ContentArea";
 
 class UserHome extends AuthenticatedRoutes {
     render() {
@@ -9,8 +8,8 @@ class UserHome extends AuthenticatedRoutes {
             const content = <div>You're on user page of user id: {this.props.match.params.id}.</div>;
             return (
                 <div>
-                <Navbar shouldShowLogout={this.state.isLoggedIn}></Navbar>
-                {content}
+                    <Navbar shouldShowLogout={this.state.isLoggedIn}></Navbar>
+                    {content}
                 </div>
             )
         } else {
