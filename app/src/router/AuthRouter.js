@@ -7,7 +7,7 @@ const RestaurantAuthenticationModel = require("../models/RestaurantAuthenticatio
 const UserHandler = require("../handlers/UserHandler");
 const UserAuthenticationModel = require("../models/UserAuthenticationModel");
 const UserModel = require("../models/UserModel");
-const {isUsername, isStrongPassword} = require("../utils/Validators");
+const {isUsername, isEmail, isStrongPassword} = require("../utils/Validators");
 
 class AuthRouter {
     constructor(app) {
@@ -69,11 +69,12 @@ class AuthRouter {
     }
 
     _validateUser(username, password, done) {
-        const userModel = new UserModel(null, null, null, null, null, username, null);
-        const authCredentials = new UserAuthenticationModel(userModel, password, false);
+        console.log(!isEmail(username));
         if (!isEmail(username) || !isStrongPassword(password)) {
             return AppUtil.badRequest(response);
         }
+        const userModel = new UserModel(null, null, null, null, null, username, null);
+        const authCredentials = new UserAuthenticationModel(userModel, password, false);
         new UserHandler().validate(authCredentials).then(function(userId) {
             return done(null, {"user_id" : userId, type : "user"});
         }).catch(function(error) {
