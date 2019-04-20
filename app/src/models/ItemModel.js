@@ -1,11 +1,11 @@
 const Model = require("../framework/Model");
-const { isPrice } = require("../utils/Validators");
+const {isPrice} = require("../utils/Validators");
 
 class ItemModel extends Model {
-    constructor(/* string */ id, 
-                /* string */ name, 
-                /* string */ description, 
-                /* numeric */ price, 
+    constructor(/* string */ id,
+                /* string */ name,
+                /* string */ description,
+                /* numeric */ price,
                 /* RestaurantItemCategoryModel */ category) {
         super(id);
         this.name = name;
