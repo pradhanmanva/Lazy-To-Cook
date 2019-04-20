@@ -1,5 +1,6 @@
 import React from 'react';
 import "../../styles/auth/Form.css";
+import { NotificationContainer, NotificationManager } from 'react-notifications';
 
 class Signin extends React.Component {
     constructor(props) {
@@ -34,7 +35,15 @@ class Signin extends React.Component {
                 },
                 body: JSON.stringify(data)
             }).then(function (response) {
-                return response.json();
+                if (response.status !== 200) {
+                    if (response.status === 400) {
+                        response.text().then(function(message){
+                            NotificationManager.error(message);
+                        })
+                    }
+                } else {
+                    return response.json();
+                }
             }).then(function(response) {
                 if (response.redirectTo) {
                     window.location = response.redirectTo;
@@ -78,6 +87,7 @@ class Signin extends React.Component {
                     </div> 
                     <input className="submit-btn" type="submit" value="Sign in" /> 
                 </form>
+                <NotificationContainer />
             </div>
         );
       }

@@ -40,6 +40,10 @@ class AppUtil {
     static denyAccess(response) {
         response.status(401).send("Access denied.").end();
     }
+
+    static badRequest(response) {
+        return response.status(400).send("Invalid input.").end();
+    }
 }
 
 module.exports = AppUtil;

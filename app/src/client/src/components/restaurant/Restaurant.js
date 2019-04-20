@@ -1,6 +1,7 @@
 import React from "react";
 import "../../styles/restaurant/Restaurant.css";
 import "../../styles/auth/Form.css";
+import { NotificationManager, NotificationContainer } from "react-notifications";
 
 class Restaurant extends React.Component {
     constructor(props) {
@@ -35,14 +36,21 @@ class Restaurant extends React.Component {
             body: JSON.stringify(this.state.restaurant)
         }).then(function(response) {
             if (!response || response.status !== 200) {
-                return null;
+                if (response.status === 400) {
+                    response.text().then(function(message){
+                        NotificationManager.error(message);
+                    });
+                }
+            } else {
+                return response.json();
             }
-            return response.json();
         }).then(function(updatedRestaurant) {
-            self.setState({
-                restaurant : updatedRestaurant
-            });
-            alert("Successfully updated!");
+            if(updatedRestaurant) {
+                self.setState({
+                    restaurant : updatedRestaurant
+                });
+                alert("Successfully updated!");
+            }
         });
     }
 
@@ -114,13 +122,13 @@ class Restaurant extends React.Component {
                         <label>
                             Email Address
                         </label>
-                        <input type="text" name="email" value={this.state.restaurant.email} onChange={this.handleChange} />
+                        <input type="email" name="email" value={this.state.restaurant.email} onChange={this.handleChange} />
                     </div>
                     <div className="field-row">
                         <label>
                             Website
                         </label>
-                        <input type="text" name="email" value={this.state.restaurant.website} onChange={this.handleChange} />
+                        <input type="text" name="website" value={this.state.restaurant.website} onChange={this.handleChange} />
                     </div>
                     <input className="submit-btn" type="submit" value="Update" />
                 </form>
@@ -128,11 +136,12 @@ class Restaurant extends React.Component {
                 </div>
             );
         }
-        const name = this.state.restaurant.name;
+        const name = (this.state && this.state.restaurant) ? this.state.restaurant.name : "";
         return (
             <div className="restaurant-detail-container">
-                <h1>{this.state.restaurant.name}{(name && name[name.length-1] === 's') ? "'" : "'s"} Profile</h1>
+                <h1>{name}{(name && name[name.length-1] === 's') ? "'" : "'s"} Profile</h1>
                 <section>{restaurantDetails}</section>
+                <NotificationContainer />
             </div>
         );
     }

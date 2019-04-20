@@ -1,4 +1,6 @@
 const Model = require("../framework/Model");
+const {isEmail, isDate, isWebAddress } = require("../utils/Validators");
+
 
 class UserModel extends Model {
     constructor(/* string */ id, 
@@ -23,6 +25,17 @@ class UserModel extends Model {
         } else {
             return `${this.firstName} ${lastName}`.trim();
         }
+    }
+
+    isValid() {
+        return (this.firstName 
+            && this.firstName.length
+            && this.lastName
+            && this.lastName.length
+            && isEmail(this.email)
+            && isDate(this.dob)
+            && this.address
+            && this.address.isValid());
     }
 }
 

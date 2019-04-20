@@ -1,6 +1,6 @@
 [
 	"DROP TABLE IF EXISTS restaurant;",
-	"CREATE TABLE restaurant (restaurant_id BIGINT NOT NULL AUTO_INCREMENT, restaurant_name TEXT DEFAULT NULL, contact BIGINT DEFAULT NULL, email TEXT DEFAULT NULL, website TEXT DEFAULT NULL, PRIMARY KEY (restaurant_id));",
+	"CREATE TABLE restaurant (restaurant_id BIGINT NOT NULL AUTO_INCREMENT, restaurant_name TEXT DEFAULT NOT NULL, contact BIGINT DEFAULT NULL, email TEXT DEFAULT NOT NULL, website TEXT DEFAULT NULL, PRIMARY KEY (restaurant_id));",
 
 	"DROP TABLE IF EXISTS restaurant_authentication;",
 	"CREATE TABLE restaurant_authentication (restaurant_id BIGINT NOT NULL AUTO_INCREMENT, username VARCHAR(10) NOT NULL UNIQUE, password TEXT NOT NULL, FOREIGN KEY (restaurant_id) REFERENCES restaurant(restaurant_id) ON DELETE CASCADE);",

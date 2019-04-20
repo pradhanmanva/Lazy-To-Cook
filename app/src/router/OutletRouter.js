@@ -87,6 +87,9 @@ class OutletRouter extends RestaurantRouter {
         const addressModel = new AddressModel(null, request.body.address.line1, request.body.address.line2, request.body.address.city, request.body.address.state, request.body.address.zipcode);
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const outletModel = new OutletModel(null, request.body.name, addressModel, request.body.contact, restaurantModel);
+        if (!outletModel.isValid()) {
+            return AppUtil.badRequest(response);
+        }
         new OutletHandler().insert(outletModel).then(function(insertedOutlet) {
             insertedOutlet = insertedOutlet.toJSON();
             insertedOutlet = self.addHateoas(insertedOutlet);
@@ -122,6 +125,9 @@ class OutletRouter extends RestaurantRouter {
         const addressModel = new AddressModel(request.body.address.id, request.body.address.line1, request.body.address.line2, request.body.address.city, request.body.address.state, request.body.address.zipcode);
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const outletModel = new OutletModel(id.toString(), request.body.name, addressModel, request.body.contact, restaurantModel);
+        if (!outletModel.isValid()) {
+            return AppUtil.badRequest(response);
+        }
         new OutletHandler().update(outletModel).then(function(updatedOutlet) {
             updatedOutlet = updatedOutlet.toJSON();
             updatedOutlet = self.addHateoas(updatedOutlet);

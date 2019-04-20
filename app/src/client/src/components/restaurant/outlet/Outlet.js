@@ -1,6 +1,7 @@
 import React , {Component} from 'react';
 import "../../../styles/restaurant/outlet/Outlet.css";
 import "../../../styles/auth/Form.css";
+import {NotificationContainer, NotificationManager} from "react-notifications";
 
 class Outlet extends Component {
 
@@ -113,10 +114,15 @@ class Outlet extends Component {
                 },
                 body : JSON.stringify(self.state.outlet)
             }).then(function(response) {
-                if (response.status !== 200) {
-                    return null;
+                if (!response || response.status !== 200) {
+                    if (response.status === 400) {
+                        response.text().then(function(message){
+                            NotificationManager.error(message);
+                        });
+                    }
+                } else {
+                    window.location = `/app/admin/${self.props.match.params.id}/outlets${self.state.isEditMode ? "/"+self.props.match.params.outlet_id+"/edit" : ""}`;
                 }
-                window.location = `/app/admin/${self.props.match.params.id}/outlets`;
             });
         } else if (event.target.name === "cancel") {
             window.location = `/app/admin/${this.props.match.params.id}/outlets`;
@@ -170,6 +176,7 @@ class Outlet extends Component {
             <div className="outlet-form-container">
                 <h1>{this.state.isEditMode ? "Edit" : "Add"} Outlet</h1>
                 <section>{outletDetails}</section>
+                <NotificationContainer />
             </div>
         );
     }

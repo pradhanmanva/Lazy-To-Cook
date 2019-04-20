@@ -2,6 +2,7 @@ import React , {Component} from 'react';
 import "../../styles/auth/Form.css";
 import "../../styles/item/Item.css";
 import ItemImage from "./ItemImage";
+import { NotificationManager, NotificationContainer } from 'react-notifications';
 
 class Item extends Component {
 
@@ -135,9 +136,14 @@ class Item extends Component {
                 body : formData
             }).then(function(response) {
                 if (response.status !== 200) {
-                    return null;
+                    if (response.status === 400) {
+                        response.text().then(function(message) {
+                            NotificationManager.error(message);
+                        });
+                    }
+                } else {
+                    window.location = `/app/admin/${restaurantId}/outlets/${outletId}/items${self.state.isEditMode ? "/"+self.props.match.params.item_id+"/edit" : ""}`;
                 }
-                window.location = `/app/admin/${restaurantId}/outlets/${outletId}/items`;
             });
         } else if (event.target.name === "cancel") {
             window.location = `/app/admin/${restaurantId}/outlets/${outletId}/items`;
@@ -189,6 +195,7 @@ class Item extends Component {
             <div className="item-form-container">
                 <h1>{this.state.isEditMode ? "Edit" : "Add"} Item</h1>
                 <section>{itemDetails}</section>
+                <NotificationContainer />
             </div>
         );
     }
