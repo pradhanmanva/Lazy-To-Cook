@@ -72,7 +72,19 @@ lazyToCookApp.get("/api/items", function(request, response) {
         })
         response.send(items).end();
     })
+});
 
+const CategoryHandler = require("./handlers/CategoryHandler");
+lazyToCookApp.get("/api/categories", function(request, response) {
+    if (!request.isAuthenticated() || !AppUtil.isUser(request)) {
+        return AppUtil.denyAccess(response);
+    }
+    new CategoryHandler().fetchAll().then(function(categories) {
+        categories = categories.map(function(category) {
+            return category.toJSON();
+        })
+        response.send(categories).end();
+    })
 });
 
 lazyToCookApp.get("/app/*", function(request, response) {

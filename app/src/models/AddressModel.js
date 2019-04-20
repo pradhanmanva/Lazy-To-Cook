@@ -27,6 +27,16 @@ class AddressModel extends Model {
             && isUSState(this.state)
             && isZipcode(this.zipcode));
     }
+
+    toJSON () {
+        return {
+            line1 : this.lineOne,
+            line2 : this.lineTwo,
+            city : this.city,
+            state : this.state,
+            zipcode : this.zipcode,
+        }
+    }
 }
 
 module.exports = AddressModel;

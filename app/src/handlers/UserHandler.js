@@ -1,6 +1,7 @@
 const DBUtil = require('../utils/DBUtil');
 
 const UserModel = require('../models/UserModel');
+const AddressModel = require('../models/AddressModel');
 
 const USER_TABLE = require('../tables/UserTable');
 const ADDRESS_TABLE = require('../tables/AddressTable');
@@ -84,17 +85,17 @@ class UserHandler {
     fetch(user /* :UserModel*/) {
         if (user && user.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${USER_TABLE.NAME} WHERE ${USER_TABLE.COLUMNS.ID} = ?`;
+            const selectQuery = `SELECT * FROM ${USER_TABLE.NAME} INNER JOIN ${ADDRESS_TABLE.NAME} ON ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.ID} = ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.ADDRESS} WHERE ${USER_TABLE.COLUMNS.ID} = ?`;
             return dbUtil.getConnection().then(function (connection) {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
                 return dbUtil.query(connection, selectQuery, user.id);
             }).then(function (result) {
-                return result.results.map(function (results, index, arr) {
-                        return new UserModel(String(result[USER_TABLE.COLUMNS.ID]), result[USER_TABLE.COLUMNS.FIRSTNAME], result[USER_TABLE.COLUMNS.MIDDLENAME], result[USER_TABLE.COLUMNS.LASTNAME], result[USER_TABLE.COLUMNS.DOB], result[USER_TABLE.COLUMNS.EMAIL], result[USER_TABLE.COLUMNS.ADDRESS]);
-                    }
-                )[0];
+                return result.results.map(function (result, index, arr) {
+                    const address = new AddressModel(result[ADDRESS_TABLE.COLUMNS.ID], result[ADDRESS_TABLE.COLUMNS.LINE1], result[ADDRESS_TABLE.COLUMNS.LINE2], result[ADDRESS_TABLE.COLUMNS.CITY], result[ADDRESS_TABLE.COLUMNS.STATE], result[ADDRESS_TABLE.COLUMNS.ZIPCODE]); 
+                    return new UserModel(String(result[USER_TABLE.COLUMNS.ID]), result[USER_TABLE.COLUMNS.FIRSTNAME], result[USER_TABLE.COLUMNS.MIDDLENAME], result[USER_TABLE.COLUMNS.LASTNAME], result[USER_TABLE.COLUMNS.DOB], result[USER_TABLE.COLUMNS.EMAIL], address);
+                })[0];
             });
         }
         throw new Error('Invalid Operation: Cannot GET all users.');

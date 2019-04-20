@@ -26,16 +26,12 @@ class UserRouter extends Router {
      * GET /api/users/:id
      */
     get(id, request, response) {
-        response.send(`Get user with id: ${id}.`);
-        response.end();
-
-        console.log(request.isAuthenticated());
         const self = this;
         const userModel = new UserModel(id, null, null, null, null, null, null);
         new UserHandler().fetch(userModel).then(function (foundUser) {
             if (foundUser) {
                 foundUser = foundUser.toJSON();
-                foundUser = self.addHateoas(foundUser);
+                // foundUser = self.addHateoas(foundUser);
                 response.status(200).json(foundUser).end();
             }
         }).catch(function (error) {
