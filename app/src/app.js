@@ -24,6 +24,7 @@ const FileStore = require('session-file-store')(session);
 
 const RegistrationRouter = require("./router/RegistrationRouter");
 const AuthRouter = require('./router/AuthRouter');
+const AppUtil = require("./utils/AppUtil");
 
 
 lazyToCookApp.use(session({
@@ -52,6 +53,27 @@ new UserRouter(lazyToCookApp).wire();
 new CartRouter(lazyToCookApp).wire();
 new CartItemRouter(lazyToCookApp).wire();
 new RestaurantItemCategoryRouter(lazyToCookApp).wire();
+
+
+const ItemListingHandler = require("./handlers/ItemListingHandler");
+lazyToCookApp.get("/api/items", function(request, response) {
+    if (!request.isAuthenticated() || !AppUtil.isUser(request)) {
+        return AppUtil.denyAccess(response);
+    }
+    new ItemListingHandler().fetchAll(request.query).then(function(items) {
+        items = items.map(function(item) {
+            return {
+                item : item.item.toJSON(),
+                restaurant : item.restaurant.toJSON(),
+                outlets : item.outlets.map(function(outlet) {
+                    return outlet.toJSON();
+                })
+            }
+        })
+        response.send(items).end();
+    })
+
+});
 
 lazyToCookApp.get("/app/*", function(request, response) {
     response.sendFile(__dirname+'/client/build/index.html');

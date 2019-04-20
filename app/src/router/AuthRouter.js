@@ -58,9 +58,9 @@ class AuthRouter {
 
     _validateRestaurant(username, password, done) {
         const authCredentials = new RestaurantAuthenticationModel(null, username, password, false);
-        if (!isUsername(username) || !isStrongPassword(password)) {
-            return AppUtil.badRequest(response);
-        }
+        // if (!isUsername(username) || !isStrongPassword(password)) {
+        //     return AppUtil.badRequest(response);
+        // }
         new RestaurantHandler().validate(authCredentials).then(function(restaurantId) {
             return done(null, {"user_id" : restaurantId, type : "admin"});
         }).catch(function(error) {
@@ -69,10 +69,9 @@ class AuthRouter {
     }
 
     _validateUser(username, password, done) {
-        console.log(!isEmail(username));
-        if (!isEmail(username) || !isStrongPassword(password)) {
-            return AppUtil.badRequest(response);
-        }
+        // if (!isEmail(username) || !isStrongPassword(password)) {
+        //     return AppUtil.badRequest(response);
+        // }
         const userModel = new UserModel(null, null, null, null, null, username, null);
         const authCredentials = new UserAuthenticationModel(userModel, password, false);
         new UserHandler().validate(authCredentials).then(function(userId) {
