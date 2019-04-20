@@ -38,6 +38,7 @@ lazyToCookApp.use(session({
 // lazyToCookApp.set('views', __dirname + '/client/views');
 // lazyToCookApp.set('view engine', 'pug');
 lazyToCookApp.use(express.static(__dirname + '/client/build'));
+lazyToCookApp.use(express.static(__dirname + '/../assets'));
 
 
 new AuthRouter(lazyToCookApp).wire();

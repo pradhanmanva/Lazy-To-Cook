@@ -8,6 +8,9 @@ const CATEGORY_TABLE = require('../tables/RestaurantItemCategoryTable');
 const ITEM_TABLE = require("../tables/ItemTable");
 const ITEMOUTLET_TABLE = require("../tables/ItemOutletTable");
 
+const path = require("path");
+const fs = require("fs");
+
 class MenuItemHandler {
     constructor() {}
 
@@ -47,7 +50,7 @@ class MenuItemHandler {
         throw new Error('Error: Cannot GET specified item.');
     }
 
-    insert(item /* : ItemModel */, outlet /* : OutletModel */) {
+    insert(item /* : ItemModel */, outlet /* : OutletModel */, dp /* File */) {
         const dbUtil = new DBUtil();
 
         // insert item and then insert item-outlet relationship.
@@ -82,7 +85,11 @@ class MenuItemHandler {
         }).then(function(result) {
             return dbUtil.query(result.connection, itemInsertQuery, itemColumnValues);
         }).then(function(result) {
-            itemOutletColumnValues[ITEMOUTLET_TABLE.COLUMNS.ITEM] = new String(result.results.insertId);
+            itemOutletColumnValues[ITEMOUTLET_TABLE.COLUMNS.ITEM] = result.results.insertId.toString();
+            if (dp) {
+                const itemImageFileName = `${result.results.insertId}${path.extname(dp.originalname)}`;
+                fs.writeFileSync(`${__dirname}/../../assets/images/${itemImageFileName}`, dp.buffer,'ascii');
+            }
             return dbUtil.query(result.connection, itemOutletInsertQuery, itemOutletColumnValues);
         }).then(function(result) {
             item.id = itemOutletColumnValues[ITEMOUTLET_TABLE.COLUMNS.ITEM];
@@ -93,9 +100,10 @@ class MenuItemHandler {
         }).then(function(result) {
             return dbUtil.commitTransaction(result.connection, result.result);
         });
+
     }
     
-    update(item /* : ItemModel */, outlet /* : OutletModel */) {
+    update(item /* : ItemModel */, outlet /* : OutletModel */, dp /* File */) {
         const dbUtil = new DBUtil();
         const itemUpdateQuery = `UPDATE ${ITEM_TABLE.NAME} SET ${ITEM_TABLE.COLUMNS.NAME} = ? , ${ITEM_TABLE.COLUMNS.DESCRIPTION} = ?, ${ITEM_TABLE.COLUMNS.PRICE} = ?, ${ITEM_TABLE.COLUMNS.CATEGORY} = ? WHERE ${ITEM_TABLE.COLUMNS.ID} = ?`;
         const itemColumnValues = [
@@ -122,6 +130,10 @@ class MenuItemHandler {
         }).then(function(result) {
             return dbUtil.query(result.connection, itemUpdateQuery, itemColumnValues);
         }).then(function(result) {
+            if (dp) {
+                const itemImageFileName = `${item.id}${path.extname(dp.originalname)}`;
+                fs.writeFileSync(`${__dirname}/../../assets/images/${itemImageFileName}`, dp.buffer,'ascii');
+            }
             return item;
         });
     }

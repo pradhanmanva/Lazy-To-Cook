@@ -41,11 +41,11 @@ class OutletRouter extends RestaurantRouter {
     * GET /api/restaurants/:restaurant_id/outlets/:id
     */
     get(id, request, response) {
-        if (!request.isAuthenticated() || (AppUtil.isAdmin(request) && !AppUtil.isOwner(request, id))) {
-            return AppUtil.denyAccess(response);
-        }
         const self = this;
         const restaurantId = request.params["restaurant_id"];
+        if (!request.isAuthenticated() || (AppUtil.isAdmin(request) && !AppUtil.isOwner(request, restaurantId))) {
+            return AppUtil.denyAccess(response);
+        }
         const outletId = request.params["id"];
         const restaurantModel = new RestaurantModel(restaurantId.toString(),null, null, null, null);
         const outletModel = new OutletModel(outletId.toString(), null, null, null, restaurantModel);
@@ -114,11 +114,11 @@ class OutletRouter extends RestaurantRouter {
     * }
     */
     update(id, request, response) {
-        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, id)) {
-            return AppUtil.denyAccess(response);
-        }
         const self = this;
         const restaurantId = request.params["restaurant_id"];
+        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, restaurantId)) {
+            return AppUtil.denyAccess(response);
+        }
         const addressModel = new AddressModel(request.body.address.id, request.body.address.line1, request.body.address.line2, request.body.address.city, request.body.address.state, request.body.address.zipcode);
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const outletModel = new OutletModel(id.toString(), request.body.name, addressModel, request.body.contact, restaurantModel);
@@ -136,10 +136,10 @@ class OutletRouter extends RestaurantRouter {
     * DELETE /api/restaurants/:restaurant_id/outlets/:id
     */
     delete(id, request, response) {
-        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, id)) {
+        const restaurantId = request.params["restaurant_id"];
+        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, restaurantId)) {
             return AppUtil.denyAccess(response);
         }
-        const restaurantId = request.params["restaurant_id"];
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const outletModel = new OutletModel(id, null, null, null, restaurantModel);
         new OutletHandler().delete(outletModel).then(function(result) {

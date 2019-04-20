@@ -1,6 +1,7 @@
 import React , {Component} from 'react';
 import "../../styles/auth/Form.css";
 import "../../styles/item/Item.css";
+import ItemImage from "./ItemImage";
 
 class Item extends Component {
 
@@ -10,6 +11,7 @@ class Item extends Component {
             item : {
                 name : "",
                 description : "",
+                item_dp : "",
                 price : "",
                 category : {
                     id : ""
@@ -100,6 +102,19 @@ class Item extends Component {
 
     handleSubmit(event) {
         event.preventDefault();
+
+        let formData = new FormData();
+        if(this.state.isEditMode) {
+            formData.append("id", this.state.item.id);
+        }
+        formData.append("name", this.state.item.name);
+        formData.append("description", this.state.item.description);
+        formData.append("price", this.state.item.price);
+        formData.append("category", this.state.item.category.id);
+        const fileUploadElement = document.getElementsByName("item_dp")[0];
+        const file = fileUploadElement.files[0];
+        formData.append("item_dp", file);
+
         const restaurantId = this.props.match.params.id;
         const outletId = this.props.match.params.outlet_id;
         if (event.target.name === "submit") {
@@ -111,13 +126,13 @@ class Item extends Component {
                 url += `/${itemId}`;
                 method = "PUT";
             }
+            
             fetch(url, {
                 method: method,
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
-                body : JSON.stringify(self.state.item)
+                body : formData
             }).then(function(response) {
                 if (response.status !== 200) {
                     return null;
@@ -133,32 +148,41 @@ class Item extends Component {
         let itemDetails = "";
         if (this.state.item && Object.keys(this.state.item).length) {
             itemDetails = (
-                <form onSubmit={()=>{return false;}}>
-                    <div className="field-row">
-                        <label>Name</label>
-                        <input type="text" name="name" value={this.state.item.name} onChange={this.handleChange} />
+                <div> 
+                    <div style={{"width" : "600px"}}>
+                        {this.state.isEditMode ? <ItemImage url={`/images/${this.state.item.id}.png`} /> : ""}
                     </div>
-                    <div className="field-row">
-                        <label>Description</label>
-                        <input type="text" name="description" value={this.state.item.description} onChange={this.handleChange} />
-                    </div>
-                    <div className="field-row">
-                        <label>Price</label>
-                        <input type="text" name="price" value={this.state.item.price} onChange={this.handleChange} />
-                    </div>
-                    <div className="field-row">
-                        <label>Category</label>
-                        <select name="category" value={this.state.item.category.id} onChange={this.handleChange}>
-                            {
-                                this.state.categories.map(function(category, index){
-                                    return <option key={category.id} value={category.id}>{category.name}</option>;
-                                })
-                            }
-                        </select>
-                    </div>
-                    <input className="submit-btn" name="submit" type="submit" value={this.state.isEditMode ? "Update" : "Create"} onClick={this.handleSubmit} />
-                    <input className="submit-btn" name="cancel" type="submit" value="Cancel" onClick={this.handleSubmit} />
-                </form>
+                    <form onSubmit={()=>{return false;}}>
+                        <div className="field-row">
+                            <label>Display Image</label>
+                            <input type="file" name="item_dp" value={this.state.item.item_dp} onChange={this.handleChange} />
+                        </div>
+                        <div className="field-row">
+                            <label>Name</label>
+                            <input type="text" name="name" value={this.state.item.name} onChange={this.handleChange} />
+                        </div>
+                        <div className="field-row">
+                            <label>Description</label>
+                            <input type="text" name="description" value={this.state.item.description} onChange={this.handleChange} />
+                        </div>
+                        <div className="field-row">
+                            <label>Price</label>
+                            <input type="text" name="price" value={this.state.item.price} onChange={this.handleChange} />
+                        </div>
+                        <div className="field-row">
+                            <label>Category</label>
+                            <select name="category" value={this.state.item.category.id} onChange={this.handleChange}>
+                                {
+                                    this.state.categories.map(function(category, index){
+                                        return <option key={category.id} value={category.id}>{category.name}</option>;
+                                    })
+                                }
+                            </select>
+                        </div>
+                        <input className="submit-btn" name="submit" type="submit" value={this.state.isEditMode ? "Update" : "Create"} onClick={this.handleSubmit} />
+                        <input className="submit-btn" name="cancel" type="submit" value="Cancel" onClick={this.handleSubmit} />
+                    </form>
+                </div>
             );
         }
         return (

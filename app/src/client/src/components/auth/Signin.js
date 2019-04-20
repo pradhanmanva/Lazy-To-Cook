@@ -66,7 +66,7 @@ class Signin extends React.Component {
                 <form onSubmit={this.handleSubmit}>
                     <div className="field-row">
                         <label>
-                            Username
+                            {this.props.user_type === "admin" ? "Username" : "Email Address"}
                         </label>
                         <input type="text" name="username" value={this.state.username} onChange={this.handleChange} />
                     </div>  

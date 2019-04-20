@@ -8,6 +8,11 @@ const RestaurantModel = require("../models/RestaurantModel");
 const RestaurantItemCategoryModel = require("../models/RestaurantItemCategoryModel");
 const AppUtil = require("../utils/AppUtil");
 
+const multer = require("multer");
+const upload = multer({
+    destination: __dirname + '/../../assets/images'
+});
+
 class MenuItemRouter extends OutletRouter {
     constructor(app) {
         super(app);
@@ -90,8 +95,8 @@ class MenuItemRouter extends OutletRouter {
         }
         const outletId = request.params["outlet_id"];
         const outletModel = new OutletModel(outletId.toString(), null, null, null, new RestaurantModel(restaurantId.toString(), null, null, null, null));
-        const menuItem = new ItemModel(null, request.body.name, request.body.description, request.body.price, new RestaurantItemCategoryModel(request.body.category.id, null, null));
-        new MenuItemHandler().insert(menuItem, outletModel).then(function(insertedItem) {
+        const menuItem = new ItemModel(null, request.body.name, request.body.description, request.body.price, new RestaurantItemCategoryModel(request.body.category, null, null));
+        new MenuItemHandler().insert(menuItem, outletModel, request.file).then(function(insertedItem) {
             if (insertedItem) {
                 insertedItem = insertedItem.toJSON();
                 insertedItem = self.addHateoas(restaurantId, outletId, insertedItem);
@@ -124,9 +129,9 @@ class MenuItemRouter extends OutletRouter {
             return AppUtil.denyAccess(response);
         }
         const outletId = request.params["outlet_id"];
-        const itemModel = new ItemModel(id, request.body.name, request.body.description, request.body.price, new RestaurantItemCategoryModel(request.body.category.id, null, null));
+        const itemModel = new ItemModel(id, request.body.name, request.body.description, request.body.price, new RestaurantItemCategoryModel(request.body.category, null, null));
         const outletModel = new OutletModel(outletId.toString(), null, null, null, new RestaurantModel(restaurantId.toString(), null, null, null, null));
-        new MenuItemHandler().update(itemModel, outletModel).then(function(updatedItem) {
+        new MenuItemHandler().update(itemModel, outletModel, request.file).then(function(updatedItem) {
             if (updatedItem) {
                 updatedItem = updatedItem.toJSON();
                 updatedItem = self.addHateoas(restaurantId, outletId, updatedItem);
@@ -169,6 +174,26 @@ class MenuItemRouter extends OutletRouter {
                  }
             ]
         }
+    }
+
+    wire() {
+        const self = this;
+        this.app
+        .get(this.getUrlPattern(), (request, response) => { 
+            self.getAll(request, response);
+        })
+        .get(this.getUrlPattern()+"/:id", (request, response) => {
+            self.get(request.params["id"], request, response);
+        })
+        .post(this.getUrlPattern(), upload.single("item_dp"), (request, response) => { 
+            self.add(request, response);
+        })
+        .put(this.getUrlPattern()+"/:id", upload.single("item_dp"), (request, response) => {
+            self.update(request.params["id"], request, response);
+        })
+        .delete(this.getUrlPattern()+"/:id", (request, response) => {
+            self.delete(request.params["id"], request, response);
+        });
     }
 }
 
