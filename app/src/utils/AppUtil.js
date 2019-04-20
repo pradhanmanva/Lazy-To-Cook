@@ -8,7 +8,7 @@ class AppUtil {
     static getEntityIdPattern(entity) {
         return `:${AppUtil.getEntityIdStr(entity)}`;
     }
-    
+
     static getEntityIdStr(entity) {
         return `${entity}_id`;
     }
@@ -19,7 +19,7 @@ class AppUtil {
         }
         return (request.user && (request.user.type === "admin"));
     }
-    
+
     static isUser(request) {
         if (!request) {
             return false;

@@ -1,13 +1,13 @@
 const Model = require("../framework/Model");
-const {isEmail, isDate, isWebAddress } = require("../utils/Validators");
+const {isEmail, isDate, isWebAddress} = require("../utils/Validators");
 
 
 class UserModel extends Model {
-    constructor(/* string */ id, 
-                /* string */ firstName, 
-                /* string */ middleName, 
-                /* string */ lastName, 
-                /* string */ dateOfBirth, 
+    constructor(/* string */ id,
+                /* string */ firstName,
+                /* string */ middleName,
+                /* string */ lastName,
+                /* string */ dateOfBirth,
                 /* string */ email,
                 /* AddressModel */ address) {
         super(id);
@@ -28,7 +28,7 @@ class UserModel extends Model {
     }
 
     isValid() {
-        return (this.firstName 
+        return (this.firstName
             && this.firstName.length > 0
             && this.lastName
             && this.lastName.length > 0
@@ -40,13 +40,13 @@ class UserModel extends Model {
 
     toJSON() {
         return {
-            first_name : this.firstName,
-            last_name : this.lastName,
-            middle_name : this.middleName,
-            dob : this.dateOfBirth,
-            email : this.email,
-            address : this.address.toJSON(),
-            full_name : this.fullName()
+            first_name: this.firstName,
+            last_name: this.lastName,
+            middle_name: this.middleName,
+            dob: this.dateOfBirth,
+            email: this.email,
+            address: this.address.toJSON(),
+            full_name: this.fullName()
         }
     }
 }

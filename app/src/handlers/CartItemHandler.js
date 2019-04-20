@@ -14,7 +14,21 @@ class CartItemHandler {
     fetchAll(cart) {
         if (cart && cart.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${CARTITEM_TABLE.NAME} WHERE ${CART}`;
+            const selectQuery = `SELECT * FROM ${CARTITEM_TABLE.NAME} WHERE ${CARTITEM_TABLE.COLUMNS.ID} = ?`;
+            return dbUtil.getConnection().then(function (connection) {
+                if (!connection) {
+                    throw Error('connection not available.');
+                }
+                return dbUtil.query(connection, selectQuery, cart.id);
+            }).then(function (result) {
+                return result.results.map(function (result, index, arr) {
+                    return new CartItemHandler(
+                        String(result[CARTITEM_TABLE.COLUMNS.ID]),
+                        result[CARTITEM_TABLE.COLUMNS.NAME],
+                        new CartModel(cart.id, null, null));
+                });
+            });
         }
+        throw new Error('Error: Cannot GET all categories.');
     }
 }

@@ -1,10 +1,11 @@
 const Model = require("../framework/Model");
-const { isUSState, isZipcode } = require("../utils/Validators");
+const {isUSState, isZipcode} = require("../utils/Validators");
+
 class AddressModel extends Model {
-    constructor(/* string */ id, 
-                /* string */ lineOne, 
-                /* string */ lineTwo, 
-                /* string */ city, 
+    constructor(/* string */ id,
+                /* string */ lineOne,
+                /* string */ lineTwo,
+                /* string */ city,
                 /* string */ state,
                 /* int */ zipcode) {
         super(id);

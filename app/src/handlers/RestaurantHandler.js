@@ -35,7 +35,7 @@ class RestaurantHandler {
         let authenticationColumnValues = {
             [RESTAURANT_AUTH_TABLE.COLUMNS.USERNAME]: authCredentials.username,
             [RESTAURANT_AUTH_TABLE.COLUMNS.PASSWORD]: authCredentials.password
-        }
+        };
         const insertQuery = `INSERT INTO ${RESTAURANT_TABLE.NAME} SET ?`;
         const columnValues = {
             [RESTAURANT_TABLE.COLUMNS.NAME]: restaurant.name,
@@ -107,7 +107,7 @@ class RestaurantHandler {
 
     delete(restaurant /* : RestaurantModel */) {
         const dbUtil = new DBUtil();
-        const deleteQuery = `DELETE FROM ${RESTAURANT_TABLE.NAME} WHERE ${RESTAURANT_TABLE.COLUMNS.ID} = ?`
+        const deleteQuery = `DELETE FROM ${RESTAURANT_TABLE.NAME} WHERE ${RESTAURANT_TABLE.COLUMNS.ID} = ?`;
         return dbUtil.getConnection().then(function (connection) {
             if (!connection) {
                 throw Error('connection not available.');

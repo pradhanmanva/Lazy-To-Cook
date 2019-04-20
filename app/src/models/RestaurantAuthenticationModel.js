@@ -2,13 +2,13 @@ const bcrypt = require("bcrypt");
 const SALT_ROUNDS = 10;
 
 class RestaurantAuthenticationModel {
-    constructor(/* RestaurantModel */ restaurant, 
+    constructor(/* RestaurantModel */ restaurant,
                 /* string */ username,
                 /* plain-text string */ password,
                 /* boolean */ shouldEncrypt) {
         if (shouldEncrypt) {
             this.password = bcrypt.hashSync(password, SALT_ROUNDS);
-        } else  {
+        } else {
             this.password = password;
         }
         this.username = username;

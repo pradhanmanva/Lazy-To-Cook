@@ -1,11 +1,11 @@
 const Model = require("../framework/Model");
-const {isEmail, isPhone, isWebAddress } = require("../utils/Validators");
+const {isEmail, isPhone, isWebAddress} = require("../utils/Validators");
 
 class RestaurantModel extends Model {
-    constructor(/* string */ id, 
-                /* string */ name, 
-                /* string */ contact, 
-                /* string */ email, 
+    constructor(/* string */ id,
+                /* string */ name,
+                /* string */ contact,
+                /* string */ email,
                 /* string */ website) {
         super(id);
         this.name = name;

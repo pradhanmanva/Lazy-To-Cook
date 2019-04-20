@@ -15,8 +15,8 @@ class OutletRouter extends RestaurantRouter {
     }
 
     /**
-    * GET /api/restaurants/:restaurant_id/outlets
-    */
+     * GET /api/restaurants/:restaurant_id/outlets
+     */
     getAll(request, response) {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
@@ -24,22 +24,22 @@ class OutletRouter extends RestaurantRouter {
             return AppUtil.denyAccess(response);
         }
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
-        new OutletHandler().fetchAll(restaurantModel).then(function(outlets) {
-            outlets = outlets.map(function(outlet, index, arr) {
+        new OutletHandler().fetchAll(restaurantModel).then(function (outlets) {
+            outlets = outlets.map(function (outlet, index, arr) {
                 outlet = outlet.toJSON();
                 outlet = self.addHateoas(outlet);
                 return outlet;
             });
             response.status(200).json(outlets).end();
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.error(error);
             response.status(500).send("Error occurred while fetching outlets for the specified restaurant. Please check logs for details.").end();
         });
     }
 
     /**
-    * GET /api/restaurants/:restaurant_id/outlets/:id
-    */
+     * GET /api/restaurants/:restaurant_id/outlets/:id
+     */
     get(id, request, response) {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
@@ -47,9 +47,9 @@ class OutletRouter extends RestaurantRouter {
             return AppUtil.denyAccess(response);
         }
         const outletId = request.params["id"];
-        const restaurantModel = new RestaurantModel(restaurantId.toString(),null, null, null, null);
+        const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const outletModel = new OutletModel(outletId.toString(), null, null, null, restaurantModel);
-        new OutletHandler().fetch(outletModel).then(function(outlet) {
+        new OutletHandler().fetch(outletModel).then(function (outlet) {
             if (outlet) {
                 outlet = outlet.toJSON();
                 outlet = self.addHateoas(outlet);
@@ -57,27 +57,27 @@ class OutletRouter extends RestaurantRouter {
                 outlet = {}
             }
             response.status(200).json(outlet).end();
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.error(error);
             response.status(500).send("Error occurred while fetching outlet for the specified restaurant. Please check logs for details.").end();
         });
     }
 
     /**
-    * POST /api/restaurants/:restaurant_id/outlets
-    * 
-    * @requires request.body {
-    *   name : "",
-    *   contact : "",
-    *   address : {
-    *       line1 : "",
-    *       line2 : "",
-    *       city : "",
-    *       state : "",
-    *       zipcode : ""
-    *   }
-    * }
-    */
+     * POST /api/restaurants/:restaurant_id/outlets
+     *
+     * @requires request.body {
+     *   name : "",
+     *   contact : "",
+     *   address : {
+     *       line1 : "",
+     *       line2 : "",
+     *       city : "",
+     *       state : "",
+     *       zipcode : ""
+     *   }
+     * }
+     */
     add(request, response) {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
@@ -90,32 +90,32 @@ class OutletRouter extends RestaurantRouter {
         if (!outletModel.isValid()) {
             return AppUtil.badRequest(response);
         }
-        new OutletHandler().insert(outletModel).then(function(insertedOutlet) {
+        new OutletHandler().insert(outletModel).then(function (insertedOutlet) {
             insertedOutlet = insertedOutlet.toJSON();
             insertedOutlet = self.addHateoas(insertedOutlet);
             response.status(200).json(insertedOutlet).end();
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.error(error);
             response.status(500).send("Error occurred while creating a outlet. Please check logs for details.").end();
         });
     }
 
     /**
-    * PUT /api/restaurants/:restaurant_id/outlets/:id
-    * 
-    * @requires request.body {
-    *   "name" : "", 
-    *   "contact" : "", 
-    *   "address" : {
-    *       "id" : "", 
-    *       "line1" : "", 
-    *       "line2" : "", 
-    *       "city" : "", 
-    *       "state" : "", 
-    *       "zipcode" : zip
-    *   }
-    * }
-    */
+     * PUT /api/restaurants/:restaurant_id/outlets/:id
+     *
+     * @requires request.body {
+     *   "name" : "",
+     *   "contact" : "",
+     *   "address" : {
+     *       "id" : "",
+     *       "line1" : "",
+     *       "line2" : "",
+     *       "city" : "",
+     *       "state" : "",
+     *       "zipcode" : zip
+     *   }
+     * }
+     */
     update(id, request, response) {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
@@ -128,19 +128,19 @@ class OutletRouter extends RestaurantRouter {
         if (!outletModel.isValid()) {
             return AppUtil.badRequest(response);
         }
-        new OutletHandler().update(outletModel).then(function(updatedOutlet) {
+        new OutletHandler().update(outletModel).then(function (updatedOutlet) {
             updatedOutlet = updatedOutlet.toJSON();
             updatedOutlet = self.addHateoas(updatedOutlet);
             response.status(200).json(updatedOutlet).end();
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.error(error);
             response.status(500).send("Error occurred while updating outlet. Please check logs for details.").end();
         });
     }
 
     /**
-    * DELETE /api/restaurants/:restaurant_id/outlets/:id
-    */
+     * DELETE /api/restaurants/:restaurant_id/outlets/:id
+     */
     delete(id, request, response) {
         const restaurantId = request.params["restaurant_id"];
         if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, restaurantId)) {
@@ -148,9 +148,9 @@ class OutletRouter extends RestaurantRouter {
         }
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const outletModel = new OutletModel(id, null, null, null, restaurantModel);
-        new OutletHandler().delete(outletModel).then(function(result) {
+        new OutletHandler().delete(outletModel).then(function (result) {
             response.status(200).send("Success").end();
-        }).catch(function(error) {
+        }).catch(function (error) {
             console.error(error);
             response.status(500).send("Error occurred while deleting a restaurant. Please check logs for details.").end();
         });
@@ -159,15 +159,15 @@ class OutletRouter extends RestaurantRouter {
     addHateoas(outlet) {
         return {
             ...outlet,
-            links : [
+            links: [
                 {
-                    rel : "self",
-                    href : `/api/restaurants/${outlet.restaurant.id}/outlets/${outlet.id}`
-                 },
-                 {
-                     rel : "items",
-                     href : `/api/restaurants/${outlet.restaurant.id}/outlets/${outlet.id}/items`
-                 }
+                    rel: "self",
+                    href: `/api/restaurants/${outlet.restaurant.id}/outlets/${outlet.id}`
+                },
+                {
+                    rel: "items",
+                    href: `/api/restaurants/${outlet.restaurant.id}/outlets/${outlet.id}/items`
+                }
             ]
         }
     }

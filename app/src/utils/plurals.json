@@ -1,8 +1,8 @@
 {
-    "restaurant" : "restaurants",
-    "outlet" : "outlets",
-    "item" : "items",
-    "cart" : "carts",
-    "user" : "users",
-    "category" : "categories"
+  "restaurant": "restaurants",
+  "outlet": "outlets",
+  "item": "items",
+  "cart": "carts",
+  "user": "users",
+  "category": "categories"
 }

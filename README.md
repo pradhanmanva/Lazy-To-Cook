@@ -28,3 +28,4 @@ Now, all the required backend dependencies will the installed and the database w
 1.  Open terminal and change current working directory to <root>/app/src/client
 2.  Run `npm install` and then `npm start` (Use `sudo`, if required.)
 3.  Open browser and go to the url: http://localhost:3000
+

@@ -2,7 +2,8 @@ const mysql = require("mysql");
 
 class DBUtil {
 
-    constructor() {}
+    constructor() {
+    }
 
     getConnection() /* returns Promise */ {
         const host = 'localhost';
@@ -10,7 +11,7 @@ class DBUtil {
         const user = 'root';
         const password = 'root';
         const database = 'lazytocook';
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             const connection = mysql.createConnection({
                 host: host,
                 user: user,
@@ -27,11 +28,11 @@ class DBUtil {
         });
     }
 
-    beginTransaction(connection) /* : returns Promise */{
-        return new Promise(function(resolve, reject) {
-            connection.beginTransaction((error)=> {
+    beginTransaction(connection) /* : returns Promise */ {
+        return new Promise(function (resolve, reject) {
+            connection.beginTransaction((error) => {
                 if (error) {
-                    connection.rollback(function() {
+                    connection.rollback(function () {
                         throw error;
                     });
                     reject(error);
@@ -42,12 +43,12 @@ class DBUtil {
     }
 
     commitTransaction(connection, result)  /* : returns Promise */ {
-        return new Promise(function(resolve, reject) {
-            connection.commit(function(err) {
+        return new Promise(function (resolve, reject) {
+            connection.commit(function (err) {
                 if (err) {
                     reject({
                         error: err,
-                        connection : connection
+                        connection: connection
                     });
                 }
                 resolve(result);
@@ -56,12 +57,12 @@ class DBUtil {
     }
 
     rollbackTransaction(connection) {
-        return new Promise(function(resolve, reject) {
-            connection.rollback(function(err) {
+        return new Promise(function (resolve, reject) {
+            connection.rollback(function (err) {
                 if (err) {
                     reject({
                         error: err,
-                        connection : connection
+                        connection: connection
                     });
                 }
                 resolve();
@@ -70,17 +71,17 @@ class DBUtil {
     }
 
     query(connection, query, value) /* : returns Promise */ {
-        return new Promise(function(resolve, reject) {
-            connection.query(query, value, function(error, results, fields) {
+        return new Promise(function (resolve, reject) {
+            connection.query(query, value, function (error, results, fields) {
                 if (error) {
                     reject({
-                        connection: connection, 
-                        error : error
+                        connection: connection,
+                        error: error
                     });
                 }
                 resolve({
-                    connection: connection, 
-                    results: results, 
+                    connection: connection,
+                    results: results,
                     fields: fields
                 });
             });

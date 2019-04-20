@@ -1,7 +1,7 @@
 const Model = require("../framework/Model");
 
 class RestaurantItemCategoryModel extends Model {
-    constructor(/* string */ id, 
+    constructor(/* string */ id,
                 /* string */ name,
                 /* RestaurantModel */ restaurant) {
         super(id);
