@@ -29,7 +29,7 @@ const AppUtil = require("./utils/AppUtil");
 
 lazyToCookApp.use(session({
     genid: (req) => {
-      return uuid();
+        return uuid();
     },
     store: new FileStore(),
     secret: 'amtnaaanrnvadang bpparalatadenhlan',
@@ -56,30 +56,30 @@ new RestaurantItemCategoryRouter(lazyToCookApp).wire();
 
 
 const ItemListingHandler = require("./handlers/ItemListingHandler");
-lazyToCookApp.get("/api/items", function(request, response) {
+lazyToCookApp.get("/api/items", function (request, response) {
     if (!request.isAuthenticated() || !AppUtil.isUser(request)) {
         return AppUtil.denyAccess(response);
     }
-    new ItemListingHandler().fetchAll(request.query).then(function(items) {
-        items = items.map(function(item) {
+    new ItemListingHandler().fetchAll(request.query).then(function (items) {
+        items = items.map(function (item) {
             return {
-                item : item.item.toJSON(),
-                restaurant : item.restaurant.toJSON(),
-                outlets : item.outlets.map(function(outlet) {
+                item: item.item.toJSON(),
+                restaurant: item.restaurant.toJSON(),
+                outlets: item.outlets.map(function (outlet) {
                     return outlet.toJSON();
                 })
             }
-        })
+        });
         response.send(items).end();
     })
 
 });
 
-lazyToCookApp.get("/app/*", function(request, response) {
-    response.sendFile(__dirname+'/client/build/index.html');
+lazyToCookApp.get("/app/*", function (request, response) {
+    response.sendFile(__dirname + '/client/build/index.html');
     // response.render('auth', { title: lazyToCookApp.get('app-name')});
 });
 
 lazyToCookApp.listen(PORT, () => {
     console.log(`Listening to port: http://${HOST}:${PORT}`);
-})
+});

@@ -3,7 +3,7 @@ const CartRouter = require("./CartRouter");
 const CartModel = require("../models/CartModel");
 const CartItemModel = require("../models/CartItemModel");
 
-const CartModelHandler = require("../handlers/CartItemHandler");
+const CartItemHandler = require("../handlers/CartItemHandler");
 
 class CartItemRouter extends CartRouter {
     constructor(app) {

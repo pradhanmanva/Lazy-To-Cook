@@ -101,6 +101,37 @@ class UserHandler {
     }
 
 
+    delete(user) {
+        const dbUtil = new DBUtil();
+        const deleteQuery = `DELETE FROM ${USER_TABLE.NAME} WHERE ${USER_TABLE.COLUMNS.ID} = ?`;
+        return dbUtil.getConnection().then(function (connection) {
+            if (!connection) {
+                throw Error('connection not available.');
+            }
+            return dbUtil.query(connection, deleteQuery, user.id);
+        });
+    }
+
+    update(user) {
+        const dbUtil = new DBUtil();
+        const updateQuery = `UPDATE ${USER_TABLE.NAME} SET ${USER_TABLE.COLUMNS.FIRSTNAME} = ?, ${USER_TABLE.COLUMNS.MIDDLENAME} = ?, ${USER_TABLE.COLUMNS.LASTNAME} = ?, ${USER_TABLE.COLUMNS.ADDRESS}, ${USER_TABLE.COLUMNS.DOB} = ?, ${USER_TABLE.COLUMNS.EMAIL} = ? WHERE ${USER_TABLE.COLUMNS.ID} = ?`;
+        const columnValues = [
+            user.firstName,
+            user.middleName,
+            user.lastName,
+            user.address.id,
+            user.dateOfBirth,
+            user.email
+        ];
+        return dbUtil.getConnection().then(function (connection) {
+            if (!connection) {
+                throw Error('connection not available.');
+            }
+            return dbUtil.query(connection, updateQuery, columnValues);
+        }).then(function (result) {
+            return user;
+        });
+    }
 }
 
 module.exports = UserHandler;
