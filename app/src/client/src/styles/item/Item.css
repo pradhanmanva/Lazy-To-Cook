@@ -1,0 +1,9 @@
+.item-form-container {
+    position: fixed;
+    left: 760px;
+    top: 60px;
+    bottom: 40px;
+    width: 100%;
+    padding: 10px;
+    overflow-y: auto;
+}

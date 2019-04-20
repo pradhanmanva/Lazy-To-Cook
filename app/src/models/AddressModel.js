@@ -1,5 +1,5 @@
 const Model = require("../framework/Model");
-
+const { isUSState, isZipcode } = require("../utils/Validators");
 class AddressModel extends Model {
     constructor(/* string */ id, 
                 /* string */ lineOne, 
@@ -19,6 +19,14 @@ class AddressModel extends Model {
         return `${lineOne} ${lineTwo}, ${city}, ${state} ${zipcode}`;
     }
 
+    isValid() {
+        return (this.lineOne
+            && this.lineOne.length
+            && this.city
+            && this.city.length
+            && isUSState(this.state)
+            && isZipcode(this.zipcode));
+    }
 }
 
 module.exports = AddressModel;

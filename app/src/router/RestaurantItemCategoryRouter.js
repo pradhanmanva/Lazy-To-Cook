@@ -5,6 +5,8 @@ const RestaurantModel = require('../models/RestaurantModel');
 
 const RestaurantItemCategoryHandler = require('../handlers/RestaurantItemCategoryHandler');
 
+const AppUtil = require("../utils/AppUtil");
+
 class RestaurantItemCategoryRouter extends RestaurantRouter {
     constructor(app) {
         super(app);
@@ -17,6 +19,9 @@ class RestaurantItemCategoryRouter extends RestaurantRouter {
     getAll(request, response) {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
+        if (!request.isAuthenticated() || (AppUtil.isAdmin(request) && !AppUtil.isOwner(request, restaurantId))) {
+            return AppUtil.denyAccess(response);
+        }
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         new RestaurantItemCategoryHandler().fetchAll(restaurantModel).then(function(categories) {
             if (categories) {
@@ -42,6 +47,9 @@ class RestaurantItemCategoryRouter extends RestaurantRouter {
     get(id, request, response) {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
+        if (!request.isAuthenticated() || (AppUtil.isAdmin(request) && !AppUtil.isOwner(request, restaurantId))) {
+            return AppUtil.denyAccess(response);
+        }
         const categoryId = request.params["id"];
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const categoryModel = new RestaurantItemCategoryModel(categoryId.toString(), null, restaurantModel);
@@ -70,8 +78,14 @@ class RestaurantItemCategoryRouter extends RestaurantRouter {
     add(request, response) {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
+        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, restaurantId)) {
+            return AppUtil.denyAccess(response);
+        }
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const categoryModel = new RestaurantItemCategoryModel(null, request.body.name, restaurantModel);
+        if (!categoryModel.isValid()) {
+            return AppUtil.badRequest(response);
+        }
         new RestaurantItemCategoryHandler().insert(categoryModel).then(function(insertedCategory) {
             insertedCategory = insertedCategory.toJSON();
             insertedCategory = self.addHateoas(insertedCategory);
@@ -92,8 +106,14 @@ class RestaurantItemCategoryRouter extends RestaurantRouter {
     update(id, request, response) {
         const self = this;
         const restaurantId = request.params["restaurant_id"];
+        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, restaurantId)) {
+            return AppUtil.denyAccess(response);
+        }
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const categoryModel = new RestaurantItemCategoryModel(id.toString(), request.body.name, restaurantModel);
+        if (!categoryModel.isValid()) {
+            return AppUtil.badRequest(response);
+        }
         new RestaurantItemCategoryHandler().update(categoryModel).then(function(updatedCategory) {
             updatedCategory = updatedCategory.toJSON();
             updatedCategory = self.addHateoas(updatedCategory);
@@ -109,6 +129,9 @@ class RestaurantItemCategoryRouter extends RestaurantRouter {
     */
     delete(id, request, response) {
         const restaurantId = request.params["restaurant_id"];
+        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, restaurantId)) {
+            return AppUtil.denyAccess(response);
+        }
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const categoryModel = new RestaurantItemCategoryModel(id, null, restaurantModel);
         new RestaurantItemCategoryHandler().delete(categoryModel).then(function(result) {

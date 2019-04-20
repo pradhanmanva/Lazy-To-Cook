@@ -8,6 +8,10 @@ class RestaurantItemCategoryModel extends Model {
         this.name = name;
         this.restaurant = restaurant;
     }
+
+    isValid() {
+        return this.name && this.name.length;
+    }
 }
 
 module.exports = RestaurantItemCategoryModel;

@@ -1,4 +1,5 @@
 const Model = require("../framework/Model");
+const { isPrice } = require("../utils/Validators");
 
 class ItemModel extends Model {
     constructor(/* string */ id, 
@@ -11,6 +12,11 @@ class ItemModel extends Model {
         this.description = description;
         this.price = price;
         this.category = category;
+    }
+
+    isValid() {
+        return (this.name && this.name.length
+            && isPrice(this.price));
     }
 
 }

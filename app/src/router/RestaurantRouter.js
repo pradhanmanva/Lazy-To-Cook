@@ -1,6 +1,7 @@
 const Router = require("../framework/Router");
 const RestaurantModel = require("../models/RestaurantModel");
 const RestaurantHandler = require("../handlers/RestaurantHandler");
+const AppUtil = require("../utils/AppUtil");
 /**
  * Router class for setting up the routes of restaurant entity.
  * 
@@ -17,7 +18,9 @@ class RestaurantRouter extends Router {
     * GET /api/restaurants/:id
     */
     get(id, request, response) {
-        console.log(request.isAuthenticated());
+        if (!request.isAuthenticated() || (AppUtil.isAdmin(request) && !AppUtil.isOwner(request, id))) {
+            return AppUtil.denyAccess(response);
+        }
         const self = this;
         const restaurantModel = new RestaurantModel(id, null, null, null, null);
         new RestaurantHandler().fetch(restaurantModel).then(function(foundRestaurant) {
@@ -70,8 +73,14 @@ class RestaurantRouter extends Router {
     * }
     */
     update(id, request, response) {
+        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, id)) {
+            return AppUtil.denyAccess(response);
+        }
         const self = this;
         const restaurantModel = new RestaurantModel(id, request.body.name, request.body.contact, request.body.email, request.body.website);
+        if (!restaurantModel.isValid()) {
+            return AppUtil.badRequest(response);
+        }
         new RestaurantHandler().update(restaurantModel).then(function(updatedRestaurant) {
             updatedRestaurant = updatedRestaurant.toJSON();
             updatedRestaurant = self.addHateoas(updatedRestaurant);
@@ -86,8 +95,12 @@ class RestaurantRouter extends Router {
     * DELETE /api/restaurants/:id
     */
     delete(id, request, response) {
+        if (!request.isAuthenticated() || !AppUtil.isAdmin(request) || !AppUtil.isOwner(request, id)) {
+            return AppUtil.denyAccess(response);
+        }
         const restaurantModel = new RestaurantModel(id, null, null, null, null);
         new RestaurantHandler().delete(restaurantModel).then(function(result) {
+            request.logout();
             response.status(200).send("Success").end();
         }).catch(function(error) {
             console.error(error);

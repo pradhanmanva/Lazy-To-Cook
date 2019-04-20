@@ -1,0 +1,33 @@
+.ContentArea-container {
+    position: fixed;
+    top:60px;
+    bottom:40px;
+    left:0;
+    right:0;
+    overflow-y: scroll;
+}
+
+.ContentArea-container > .ContentArea-icon-tray {
+    position: absolute;
+    top:0;
+    bottom:0;
+    width:60px;
+    background-color:#f0f0f0;
+}
+
+.ContentArea-container > .ContentArea-left-pane {
+    position: absolute;
+    left: 60px;
+    width: 400px;
+    top: 0;
+    bottom: 0;
+    background-color:#f7f5f5;
+}
+
+.ContentArea-container > .ContentArea-content-pane {
+    position: absolute;
+    left: 460px;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
