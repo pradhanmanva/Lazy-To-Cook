@@ -46,10 +46,15 @@ class Restaurant extends React.Component {
             }
         }).then(function(updatedRestaurant) {
             if(updatedRestaurant) {
+                let successMsg = "Successfully updated!";
+                if (self.state.restaurant.is_deleted) {
+                    successMsg = "Successfully restored!";
+                }
                 self.setState({
                     restaurant : updatedRestaurant
+                }, ()=> {
+                    alert(successMsg);
                 });
-                alert("Successfully updated!");
             }
         });
     }
@@ -129,9 +134,9 @@ class Restaurant extends React.Component {
                         </label>
                         <input type="text" name="website" value={this.state.restaurant.website} onChange={this.handleChange} />
                     </div>
-                    <input className="submit-btn" type="submit" value="Update" />
+                    <input className="submit-btn" type="submit" value={this.state.restaurant.is_deleted ? "Restore Account" : "Update"} />
                 </form>
-                <button onClick={this.delete} className="submit-btn trash-btn"><i className="fas fa-trash"></i>&nbsp;Delete Restaurant</button>
+                {!this.state.restaurant.is_deleted ? <button onClick={this.delete} className="submit-btn trash-btn"><i className="fas fa-trash"></i>&nbsp;Delete Restaurant</button> : ""}
                 </div>
             );
         }

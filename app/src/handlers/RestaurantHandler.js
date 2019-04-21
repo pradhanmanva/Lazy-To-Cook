@@ -21,7 +21,7 @@ class RestaurantHandler {
                 return dbUtil.query(connection, selectQuery, restaurant.id);
             }).then(function (result) {
                 return result.results.map(function (result, index, arr) {
-                    return new RestaurantModel(String(result[RESTAURANT_TABLE.COLUMNS.ID]), result[RESTAURANT_TABLE.COLUMNS.NAME], String(result[RESTAURANT_TABLE.COLUMNS.CONTACT]), result[RESTAURANT_TABLE.COLUMNS.EMAIL], result[RESTAURANT_TABLE.COLUMNS.WEBSITE]);
+                    return new RestaurantModel(String(result[RESTAURANT_TABLE.COLUMNS.ID]), result[RESTAURANT_TABLE.COLUMNS.NAME], String(result[RESTAURANT_TABLE.COLUMNS.CONTACT]), result[RESTAURANT_TABLE.COLUMNS.EMAIL], result[RESTAURANT_TABLE.COLUMNS.WEBSITE], result[RESTAURANT_TABLE.COLUMNS.IS_DELETED]);
                 })[0];
             });
         }
@@ -87,7 +87,7 @@ class RestaurantHandler {
 
     update(restaurant /* : RestaurantModel */) {
         const dbUtil = new DBUtil();
-        const updateQuery = `UPDATE ${RESTAURANT_TABLE.NAME} SET ${RESTAURANT_TABLE.COLUMNS.NAME} = ?, ${RESTAURANT_TABLE.COLUMNS.CONTACT} = ?, ${RESTAURANT_TABLE.COLUMNS.EMAIL} = ?, ${RESTAURANT_TABLE.COLUMNS.WEBSITE} = ? WHERE ${RESTAURANT_TABLE.COLUMNS.ID} = ?`;
+        const updateQuery = `UPDATE ${RESTAURANT_TABLE.NAME} SET ${RESTAURANT_TABLE.COLUMNS.NAME} = ?, ${RESTAURANT_TABLE.COLUMNS.CONTACT} = ?, ${RESTAURANT_TABLE.COLUMNS.EMAIL} = ?, ${RESTAURANT_TABLE.COLUMNS.WEBSITE} = ?, ${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false WHERE ${RESTAURANT_TABLE.COLUMNS.ID} = ?`;
         const columnValues = [
             restaurant.name,
             restaurant.contact,
@@ -107,7 +107,7 @@ class RestaurantHandler {
 
     delete(restaurant /* : RestaurantModel */) {
         const dbUtil = new DBUtil();
-        const deleteQuery = `DELETE FROM ${RESTAURANT_TABLE.NAME} WHERE ${RESTAURANT_TABLE.COLUMNS.ID} = ?`;
+        const deleteQuery = `UPDATE ${RESTAURANT_TABLE.NAME} SET ${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = true WHERE ${RESTAURANT_TABLE.COLUMNS.ID} = ? AND ${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false`;
         return dbUtil.getConnection().then(function (connection) {
             if (!connection) {
                 throw Error('connection not available.');

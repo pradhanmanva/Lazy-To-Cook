@@ -26,7 +26,7 @@ class RestaurantRouter extends Router {
         const restaurantModel = new RestaurantModel(id, null, null, null, null);
         new RestaurantHandler().fetch(restaurantModel).then(function (foundRestaurant) {
             if (foundRestaurant) {
-                foundRestaurant = foundRestaurant.toJSON();
+                foundRestaurant = foundRestaurant.toJSON(true);
                 foundRestaurant = self.addHateoas(foundRestaurant);
                 response.status(200).json(foundRestaurant).end();
             }

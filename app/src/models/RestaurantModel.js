@@ -6,12 +6,14 @@ class RestaurantModel extends Model {
                 /* string */ name,
                 /* string */ contact,
                 /* string */ email,
-                /* string */ website) {
+                /* string */ website,
+                /* */ is_deleted) {
         super(id);
         this.name = name;
         this.contact = contact;
         this.email = email;
         this.website = website;
+        this.is_deleted = is_deleted || false;
     }
 
     isValid() {

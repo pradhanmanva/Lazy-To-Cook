@@ -3,7 +3,7 @@ class Model {
         this.id = id;
     }
 
-    toJSON() {
+    toJSON(shouldIncludeIsDeleted) {
         let result = {};
         const props = Object.keys(this);
         for (let prop of props) {
@@ -13,6 +13,13 @@ class Model {
                 } else {
                     result[prop] = this[prop];
                 }
+            }
+        }
+        if (!shouldIncludeIsDeleted) {
+            delete result.is_deleted;
+        } else {
+            if (result.is_deleted) {
+                result.is_deleted = (result.is_deleted == 1);
             }
         }
         return result;

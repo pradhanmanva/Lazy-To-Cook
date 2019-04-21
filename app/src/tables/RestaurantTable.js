@@ -5,6 +5,7 @@ module.exports = {
         NAME: 'restaurant_name',
         CONTACT: 'contact',
         EMAIL: 'email',
-        WEBSITE: 'website'
+        WEBSITE: 'website',
+        IS_DELETED : 'is_deleted'
     }
 };
