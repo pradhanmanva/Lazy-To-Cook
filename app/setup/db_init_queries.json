@@ -15,7 +15,7 @@
 	"CREATE TABLE timing (timing_id BIGINT NOT NULL AUTO_INCREMENT, outlet_id BIGINT NOT NULL, day VARCHAR(9) NOT NULL, start_hour NUMERIC NOT NULL, end_hour NUMERIC NOT NULL, PRIMARY KEY (timing_id), FOREIGN KEY (outlet_id) REFERENCES outlet(outlet_id));",
 
 	"DROP TABLE IF EXISTS category;",
-	"CREATE TABLE category (category_id BIGINT NOT NULL AUTO_INCREMENT, category_name TEXT NOT NULL, restaurant_id BIGINT NOT NULL, PRIMARY KEY (category_id), FOREIGN KEY (restaurant_id) REFERENCES restaurant(restaurant_id) ON DELETE CASCADE);",
+	"CREATE TABLE category (category_id BIGINT NOT NULL AUTO_INCREMENT, category_name TEXT NOT NULL, restaurant_id BIGINT NOT NULL, is_deleted BOOLEAN NOT NULL DEFAULT false, PRIMARY KEY (category_id), FOREIGN KEY (restaurant_id) REFERENCES restaurant(restaurant_id) ON DELETE CASCADE);",
 
 	"DROP TABLE IF EXISTS item;",
 	"CREATE TABLE item (item_id BIGINT NOT NULL AUTO_INCREMENT, item_name TEXT NOT NULL, description TEXT NOT NULL, price DOUBLE(10,2) NOT NULL, category_id BIGINT, PRIMARY KEY (item_id), FOREIGN KEY (category_id) REFERENCES category(category_id) ON DELETE SET NULL);",

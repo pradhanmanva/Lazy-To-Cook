@@ -77,11 +77,9 @@ class Category extends Component {
                 body : JSON.stringify(self.state.category)
             }).then(function(response) {
                 if (response.status !== 200) {
-                    if (response.status === 400) {
-                        response.text().then(function(message){
-                            NotificationManager.error(message);
-                        });
-                    }
+                    response.text().then(function(message){
+                        NotificationManager.error(message);
+                    });
                 } else {
                     window.location = `/app/admin/${restaurantId}/categories${self.state.isEditMode ? "/"+self.props.match.params.category_id+"/edit" : ""}`;
                 }

@@ -1,6 +1,7 @@
 const DBUtil = require("../utils/DBUtil");
 
 const CATEGORY_TABLE = require('../tables/RestaurantItemCategoryTable');
+const RESTAURANT_TABLE = require('../tables/RestaurantTable');
 
 const RestaurantModel = require("../models/RestaurantModel");
 const RestaurantItemCategoryModel = require("../models/RestaurantItemCategoryModel");
@@ -12,7 +13,7 @@ class RestaurantItemCategoryHandler {
     fetchAll(restaurant /* : RestaurantModel */) {
         if (restaurant && restaurant.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${CATEGORY_TABLE.NAME} WHERE ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.RESTAURANT} = ?`;
+            const selectQuery = `SELECT * FROM ${CATEGORY_TABLE.NAME} INNER JOIN ${RESTAURANT_TABLE.NAME} ON ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID}=${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.RESTAURANT} WHERE ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.RESTAURANT} = ? AND ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.IS_DELETED} = false AND ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false`;
             return dbUtil.getConnection().then(function (connection) {
                 if (!connection) {
                     throw Error('connection not available.');
@@ -33,7 +34,7 @@ class RestaurantItemCategoryHandler {
     fetch(category /* : RestaurantItemCategoryModel */) {
         if (category && category.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${CATEGORY_TABLE.NAME} WHERE ${CATEGORY_TABLE.COLUMNS.ID} = ? AND ${CATEGORY_TABLE.COLUMNS.RESTAURANT} = ?`;
+            const selectQuery = `SELECT * FROM ${CATEGORY_TABLE.NAME} INNER JOIN ${RESTAURANT_TABLE.NAME} ON ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID}=${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.RESTAURANT} WHERE ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} = ? AND ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.RESTAURANT} = ? AND ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.IS_DELETED} = false AND ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false`;
             return dbUtil.getConnection().then(function (connection) {
                 if (!connection) {
                     throw Error('connection not available.');
@@ -59,11 +60,21 @@ class RestaurantItemCategoryHandler {
             [CATEGORY_TABLE.COLUMNS.NAME]: category.name,
             [CATEGORY_TABLE.COLUMNS.RESTAURANT]: category.restaurant.id
         };
-        return dbUtil.getConnection().then(function (connection) {
+        const nonDeletedRestaurantSelectQuery =`SELECT ${RESTAURANT_TABLE.COLUMNS.ID} FROM ${RESTAURANT_TABLE.NAME} WHERE ${RESTAURANT_TABLE.COLUMNS.ID} = ? AND ${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false`;
+        return dbUtil.getConnection().then(function(connection) {
             if (!connection) {
-                throw Error('connection not available.');
+                return Promise.reject(new Error('Some internal error occurred.'));
             }
-            return dbUtil.query(connection, insertQuery, columnValues);
+            return dbUtil.query(connection, nonDeletedRestaurantSelectQuery, category.restaurant.id);
+        }).then(function (result) {
+            if (!result || !result.results || result.results.length === 0) {
+                return dbUtil.rollbackTransaction(result.connection).then(function () {
+                    const err = "Invalid Operation: Cannot add category to a non-existent restaurant.";
+                    return Promise.reject(new Error(err));
+                })
+            } else {
+                return dbUtil.query(result.connection, insertQuery, columnValues);
+            }
         }).then(function (result) {
             return new RestaurantItemCategoryModel(String(result.results.insertId), category.name, category.restaurant);
         });
@@ -71,7 +82,7 @@ class RestaurantItemCategoryHandler {
 
     update(category /* : RestaurantItemCategoryModel */) {
         const dbUtil = new DBUtil();
-        const updateQuery = `UPDATE ${CATEGORY_TABLE.NAME} SET ${CATEGORY_TABLE.COLUMNS.NAME} = ? WHERE ${CATEGORY_TABLE.COLUMNS.ID} = ? AND ${CATEGORY_TABLE.COLUMNS.RESTAURANT} = ?`;
+        const updateQuery = `UPDATE ${CATEGORY_TABLE.NAME} INNER JOIN ${RESTAURANT_TABLE.NAME} ON ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID}=${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.RESTAURANT} SET ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.NAME} = ? WHERE ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} = ? AND ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.RESTAURANT} = ? AND ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false`;
         const columnValues = [
             category.name,
             category.id,
@@ -84,7 +95,7 @@ class RestaurantItemCategoryHandler {
             return dbUtil.query(connection, updateQuery, columnValues);
         }).then(function (result) {
             if (result.results.affectedRows === 0) {
-                throw new Error("Unauthorized update or no such record found.");
+                return Promise.reject(new Error("Invalid operation: Cannot update category of non-existent restaurant."));
             }
             return category;
         });
@@ -92,7 +103,8 @@ class RestaurantItemCategoryHandler {
 
     delete(category /* : RestaurantItemCategoryModel */) {
         const dbUtil = new DBUtil();
-        const deleteQuery = `DELETE FROM ${CATEGORY_TABLE.NAME} WHERE ${CATEGORY_TABLE.COLUMNS.ID} = ? AND ${CATEGORY_TABLE.COLUMNS.RESTAURANT} = ?`;
+        const deleteQuery = `UPDATE ${CATEGORY_TABLE.NAME} INNER JOIN ${RESTAURANT_TABLE.NAME} ON ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID}=${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.RESTAURANT} SET ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.IS_DELETED} = true WHERE ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} = ? AND ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.RESTAURANT} = ? AND ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false`;
+        // const deleteQuery = `DELETE FROM ${CATEGORY_TABLE.NAME} WHERE ${CATEGORY_TABLE.COLUMNS.ID} = ? AND ${CATEGORY_TABLE.COLUMNS.RESTAURANT} = ?`;
         return dbUtil.getConnection().then(function (connection) {
             if (!connection) {
                 throw Error('connection not available.');
@@ -100,7 +112,7 @@ class RestaurantItemCategoryHandler {
             return dbUtil.query(connection, deleteQuery, [category.id, category.restaurant.id]);
         }).then(function (result) {
             if (result.results.affectedRows === 0) {
-                throw new Error("Unauthorized delete or no matching record found.");
+                return Promise.reject(new Error("Invalid operation: Cannot delete category of non-existent restaurant."));
             }
         });
     }

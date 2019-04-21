@@ -46,6 +46,7 @@ class CategoryHome extends AuthenticatedRoutes {
                         </NavLink>
                     </h4>
                     <ul className="outlet-list">
+                        {!this.state.categories || !this.state.categories.length ? <div style={{textAlign:"center",marginTop:"10px"}}>No category to display.</div> : ""}
                         {this.state.categories.map(function(category, index) {
                             return (
                                 <li className="outlet-list-item" key={category.id} >

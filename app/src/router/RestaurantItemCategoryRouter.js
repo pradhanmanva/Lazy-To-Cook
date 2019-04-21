@@ -84,13 +84,19 @@ class RestaurantItemCategoryRouter extends RestaurantRouter {
         if (!categoryModel.isValid()) {
             return AppUtil.badRequest(response);
         }
-        new RestaurantItemCategoryHandler().insert(categoryModel).then(function (insertedCategory) {
-            insertedCategory = insertedCategory.toJSON();
-            insertedCategory = self.addHateoas(insertedCategory);
-            response.status(200).json(insertedCategory).end();
+        new RestaurantItemCategoryHandler().insert(categoryModel).then(function (insertedCategoryOrError) {
+            if (insertedCategoryOrError) {
+                if (insertedCategoryOrError instanceof Error) {
+                    return Promise.reject(insertedCategoryOrError);
+                } else {
+                    let insertedCategory = insertedCategoryOrError.toJSON();
+                    insertedCategory = self.addHateoas(insertedCategory);
+                    response.status(200).json(insertedCategory).end();
+                }
+            }
         }).catch(function (error) {
             console.error(error);
-            response.status(500).send("Error occurred while creating category. Please check logs for details.").end();
+            response.status(500).send(error.message).end();
         });
     }
 
@@ -112,13 +118,16 @@ class RestaurantItemCategoryRouter extends RestaurantRouter {
         if (!categoryModel.isValid()) {
             return AppUtil.badRequest(response);
         }
-        new RestaurantItemCategoryHandler().update(categoryModel).then(function (updatedCategory) {
-            updatedCategory = updatedCategory.toJSON();
+        new RestaurantItemCategoryHandler().update(categoryModel).then(function (updatedCategoryOrError) {
+            if (updatedCategoryOrError instanceof Error) {
+                return Promise.reject(updatedCategoryOrError);
+            }
+            let updatedCategory = updatedCategoryOrError.toJSON();
             updatedCategory = self.addHateoas(updatedCategory);
             response.status(200).json(updatedCategory).end();
         }).catch(function (error) {
-            console.error(error);
-            response.status(500).send("Error occurred while updating outlet. Please check logs for details.").end();
+            console.error("abc", error.message);
+            response.status(500).send(error.message).end();
         });
     }
 
@@ -132,11 +141,14 @@ class RestaurantItemCategoryRouter extends RestaurantRouter {
         }
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const categoryModel = new RestaurantItemCategoryModel(id, null, restaurantModel);
-        new RestaurantItemCategoryHandler().delete(categoryModel).then(function (result) {
+        new RestaurantItemCategoryHandler().delete(categoryModel).then(function (resultOrError) {
+            if (resultOrError instanceof Error) {
+                return Promise.reject(resultOrError);
+            }
             response.status(200).send("Success").end();
         }).catch(function (error) {
             console.error(error);
-            response.status(500).send("Error occurred while deleting a restaurant. Please check logs for details.").end();
+            response.status(500).send(error.message).end();
         });
     }
 
