@@ -22,7 +22,7 @@ class CartItemHandler {
                 return dbUtil.query(connection, selectQuery, cart.id);
             }).then(function (result) {
                 return result.results.map(function (result, index, arr) {
-                    return new CartItemHandler(
+                    return new CartItemModel(
                         String(result[CARTITEM_TABLE.COLUMNS.ID]),
                         result[CARTITEM_TABLE.COLUMNS.NAME],
                         new CartModel(cart.id, null, null));
@@ -32,3 +32,5 @@ class CartItemHandler {
         throw new Error('Error: Cannot GET all categories.');
     }
 }
+
+module.exports = CartItemHandler;

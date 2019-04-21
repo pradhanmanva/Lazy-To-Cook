@@ -10,16 +10,14 @@ class CartRouter extends UserRouter {
      * GET /api/users/:user_id/carts
      */
     getAll(request, response) {
-        response.send(`Get all carts of user ${userId}`);
-        response.end();
+
     }
 
     /**
      * GET /api/users/:user_id/carts/:id
      */
     get(id, request, response) {
-        response.send(`Get cart ${id} of user ${userId}`);
-        response.end();
+
     }
 
     /**
