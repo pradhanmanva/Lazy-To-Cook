@@ -64,10 +64,15 @@ class User extends React.Component {
             }
         }).then(function(updatedUser) {
             if(updatedUser) {
+                let successMsg = "Successfully updated!";
+                if (self.state.user.is_deleted) {
+                    successMsg = "Successfully restored!";
+                }
                 self.setState({
                     user : updatedUser
+                }, ()=> {
+                    alert(successMsg);
                 });
-                alert("Successfully updated!");
             }
         });
     }
@@ -184,9 +189,10 @@ class User extends React.Component {
                             <input type="text" name="zipcode" value={this.state.user.address.zipcode} onChange={this.handleChange} />
                         </div>
                     </div>
-                    <input className="submit-btn" type="submit" value="Submit" />
+                    <input className="submit-btn" type="submit" value={this.state.user.is_deleted ? "Restore Account" : "Update"} />
                 </form>
-                <button onClick={this.delete} className="submit-btn trash-btn"><i className="fas fa-trash"></i>&nbsp;Delete Account</button>
+                {!this.state.user.is_deleted ? <button onClick={this.delete} className="submit-btn trash-btn"><i className="fas fa-trash"></i>&nbsp;Delete Account</button> : ""}
+                
                 </div>
             );
         }

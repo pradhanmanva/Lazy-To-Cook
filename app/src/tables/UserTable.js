@@ -7,6 +7,7 @@ module.exports = {
         LASTNAME: "last_name",
         DOB: "date_of_birth",
         EMAIL: "email_address",
-        ADDRESS: "address"
+        ADDRESS: "address",
+        IS_DELETED : "is_deleted"
     }
 };

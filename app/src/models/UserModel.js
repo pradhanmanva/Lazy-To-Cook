@@ -9,7 +9,8 @@ class UserModel extends Model {
                 /* string */ lastName,
                 /* string */ dateOfBirth,
                 /* string */ email,
-                /* AddressModel */ address) {
+                /* AddressModel */ address,
+                /* boolean */is_deleted) {
         super(id);
         this.firstName = firstName;
         this.middleName = middleName;
@@ -17,6 +18,7 @@ class UserModel extends Model {
         this.dateOfBirth = dateOfBirth;
         this.email = email;
         this.address = address;
+        this.is_deleted = is_deleted || false;
     }
 
     fullName() {
@@ -38,8 +40,8 @@ class UserModel extends Model {
             && this.address.isValid());
     }
 
-    toJSON() {
-        return {
+    toJSON(shouldIncludeIsDeleted) {
+        let result = {
             first_name: this.firstName,
             last_name: this.lastName,
             middle_name: this.middleName,
@@ -48,6 +50,10 @@ class UserModel extends Model {
             address: this.address.toJSON(),
             full_name: this.fullName()
         }
+        if (shouldIncludeIsDeleted && this.is_deleted) {
+                result.is_deleted = (this.is_deleted === 1);
+        }
+        return result;
     }
 }
 

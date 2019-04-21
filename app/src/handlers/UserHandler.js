@@ -94,7 +94,7 @@ class UserHandler {
             }).then(function (result) {
                 return result.results.map(function (result, index, arr) {
                     const address = new AddressModel(result[ADDRESS_TABLE.COLUMNS.ID], result[ADDRESS_TABLE.COLUMNS.LINE1], result[ADDRESS_TABLE.COLUMNS.LINE2], result[ADDRESS_TABLE.COLUMNS.CITY], result[ADDRESS_TABLE.COLUMNS.STATE], result[ADDRESS_TABLE.COLUMNS.ZIPCODE]); 
-                    return new UserModel(String(result[USER_TABLE.COLUMNS.ID]), result[USER_TABLE.COLUMNS.FIRSTNAME], result[USER_TABLE.COLUMNS.MIDDLENAME], result[USER_TABLE.COLUMNS.LASTNAME], result[USER_TABLE.COLUMNS.DOB], result[USER_TABLE.COLUMNS.EMAIL], address);
+                    return new UserModel(String(result[USER_TABLE.COLUMNS.ID]), result[USER_TABLE.COLUMNS.FIRSTNAME], result[USER_TABLE.COLUMNS.MIDDLENAME], result[USER_TABLE.COLUMNS.LASTNAME], result[USER_TABLE.COLUMNS.DOB], result[USER_TABLE.COLUMNS.EMAIL], address, result[USER_TABLE.COLUMNS.IS_DELETED]);
                 })[0];
             });
         }
@@ -104,7 +104,7 @@ class UserHandler {
 
     delete(user) {
         const dbUtil = new DBUtil();
-        const deleteQuery = `DELETE FROM ${USER_TABLE.NAME} WHERE ${USER_TABLE.COLUMNS.ID} = ?`;
+        const deleteQuery = `UPDATE ${USER_TABLE.NAME} SET ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.IS_DELETED} = true WHERE ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.ID} = ?`;
         return dbUtil.getConnection().then(function (connection) {
             if (!connection) {
                 throw Error('connection not available.');
@@ -113,24 +113,42 @@ class UserHandler {
         });
     }
 
-    update(user) {
+    update(user /* : UserModel */) {
+        if (!user || !user.id) {
+            throw new Error("Insufficient input.");
+        }
         const dbUtil = new DBUtil();
-        const updateQuery = `UPDATE ${USER_TABLE.NAME} SET ${USER_TABLE.COLUMNS.FIRSTNAME} = ?, ${USER_TABLE.COLUMNS.MIDDLENAME} = ?, ${USER_TABLE.COLUMNS.LASTNAME} = ?, ${USER_TABLE.COLUMNS.ADDRESS}, ${USER_TABLE.COLUMNS.DOB} = ?, ${USER_TABLE.COLUMNS.EMAIL} = ? WHERE ${USER_TABLE.COLUMNS.ID} = ?`;
+
+        const updateQuery = `UPDATE ${USER_TABLE.NAME} INNER JOIN ${ADDRESS_TABLE.NAME} ON ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.ADDRESS}=${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.ID} SET ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.ADDRESS}=${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.ID}, ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.FIRSTNAME} = ?, ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.MIDDLENAME} = ?, ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.LASTNAME} = ?, ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.DOB} = ?, ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.EMAIL} = ?, ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.IS_DELETED} = false, ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.LINE1} = ?, ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.LINE2} = ?, ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.CITY} = ?, ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.STATE} = ?, ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.ZIPCODE} = ? WHERE ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.ID} = ?`;
         const columnValues = [
             user.firstName,
             user.middleName,
             user.lastName,
-            user.address.id,
             user.dateOfBirth,
-            user.email
+            user.email,
+            user.address.lineOne,
+            user.address.lineTwo,
+            user.address.city,
+            user.address.state,
+            user.address.zipcode,
+            user.id
         ];
+
         return dbUtil.getConnection().then(function (connection) {
             if (!connection) {
                 throw Error('connection not available.');
             }
+            return dbUtil.beginTransaction(connection);
+        }).then(function (connection) {
             return dbUtil.query(connection, updateQuery, columnValues);
+        })
+        .then(function (result) {
+            return {
+                connection: result.connection,
+                result: user
+            }
         }).then(function (result) {
-            return user;
+            return dbUtil.commitTransaction(result.connection, result.result);
         });
     }
 }

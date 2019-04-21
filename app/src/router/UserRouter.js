@@ -25,7 +25,8 @@ class UserRouter extends Router {
         const userModel = new UserModel(id, null, null, null, null, null, null);
         new UserHandler().fetch(userModel).then(function (foundUser) {
             if (foundUser) {
-                foundUser = foundUser.toJSON();
+                foundUser = foundUser.toJSON(true);
+                console.log(foundUser);
                 foundUser = self.addHateoas(foundUser);
                 response.status(200).json(foundUser).end();
             }
@@ -40,16 +41,22 @@ class UserRouter extends Router {
      */
     update(id, request, response) {
         const self = this;
-        const userId = request.params["user_id"];
+        const userId = request.params["id"];
         if (!request.isAuthenticated() || !AppUtil.isUser(request) || !AppUtil.isOwner(request, userId)) {
             return AppUtil.denyAccess(response);
         }
         const addressModel = new AddressModel(request.body.address.id, request.body.address.line1, request.body.address.line2, request.body.address.city, request.body.address.state, request.body.address.zipcode);
         const userModel = new UserModel(userId.toString(), request.body.first_name, request.body.middle_name, request.body.last_name, request.body.dob, request.body.email, addressModel);
-
+        if (!userModel.isValid()) {
+            return AppUtil.badRequest(response);
+        }
         new UserHandler().update(userModel).then(function (updatedUser) {
-            updatedUser = updatedUser.toJSON();
-            updatedUser = self.addHateoas(updatedUser);
+            if (updatedUser) {
+                updatedUser = updatedUser.toJSON();
+                updatedUser = self.addHateoas(updatedUser);
+            } else {
+                updatedUser = {};
+            }
             response.status(200).json(updatedUser).end();
         }).catch(function (error) {
             console.error(error);
@@ -61,13 +68,14 @@ class UserRouter extends Router {
      * DELETE /api/users/:id
      */
     delete(id, request, response) {
-        const userId = request.params["user_id"];
+        const userId = request.params["id"];
         if (!request.isAuthenticated() || !AppUtil.isUser(request) || !AppUtil.isOwner(request, userId)) {
             return AppUtil.denyAccess(response);
         }
         const userModel = new UserModel(userId.toString(), null, null, null, null, null, null);
 
         new UserHandler().delete(userModel).then(function (result) {
+            request.logout();
             response.status(200).send("Success").end();
         }).catch(function (error) {
             console.error(error);
