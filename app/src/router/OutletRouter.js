@@ -91,12 +91,16 @@ class OutletRouter extends RestaurantRouter {
             return AppUtil.badRequest(response);
         }
         new OutletHandler().insert(outletModel).then(function (insertedOutlet) {
-            insertedOutlet = insertedOutlet.toJSON();
-            insertedOutlet = self.addHateoas(insertedOutlet);
-            response.status(200).json(insertedOutlet).end();
+            if(insertedOutlet instanceof Error) {
+                return Promise.reject(insertedOutlet);
+            }
+            if (insertedOutlet) {
+                insertedOutlet = insertedOutlet.toJSON();
+                insertedOutlet = self.addHateoas(insertedOutlet);
+                response.status(200).json(insertedOutlet).end();
+            }
         }).catch(function (error) {
-            console.error(error);
-            response.status(500).send("Error occurred while creating a outlet. Please check logs for details.").end();
+            response.status(500).send(error.message).end();
         });
     }
 
@@ -128,13 +132,15 @@ class OutletRouter extends RestaurantRouter {
         if (!outletModel.isValid()) {
             return AppUtil.badRequest(response);
         }
-        new OutletHandler().update(outletModel).then(function (updatedOutlet) {
-            updatedOutlet = updatedOutlet.toJSON();
+        new OutletHandler().update(outletModel).then(function (updatedOutletOrError) {
+            if (updatedOutletOrError instanceof Error) {
+                return Promise.reject(updatedOutletOrError)
+            }
+            let updatedOutlet = updatedOutletOrError.toJSON();
             updatedOutlet = self.addHateoas(updatedOutlet);
             response.status(200).json(updatedOutlet).end();
         }).catch(function (error) {
-            console.error(error);
-            response.status(500).send("Error occurred while updating outlet. Please check logs for details.").end();
+            response.status(500).send(error.message).end();
         });
     }
 
@@ -149,10 +155,13 @@ class OutletRouter extends RestaurantRouter {
         const restaurantModel = new RestaurantModel(restaurantId.toString(), null, null, null, null);
         const outletModel = new OutletModel(id, null, null, null, restaurantModel);
         new OutletHandler().delete(outletModel).then(function (result) {
+            if (result instanceof Error) {
+                return Promise.reject(result);
+            }
             response.status(200).send("Success").end();
         }).catch(function (error) {
             console.error(error);
-            response.status(500).send("Error occurred while deleting a restaurant. Please check logs for details.").end();
+            response.status(500).send(error.message).end();
         });
     }
 

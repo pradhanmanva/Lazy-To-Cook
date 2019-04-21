@@ -47,6 +47,7 @@ class OutletHome extends AuthenticatedRoutes {
                         </Link>
                     </h4>
                     <ul className="outlet-list">
+                        {!this.state.outlets || !this.state.outlets.length ? <div style={{textAlign:"center",marginTop:"10px"}}>No outlet to display.</div> : ""}
                         {this.state.outlets.map(function(outlet, index) {
                             return (
                                 <li className="outlet-list-item" key={outlet.id} >

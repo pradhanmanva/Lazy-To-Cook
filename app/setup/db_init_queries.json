@@ -9,7 +9,7 @@
 	"CREATE TABLE address (address_id BIGINT NOT NULL AUTO_INCREMENT, line_1 TEXT NOT NULL, line_2 TEXT, city TEXT NOT NULL, state TEXT NOT NULL, zipcode INTEGER NOT NULL, PRIMARY KEY (address_id));",
 
 	"DROP TABLE IF EXISTS outlet;",
-	"CREATE TABLE outlet (outlet_id BIGINT NOT NULL AUTO_INCREMENT, outlet_name TEXT NOT NULL, outlet_address BIGINT NOT NULL, outlet_contact TEXT DEFAULT NULL, restaurant_id BIGINT NOT NULL, FOREIGN KEY (outlet_address) REFERENCES address(address_id), FOREIGN KEY (restaurant_id) REFERENCES restaurant(restaurant_id) ON DELETE CASCADE, PRIMARY KEY(outlet_id));",
+	"CREATE TABLE outlet (outlet_id BIGINT NOT NULL AUTO_INCREMENT, outlet_name TEXT NOT NULL, outlet_address BIGINT NOT NULL, outlet_contact TEXT DEFAULT NULL, restaurant_id BIGINT NOT NULL, is_deleted BOOLEAN NOT NULL DEFAULT false, FOREIGN KEY (outlet_address) REFERENCES address(address_id), FOREIGN KEY (restaurant_id) REFERENCES restaurant(restaurant_id) ON DELETE CASCADE, PRIMARY KEY(outlet_id));",
 	
 	"DROP TABLE IF EXISTS timing;",
 	"CREATE TABLE timing (timing_id BIGINT NOT NULL AUTO_INCREMENT, outlet_id BIGINT NOT NULL, day VARCHAR(9) NOT NULL, start_hour NUMERIC NOT NULL, end_hour NUMERIC NOT NULL, PRIMARY KEY (timing_id), FOREIGN KEY (outlet_id) REFERENCES outlet(outlet_id));",

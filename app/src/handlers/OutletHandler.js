@@ -15,7 +15,7 @@ class OutletHandler {
     fetchAll(restaurant /* : RestaurantModel */) {
         if (restaurant && restaurant.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${OUTLET_TABLE.NAME} LEFT JOIN ${ADDRESS_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ADDRESS} = ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.ID} LEFT JOIN  ${RESTAURANT_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID} WHERE ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`;
+            const selectQuery = `SELECT * FROM ${OUTLET_TABLE.NAME} LEFT JOIN ${ADDRESS_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ADDRESS} = ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.ID} LEFT JOIN  ${RESTAURANT_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID} WHERE ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.IS_DELETED} = false AND ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false`;
             return dbUtil.getConnection().then(function (connection) {
                 if (!connection) {
                     throw Error('connection not available.');
@@ -50,7 +50,7 @@ class OutletHandler {
     fetch(outlet /* : OutletModel */) {
         if (outlet && outlet.id && outlet.restaurant && outlet.restaurant.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${OUTLET_TABLE.NAME} LEFT JOIN ${ADDRESS_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ADDRESS} = ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.ID} LEFT JOIN  ${RESTAURANT_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID} WHERE ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`
+            const selectQuery = `SELECT * FROM ${OUTLET_TABLE.NAME} LEFT JOIN ${ADDRESS_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ADDRESS} = ${ADDRESS_TABLE.NAME}.${ADDRESS_TABLE.COLUMNS.ID} LEFT JOIN  ${RESTAURANT_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID} WHERE ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.IS_DELETED} = false AND ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false`;
             return dbUtil.getConnection().then(function (connection) {
                 if (!connection) {
                     throw Error('connection not available.');
@@ -101,13 +101,24 @@ class OutletHandler {
             [OUTLET_TABLE.COLUMNS.CONTACT]: outlet.contact,
             [OUTLET_TABLE.COLUMNS.RESTAURANT]: outlet.restaurant.id
         };
+
+        const nonDeletedRestaurantSelectQuery =`SELECT ${RESTAURANT_TABLE.COLUMNS.ID} FROM ${RESTAURANT_TABLE.NAME} WHERE ${RESTAURANT_TABLE.COLUMNS.ID} = ? AND ${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false`;
         return dbUtil.getConnection().then(function (connection) {
             if (!connection) {
                 throw Error('connection not available.');
             }
             return dbUtil.beginTransaction(connection);
-        }).then(function (connection) {
-            return dbUtil.query(connection, addressInsertQuery, addressColumnValues);
+        }).then(function(connection) {
+            return dbUtil.query(connection, nonDeletedRestaurantSelectQuery, outlet.restaurant.id);
+        }).then(function (result) {
+            if (!result || !result.results || result.results.length === 0) {
+                return dbUtil.rollbackTransaction(result.connection).then(function () {
+                    const err = "Invalid Operation: Cannot add outlet to a non-existent restaurant.";
+                    return Promise.reject(new Error(err));
+                })
+            } else {
+                return dbUtil.query(result.connection, addressInsertQuery, addressColumnValues);
+            }
         }).then(function (result) {
             outletColumnValues[OUTLET_TABLE.COLUMNS.ADDRESS] = String(result.results.insertId);
             return dbUtil.query(result.connection, outletInsertQuery, outletColumnValues);
@@ -150,7 +161,7 @@ class OutletHandler {
             outlet.address.id
         ];
 
-        const outletUpdateQuery = `UPDATE ${OUTLET_TABLE.NAME} SET ${OUTLET_TABLE.COLUMNS.NAME} = ?, ${OUTLET_TABLE.COLUMNS.CONTACT} = ? WHERE ${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`;
+        const outletUpdateQuery = `UPDATE ${OUTLET_TABLE.NAME} INNER JOIN ${RESTAURANT_TABLE.NAME} ON ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID}=${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} SET ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.NAME} = ?, ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.CONTACT} = ? WHERE ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.IS_DELETED} = false AND ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false`;
         const outletColumnValues = [
             outlet.name,
             outlet.contact,
@@ -168,10 +179,11 @@ class OutletHandler {
         }).then(function (result) {
             if (result.results.affectedRows === 0) {
                 return dbUtil.rollbackTransaction(result.connection).then(function () {
-                    throw Error("Unauthorized update.");
+                    return Promise.reject(new Error("Invalid Operation: Either no outlet is found or update on non-existent restaurant."));
                 });
+            } else {
+                return dbUtil.query(result.connection, addressUpdateQuery, addressColumnValues);
             }
-            return dbUtil.query(result.connection, addressUpdateQuery, addressColumnValues);
         }).then(function (result) {
             return {
                 connection: result.connection,
@@ -184,7 +196,8 @@ class OutletHandler {
 
     delete(outlet /* : OutletMode */) {
         const dbUtil = new DBUtil();
-        const deleteQuery = `DELETE FROM ${OUTLET_TABLE.NAME} WHERE ${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`
+        const deleteQuery = `UPDATE ${OUTLET_TABLE.NAME} INNER JOIN ${RESTAURANT_TABLE.NAME} ON ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID}=${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} SET ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.IS_DELETED} = true WHERE ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ? AND ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false`;
+        // const deleteQuery = `DELETE FROM ${OUTLET_TABLE.NAME} WHERE ${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.COLUMNS.RESTAURANT} = ?`
         return dbUtil.getConnection().then(function (connection) {
             if (!connection) {
                 throw Error('connection not available.');
@@ -192,7 +205,7 @@ class OutletHandler {
             return dbUtil.query(connection, deleteQuery, [outlet.id, outlet.restaurant.id]);
         }).then(function (result) {
             if (result.results.affectedRows === 0) {
-                throw new Error("Unauthorized delete.");
+                return Promise.reject(new Error("Invalid Operation: Either no outlet is found or delete on non-existent restaurant."));
             }
         });
     }

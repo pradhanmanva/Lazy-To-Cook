@@ -104,11 +104,9 @@ class Outlet extends Component {
                 body : JSON.stringify(self.state.outlet)
             }).then(function(response) {
                 if (!response || response.status !== 200) {
-                    if (response.status === 400) {
-                        response.text().then(function(message){
-                            NotificationManager.error(message);
-                        });
-                    }
+                    response.text().then(function(message){
+                        NotificationManager.error(message);
+                    });
                 } else {
                     window.location = `/app/admin/${self.props.match.params.id}/outlets${self.state.isEditMode ? "/"+self.props.match.params.outlet_id+"/edit" : ""}`;
                 }

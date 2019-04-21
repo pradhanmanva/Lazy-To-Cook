@@ -5,6 +5,7 @@ module.exports = {
         NAME: 'outlet_name',
         ADDRESS: 'outlet_address',
         CONTACT: 'outlet_contact',
-        RESTAURANT: 'restaurant_id'
+        RESTAURANT: 'restaurant_id',
+        IS_DELETED : 'is_deleted'
     }
 };
