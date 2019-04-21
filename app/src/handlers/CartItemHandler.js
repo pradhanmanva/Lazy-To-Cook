@@ -7,6 +7,7 @@ const DBUtil = require("../utils/DBUtil");
 const CART_TABLE = require("../tables/CartTable");
 const CARTITEM_TABLE = require("../tables/CartItemTable");
 const ITEM_TABLE = require("../tables/ItemTable");
+const CATEGORY_TABLE = require("../tables/CategoryTable");
 const USER_TABLE = require('../tables/UserTable');
 
 class CartItemHandler {
@@ -17,7 +18,7 @@ class CartItemHandler {
     fetchAll(cart) {
         if (cart && cart.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${CARTITEM_TABLE.NAME} LEFT JOIN ${ITEM_TABLE.NAME} ON ${CARTITEM_TABLE.COLUMNS.ITEM}=${ITEM_TABLE.COLUMNS.ID} WHERE ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ID} = ?`;
+            const selectQuery = `SELECT * FROM ${ITEM_TABLE.NAME} INNER JOIN ${CARTITEM_TABLE.NAME} ON ${CARTITEM_TABLE.COLUMNS.ITEM}=${ITEM_TABLE.COLUMNS.ID} INNER JOIN ${CATEGORY_TABLE.NAME} ON ${CATEGORY_TABLE.COLUMNS.ID}=${ITEM_TABLE.COLUMNS.ID} WHERE ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ID} = ?`;
             return dbUtil.getConnection().then(function (connection) {
                 if (!connection) {
                     throw Error('connection not available.');
@@ -27,7 +28,7 @@ class CartItemHandler {
                 return result.results.map(function (result, index, arr) {
                     return new CartItemModel(
                         String(result[CARTITEM_TABLE.COLUMNS.ID]),
-                        new ItemModel(result[ITEM_TABLE.COLUMNS.ID], result[ITEM_TABLE.COLUMNS.NAME], result[ITEM_TABLE.COLUMNS.DESCRIPTION], result[ITEM_TABLE.COLUMNS.PRICE], result[ITEM_TABLE.COLUMNS.CATEGORY]),
+                        new ItemModel(result[ITEM_TABLE.COLUMNS.ID], result[ITEM_TABLE.COLUMNS.NAME], result[ITEM_TABLE.COLUMNS.DESCRIPTION], result[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(result[CATEGORY_TABLE.COLUMNS.ID],result[CATEGORY_TABLE.COLUMNS.NAME],result[CATEGORY_TABLE.COLUMNS.RESTAURANT])),
                         result[CARTITEM_TABLE.COLUMNS.QUANTITY]
                     );
                 });
@@ -45,14 +46,14 @@ class CartItemHandler {
         const validationColumnValues = [
             cart.id,
             cart.user.id
-        ]
+        ];
 
-        const insertQuery  = `INSERT INTO ${CARTITEM_TABLE.NAME} SET ?`;
+        const insertQuery = `INSERT INTO ${CARTITEM_TABLE.NAME} SET ?`;
         const insertColumnValues = {
             [CARTITEM_TABLE.COLUMNS.ID]: cartItem.id,
             [CARTITEM_TABLE.COLUMNS.QUANTITY]: cartItem.quantity,
             [CARTITEM_TABLE.COLUMNS.ITEM]: cartItem.item
-        }
+        };
         const dbUtil = new DBUtil();
         return dbUtil.getConnection().then(function (connection) {
             if (!connection) {
