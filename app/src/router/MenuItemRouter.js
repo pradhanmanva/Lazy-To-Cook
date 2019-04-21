@@ -102,11 +102,10 @@ class MenuItemRouter extends OutletRouter {
             if (insertedItemOrError instanceof Error) {
                 return Promise.reject(insertedItemOrError);
             } else {
-                if (insertedItem) {
-                    insertedItem = insertedItem.toJSON();
+                let insertedItem = {};
+                if (insertedItemOrError) {
+                    insertedItem = insertedItemOrError.toJSON();
                     insertedItem = self.addHateoas(restaurantId, outletId, insertedItem);
-                } else {
-                    insertedItem = {};
                 }
                 response.status(200).json(insertedItem).end();
             }
