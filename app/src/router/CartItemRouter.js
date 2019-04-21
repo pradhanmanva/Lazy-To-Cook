@@ -6,6 +6,7 @@ const CartRouter = require("./CartRouter");
 const CartModel = require("../models/CartModel");
 const CartItemModel = require("../models/CartItemModel");
 const UserModel = require('../models/UserModel');
+const ItemModel = require('../models/ItemModel');
 
 const CartItemHandler = require("../handlers/CartItemHandler");
 
@@ -30,7 +31,6 @@ class CartItemRouter extends CartRouter {
             if (items) {
                 items = items.map(function (item, index, arr) {
                     item = item.toJSON();
-                    item = self.addHateoas(item);
                     return item;
                 });
             } else {
@@ -66,7 +66,7 @@ class CartItemRouter extends CartRouter {
         }
         const cartId = request.params["cart_id"];
         const cartModel = new CartModel(cartId.toString(), null, new UserModel(userId.toString()));
-        const cartItemModel = new CartItemModel(cartId.toString(), request.body.item_id, request.body.quantity);
+        const cartItemModel = new CartItemModel(cartId.toString(), new ItemModel(request.body.item_id.toString(), null, null, null, null), request.body.quantity);
         if (!cartItemModel.isValid()) {
             return AppUtil.badRequest(response);
         }
@@ -102,8 +102,28 @@ class CartItemRouter extends CartRouter {
      * DELETE /api/users/:user_id/carts/:cart_id/items/:id
      */
     delete(id, request, response) {
+        const userId = request.params["user_id"];
+        const cartId = request.params["cart_id"];
+        const itemId = request.params["id"];
+        if (!request.isAuthenticated() || !AppUtil.isUser(request) || !AppUtil.isOwner(request, userId)) {
+            return AppUtil.denyAccess(response);
+        }
+
+        const cartItemModel = new CartItemModel(cartId.toString(), new ItemModel(itemId.toString(), null, null, null, null), 1);
+        const cartModel = new CartModel(cartId.toString(), null, new UserModel(userId.toString(), null, null, null, null, null, null, null));
+        if (!cartItemModel.isValid()) {
+            return AppUtil.badRequest(response);
+        }
+        new CartItemHandler().delete(cartModel, cartItemModel).then(function(result) {
+            response.status(200).send("Success").end();
+        }).catch(function(error) {
+            console.error(error);
+            response.status(500).send("Error occurred while deleting item from cart. Please check logs for details.").end();
+        });
 
     }
+
+    addHateoas() {}
 }
 
 module.exports = CartItemRouter;

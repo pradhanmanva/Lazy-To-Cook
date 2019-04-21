@@ -90,3 +90,11 @@
 .item-list-entry-container .item-operation-bar .item-operation-btn:hover {
     background-color:rgba(56, 204, 21, 0.3);
 }
+
+.item-list-entry-container .item-operation-bar .danger-btn {
+    border:1px solid #a02133;
+    color: #a02133;
+}
+.item-list-entry-container .item-operation-bar .danger-btn:hover {
+    background-color:rgba(160, 33, 51, 0.2);
+}

@@ -5,6 +5,10 @@ import "../../../styles/item/listing/ItemListingEntry.css";
 import ItemCategoryTab from "./ItemCategoryTab";
 
 export default (props) => {
+    let seller = "";
+    if (props.data.outlets && props.data.outlets.length && props.data.restaurant && props.data.restaurant.name) {
+        seller = <span>Sold by <b>{props.data.outlets[0].name} - {props.data.restaurant.name}</b></span>
+    }
     return (
         <div className="item-list-entry-details">
             <div className="item-list-entry-image">
@@ -18,13 +22,15 @@ export default (props) => {
                 <p className="item-list-entry-description">{props.data.item.description}</p>
                 <Price amount={props.data.item.price} type="USD" />
                 <p>
-                    Sold by <b>{props.data.outlets[0].name} - {props.data.restaurant.name}</b>
+                    {seller}
                 </p>
             </div>
             <div className="clear-both"></div>
         </div>
     )
 }
+
+
 
 // {
 //     "item": {

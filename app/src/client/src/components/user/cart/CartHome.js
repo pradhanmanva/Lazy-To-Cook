@@ -70,7 +70,17 @@ class CartHome extends AuthenticatedRoutes {
                 <ul className="menu-list-container">
                     {
                         this.state.items.map(function(item) {
-                            return <ItemListingEntry key={item.id} data={item} />
+                            const itemTransformed = {
+                                "item" :{
+                                    "id" : item.item.id,
+                                    "name" : item.item.name,
+                                    "description" : item.item.description,
+                                    "price": item.item.price,
+                                    "category" : item.item.category
+                                }
+                            }
+
+                            return <ItemListingEntry key={itemTransformed.id} data={itemTransformed} />
                         })
                     }
                 </ul>
