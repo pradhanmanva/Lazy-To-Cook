@@ -74,3 +74,19 @@
 .paging-btn:hover {
     background-color: rgb(0,0,0,0.2);
 }
+
+.item-list-entry-container .item-operation-bar {
+    margin-top:15px;
+}
+
+.item-list-entry-container .item-operation-bar .item-operation-btn {
+    border: 1px solid #39cc14;
+    outline: none;
+    color: #007900;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.item-list-entry-container .item-operation-bar .item-operation-btn:hover {
+    background-color:rgba(56, 204, 21, 0.3);
+}

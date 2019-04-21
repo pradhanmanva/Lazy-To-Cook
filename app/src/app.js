@@ -64,6 +64,7 @@ lazyToCookApp.get("/api/items", function (request, response) {
     itemListingHandler.fetchAll(request.query).then(function (items) {
         items = items.map(function (item) {
             return {
+                is_in_cart : item.is_in_cart,
                 item: item.item.toJSON(),
                 restaurant: item.restaurant.toJSON(),
                 outlets: item.outlets.map(function (outlet) {

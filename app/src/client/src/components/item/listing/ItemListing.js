@@ -206,6 +206,7 @@ class ItemListing extends React.Component {
     }
 
     addToCart(itemId) {
+        const self = this;
         if (this.cart && this.cart.id) {
             fetch(`/api/users/${this.props.match.params.id}/carts/${this.cart.id}/items`, {
                 method: 'POST',
@@ -224,6 +225,15 @@ class ItemListing extends React.Component {
                     })
                 } else {
                     NotificationManager.success("Successfully added item to cart.");
+                    self.setState((prevState)=> {
+                        prevState.items = prevState.items.map(function(item) {
+                            if (item.item.id == itemId) {
+                                item.is_in_cart = !item.is_in_cart;
+                            }
+                            return item;
+                        })
+                        return prevState;
+                    });
                     return;
                 }
             })
@@ -242,9 +252,19 @@ class ItemListing extends React.Component {
                                 <li key={item.item.id} className="item-list-entry-container">
                                     <ItemListingEntry data={item} />
                                     <div className="item-operation-bar">
-                                        <button name="addToCart" className="item-operation-btn" onClick={()=>{
-                                            self.addToCart(item.item.id)
-                                        }}>Add to Cart</button>
+                                    {
+                                        item.is_in_cart ? 
+                                            (
+                                                <button name="addToCart" className="item-operation-btn" onClick={(event)=>{event.preventDefault();}}>
+                                                    <i className="fas fa-check"></i> In cart
+                                                </button>
+                                            ) : 
+                                            (
+                                                <button name="addToCart" className="item-operation-btn" onClick={()=>{
+                                                    self.addToCart(item.item.id)
+                                                }}>Add to Cart</button>
+                                            )
+                                    }
                                     </div>
                                 </li>
                             )
