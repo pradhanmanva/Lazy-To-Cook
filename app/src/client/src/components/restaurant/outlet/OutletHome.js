@@ -52,7 +52,7 @@ class OutletHome extends AuthenticatedRoutes {
                                 <li className="outlet-list-item" key={outlet.id} >
                                     <Link className="outlet-list-item-detail float-left" to={`${self.props.match.url}/${outlet.id}/items`}>
                                         <h3>{outlet.name}</h3>
-                                        <span>{`${outlet.address.lineOne} ${outlet.address.lineTwo ? outlet.address.lineTwo : ""}, ${outlet.address.city}`}</span>
+                                        <span>{`${outlet.address.line1} ${outlet.address.line2 ? outlet.address.line2 : ""}, ${outlet.address.city}`}</span>
                                     </Link>
                                     <span className="float-right">
                                         <Link className="float-right" to={`${self.props.match.url}/${outlet.id}/edit`} >

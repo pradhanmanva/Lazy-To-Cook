@@ -1,9 +1,9 @@
 .nav-tray {
-    position:absolute;
-    left:0;
-    width:60px;
-    bottom:0;
-    top:0;
+    position: fixed;
+    left: 0;
+    width: 60px;
+    bottom: 40px;
+    top: 60px;
     background-color: #a02233;
 }
 

@@ -47,19 +47,8 @@ class Outlet extends Component {
                 return response.json();
             }).then(function(outlet) {
                 if (outlet) {
-                    self.setState((prevState) => {
-                        let newState = {
-                            outlet: {
-                                ...outlet,
-                                address : {
-                                    ...outlet.address,
-                                    line1 : outlet.address.lineOne,
-                                    line2 : outlet.address.lineTwo
-                                }
-                            }
-                        }
-                        delete newState.outlet.address.lineOne;
-                        return newState
+                    self.setState({
+                        outlet : outlet
                     });
                 }
             })

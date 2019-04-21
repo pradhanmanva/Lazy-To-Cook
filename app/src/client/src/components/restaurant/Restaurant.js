@@ -83,7 +83,6 @@ class Restaurant extends React.Component {
     delete(event) {
         if (this.props.match.params.id) {
             if (window.confirm("Are you sure you want to delete your restaurant?")) {
-                const self = this;
                 fetch(`/api/restaurants/${this.props.match.params.id}`, {
                     method: 'DELETE',
                     headers: {

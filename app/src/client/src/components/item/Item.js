@@ -156,7 +156,7 @@ class Item extends Component {
             itemDetails = (
                 <div> 
                     <div style={{"width" : "600px"}}>
-                        {this.state.isEditMode ? <ItemImage url={`/images/${this.state.item.id}.png`} /> : ""}
+                        {this.state.isEditMode && this.state.item.id ? <ItemImage url={`/images/${this.state.item.id}.png`} /> : ""}
                     </div>
                     <form onSubmit={()=>{return false;}}>
                         <div className="field-row">

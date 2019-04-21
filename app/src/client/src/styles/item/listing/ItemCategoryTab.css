@@ -1,0 +1,10 @@
+.tab {
+    margin: 0px 5px;
+    display: inline-block;
+    padding: 2px 9px;
+    border-radius: 4px;
+    background-color: #d92a41;
+    color: white;
+    font-size: 14px;
+    vertical-align: text-bottom;
+}
