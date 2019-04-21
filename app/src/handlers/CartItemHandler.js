@@ -16,7 +16,7 @@ class CartItemHandler {
     fetchAll(cart) {
         if (cart && cart.id) {
             const dbUtil = new DBUtil();
-            const selectQuery = `SELECT * FROM ${CARTITEM_TABLE.NAME} JOIN ${ITEM_TABLE.NAME} ON ${CARTITEM_TABLE.COLUMNS.ITEM}=${ITEM_TABLE.COLUMNS.ID} WHERE ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ID} = ?`;
+            const selectQuery = `SELECT * FROM ${CARTITEM_TABLE.NAME} LEFT JOIN ${ITEM_TABLE.NAME} ON ${CARTITEM_TABLE.COLUMNS.ITEM}=${ITEM_TABLE.COLUMNS.ID} WHERE ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ID} = ?`;
             return dbUtil.getConnection().then(function (connection) {
                 if (!connection) {
                     throw Error('connection not available.');
