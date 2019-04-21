@@ -60,7 +60,8 @@ lazyToCookApp.get("/api/items", function (request, response) {
     if (!request.isAuthenticated() || !AppUtil.isUser(request)) {
         return AppUtil.denyAccess(response);
     }
-    new ItemListingHandler().fetchAll(request.query).then(function (items) {
+    const itemListingHandler = new ItemListingHandler();
+    itemListingHandler.fetchAll(request.query).then(function (items) {
         items = items.map(function (item) {
             return {
                 item: item.item.toJSON(),
@@ -70,8 +71,25 @@ lazyToCookApp.get("/api/items", function (request, response) {
                 })
             }
         });
-        response.send(items).end();
-    })
+        return items;
+    }).then(function(itemsToSend) {
+        itemListingHandler.hasMoreItems(request.query).then(function(nextPageData) {
+            const page = (request.query && request.query.page && !isNaN(request.query.page)) ? parseInt(request.query.page) : 1;
+            let paging = {
+                hasPrevious : (page > 1),
+                hasNext : nextPageData.hasMore,
+                rows_per_page : nextPageData.rowsPerPage
+            };
+            paging.next = nextPageData.hasMore ? nextPageData.next : page;
+            paging.previous = paging.hasPrevious ? page - 1 : page;
+
+            const result = {
+                items : itemsToSend,
+                paging : paging
+            }
+            response.send(result).end();
+        });
+    });
 });
 
 const CategoryHandler = require("./handlers/CategoryHandler");

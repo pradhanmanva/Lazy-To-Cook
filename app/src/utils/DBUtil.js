@@ -21,6 +21,7 @@ class DBUtil {
             });
             connection.connect(function (error) {
                 if (error) {
+                    console.error(error);
                     throw reject(error);
                 }
                 resolve(connection);
@@ -35,6 +36,7 @@ class DBUtil {
                     connection.rollback(function () {
                         throw error;
                     });
+                    console.error(error);
                     reject(error);
                 }
                 resolve(connection);
@@ -46,6 +48,7 @@ class DBUtil {
         return new Promise(function (resolve, reject) {
             connection.commit(function (err) {
                 if (err) {
+                    console.error(error);
                     reject({
                         error: err,
                         connection: connection
@@ -60,6 +63,7 @@ class DBUtil {
         return new Promise(function (resolve, reject) {
             connection.rollback(function (err) {
                 if (err) {
+                    console.error(error);
                     reject({
                         error: err,
                         connection: connection
@@ -74,6 +78,7 @@ class DBUtil {
         return new Promise(function (resolve, reject) {
             connection.query(query, value, function (error, results, fields) {
                 if (error) {
+                    console.error(error);
                     reject({
                         connection: connection,
                         error: error
