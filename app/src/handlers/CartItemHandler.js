@@ -24,8 +24,7 @@ class CartItemHandler {
                 return result.results.map(function (result, index, arr) {
                     return new CartItemModel(
                         String(result[CARTITEM_TABLE.COLUMNS.ID]),
-                        result[CARTITEM_TABLE.COLUMNS.NAME],
-                        result[CARTITEM_TABLE.COLUMNS.QUANTITY],
+                        new ItemModel(),
                         new CartModel(cart.id, null, null)
                     );
                 });
