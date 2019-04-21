@@ -25,7 +25,7 @@ class CartItemHandler {
                     return new CartItemModel(
                         String(result[CARTITEM_TABLE.COLUMNS.ID]),
                         new ItemModel(),
-                        new CartModel(cart.id, null, null)
+                        result[CARTITEM_TABLE.COLUMNS.QUANTITY]
                     );
                 });
             });
