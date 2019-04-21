@@ -40,33 +40,33 @@ const UsernameValidator = (usernameStr) => {
 };
 
 const StrongPasswordValidator = (passwordStr) => {
-    return !(!passwordStr || !passwordStr.length);
-     // TODO
-};
-
-const PriceValidator = (priceStr) => {
-    if (typeof priceStr === "number") {
-        priceStr = String(priceStr);
+    if (typeof passwordStr === "number") {
+        passwordStr = String(passwordStr);
     }
-    if (!priceStr || !priceStr.length) return false;
+    if (!passwordStr || !passwordStr.length) return false;
     let hist = {
         uppercase: 0,
         lowercase: 0,
         numeric: 0,
         specialchar: 0
     };
-    for (let i = 0; i < priceStr.length; i++) {
-        if (priceStr[i] >= 'a' && priceStr[i] <= 'z') {
+    for (let i = 0; i < passwordStr.length; i++) {
+        if (passwordStr[i] >= 'a' && passwordStr[i] <= 'z') {
             hist.lowercase++;
-        } else if (priceStr[i] >= 'A' && priceStr[i] <= 'Z') {
+        } else if (passwordStr[i] >= 'A' && passwordStr[i] <= 'Z') {
             hist.uppercase++;
-        } else if (priceStr[i] >= '0' && priceStr[i] <= '9') {
+        } else if (passwordStr[i] >= '0' && passwordStr[i] <= '9') {
             hist.numeric++;
         } else {
             hist.specialchar++;
         }
     }
-    return (priceStr.length >= 8 && hist.uppercase > 0 && hist.lowercase > 0 && hist.numeric > 0 && hist.specialchar > 0);
+    return (passwordStr.length >= 8 && hist.uppercase > 0 && hist.lowercase > 0 && hist.numeric > 0 && hist.specialchar > 0);
+};
+
+const PriceValidator = (priceStr) => {
+    if (!priceStr || !priceStr.length) return false;
+    return (/^[0-9]*\.\d{2}|[0-9]*$/.test(priceStr));
 };
 
 module.exports = {
