@@ -33,34 +33,6 @@ class CartRouter extends UserRouter {
         });
     }
 
-    /**
-     * GET /api/users/:user_id/carts/:id
-     */
-    get(id, request, response) {
-
-    }
-
-    /**
-     * POST /api/users/:user_id/carts
-     */
-    add(request, response) {
-
-    }
-
-    /**
-     * PUT /api/users/:user_id/carts/:id
-     */
-    update(id, request, response) {
-
-    }
-
-    /**
-     * DELETE /api/users/:user_id/carts/:id
-     */
-    delete(id, request, response) {
-
-    }
-
     addHateoas(userId, cart) {
         return {
             ...cart,
