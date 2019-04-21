@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import "../../styles/item/DeleteItem.css";
 import "../../styles/auth/Form.css";
-import { NotificationManager } from "react-notifications";
+import { NotificationManager, NotificationContainer } from "react-notifications";
 
 class DeleteItem extends Component {
 
@@ -21,7 +21,9 @@ class DeleteItem extends Component {
                 }
             }).then(function(response) {
                 if (response.status !== 200) {
-                    NotificationManager.error("Error occurred while deleting category.");
+                    response.text().then(function(error) {
+                        NotificationManager.error(error);
+                    })
                     return null;   
                 }
                 window.location = `/app/admin/${self.props.match.params.id}/outlets/${self.props.match.params.outlet_id}/items`; 
@@ -38,6 +40,7 @@ class DeleteItem extends Component {
                 <p>Do you still want to delete item?</p>
                 <button name="submit" className="submit-btn" onClick={this.handleSubmit}>Delete</button>
                 <button name="cancel" className="submit-btn" onClick={this.handleSubmit}>Cancel</button>
+                <NotificationContainer />
             </div>
         );
     }

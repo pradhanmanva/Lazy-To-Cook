@@ -5,6 +5,7 @@ module.exports = {
         NAME: 'item_name',
         DESCRIPTION: 'description',
         PRICE: 'price',
-        CATEGORY: 'category_id'
+        CATEGORY: 'category_id',
+        IS_DELETED : 'is_deleted'
     }
 };

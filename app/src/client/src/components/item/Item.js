@@ -136,11 +136,9 @@ class Item extends Component {
                 body : formData
             }).then(function(response) {
                 if (response.status !== 200) {
-                    if (response.status === 400) {
-                        response.text().then(function(message) {
-                            NotificationManager.error(message);
-                        });
-                    }
+                    response.text().then(function(message) {
+                        NotificationManager.error(message);
+                    });
                 } else {
                     window.location = `/app/admin/${restaurantId}/outlets/${outletId}/items${self.state.isEditMode ? "/"+self.props.match.params.item_id+"/edit" : ""}`;
                 }
@@ -177,7 +175,7 @@ class Item extends Component {
                         </div>
                         <div className="field-row">
                             <label>Category</label>
-                            <select name="category" value={this.state.item.category.id} onChange={this.handleChange}>
+                            <select name="category" value={this.state.item.category ? this.state.item.category.id : ""} onChange={this.handleChange}>
                                 {
                                     this.state.categories.map(function(category, index){
                                         return <option key={category.id} value={category.id}>{category.name}</option>;

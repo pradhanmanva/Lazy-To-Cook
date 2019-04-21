@@ -95,20 +95,24 @@ class MenuItemRouter extends OutletRouter {
         const outletId = request.params["outlet_id"];
         const outletModel = new OutletModel(outletId.toString(), null, null, null, new RestaurantModel(restaurantId.toString(), null, null, null, null));
         const menuItem = new ItemModel(null, request.body.name, request.body.description, request.body.price, new RestaurantItemCategoryModel(request.body.category, null, null));
-        if (!request.body.category || !request.body.category.trim().length || !menuItem.isValid()) {
+        if (!request.body.category || !request.body.category.toString().trim().length || !menuItem.isValid()) {
             return AppUtil.badRequest(response);
         }
-        new MenuItemHandler().insert(menuItem, outletModel, request.file).then(function (insertedItem) {
-            if (insertedItem) {
-                insertedItem = insertedItem.toJSON();
-                insertedItem = self.addHateoas(restaurantId, outletId, insertedItem);
+        new MenuItemHandler().insert(menuItem, outletModel, request.file).then(function (insertedItemOrError) {
+            if (insertedItemOrError instanceof Error) {
+                return Promise.reject(insertedItemOrError);
             } else {
-                insertedItem = {};
+                if (insertedItem) {
+                    insertedItem = insertedItem.toJSON();
+                    insertedItem = self.addHateoas(restaurantId, outletId, insertedItem);
+                } else {
+                    insertedItem = {};
+                }
+                response.status(200).json(insertedItem).end();
             }
-            response.status(200).json(insertedItem).end();
         }).catch(function (error) {
             console.error(error);
-            response.status(500).send("Error occurred while creating an item. Please check logs for details.").end();
+            response.status(500).send(error.message).end();
         });
     }
 
@@ -133,20 +137,24 @@ class MenuItemRouter extends OutletRouter {
         const outletId = request.params["outlet_id"];
         const itemModel = new ItemModel(id, request.body.name, request.body.description, request.body.price, new RestaurantItemCategoryModel(request.body.category, null, null));
         const outletModel = new OutletModel(outletId.toString(), null, null, null, new RestaurantModel(restaurantId.toString(), null, null, null, null));
-        if (!request.body.category || !request.body.category.trim().length || !itemModel.isValid()) {
+        if (!request.body.category || !request.body.category.toString().trim().length || !itemModel.isValid()) {
             return AppUtil.badRequest(response);
         }
-        new MenuItemHandler().update(itemModel, outletModel, request.file).then(function (updatedItem) {
-            if (updatedItem) {
-                updatedItem = updatedItem.toJSON();
-                updatedItem = self.addHateoas(restaurantId, outletId, updatedItem);
+        new MenuItemHandler().update(itemModel, outletModel, request.file).then(function (updatedItemOrError) {
+            if(updatedItemOrError) {
+                if (updatedItemOrError instanceof Error) {
+                    return Promise.reject(updatedItemOrError);
+                } else {
+                    let updatedItem = updatedItemOrError.toJSON();
+                    updatedItem = self.addHateoas(restaurantId, outletId, updatedItem);
+                    response.status(200).json(updatedItem).end();
+                }
             } else {
-                updatedItem = {};
+                response.status(200).json({}).end();
             }
-            response.status(200).json(updatedItem).end();
         }).catch(function (error) {
             console.error(error);
-            response.status(500).send("Error occurred while updating the item. Please check logs for details.").end();
+            response.status(500).send(error.message).end();
         });
     }
 
@@ -161,11 +169,15 @@ class MenuItemRouter extends OutletRouter {
         }
         const menuItem = new ItemModel(id, null, null, null, null);
         const outletModel = new OutletModel(outletId.toString(), null, null, null, new RestaurantModel(restaurantId.toString(), null, null, null, null));
-        new MenuItemHandler().delete(menuItem, outletModel).then(function (result) {
-            response.status(200).send("Success").end();
+        new MenuItemHandler().delete(menuItem, outletModel).then(function (resultOrError) {
+            if (resultOrError instanceof Error) {
+                return Promise.reject(resultOrError);
+            } else {
+                response.status(200).send("Success").end();
+            }
         }).catch(function (error) {
             console.error(error);
-            response.status(500).send("Error occurred while deleting a item. Please check logs for details.").end();
+            response.status(500).send(error.message).end();
         });
     }
 

@@ -45,6 +45,7 @@ class ItemHome extends AuthenticatedRoutes {
                 </h4>
                 <BrowserRouter forceRefresh={true} basename="/app">    
                     <ul className="item-list">
+                        {!this.state.items || !this.state.items.length ? <div style={{textAlign:"center",marginTop:"10px"}}>No item to display.</div> : ""}
                         {this.state.items.map(function(item, index) {
                             return (
                                 <li className="item-list-item" key={item.id} >
