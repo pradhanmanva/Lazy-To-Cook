@@ -6,28 +6,23 @@ import ItemCategoryTab from "./ItemCategoryTab";
 
 export default (props) => {
     return (
-        <li className="item-list-entry-container">
-            <div className="item-list-entry-details">
-                <div className="item-list-entry-image">
-                    <ItemImage url={`/images/${props.data.item.id}.png`} />
-                </div>
+        <div className="item-list-entry-details">
+            <div className="item-list-entry-image">
+                <ItemImage url={`/images/${props.data.item.id}.png`} />
+            </div>
+            <div>
                 <div>
-                    <div>
-                        <h2 className="item-list-entry-name">{props.data.item.name}</h2>
-                        <ItemCategoryTab name={props.data.item.category.name} />
-                    </div>
-                    <p className="item-list-entry-description">{props.data.item.description}</p>
-                    <Price amount={props.data.item.price} type="USD" />
-                    <p>
-                        Sold by <b>{props.data.outlets[0].name} - {props.data.restaurant.name}</b>
-                    </p>
+                    <h2 className="item-list-entry-name">{props.data.item.name}</h2>
+                    <ItemCategoryTab name={props.data.item.category.name} />
                 </div>
-                <div className="clear-both"></div>
+                <p className="item-list-entry-description">{props.data.item.description}</p>
+                <Price amount={props.data.item.price} type="USD" />
+                <p>
+                    Sold by <b>{props.data.outlets[0].name} - {props.data.restaurant.name}</b>
+                </p>
             </div>
-            <div className="item-operation-bar">
-                <button className="item-operation-btn">Add to Cart</button>
-            </div>
-        </li>
+            <div className="clear-both"></div>
+        </div>
     )
 }
 

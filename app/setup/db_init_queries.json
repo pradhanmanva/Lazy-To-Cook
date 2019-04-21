@@ -33,5 +33,5 @@
 	"CREATE TABLE cart (cart_id BIGINT NOT NULL AUTO_INCREMENT, cart_name VARCHAR(20) NOT NULL DEFAULT 'CART', user_id BIGINT NOT NULL, PRIMARY KEY (cart_id), FOREIGN KEY(user_id) REFERENCES user(user_id));",
 
 	"DROP TABLE IF EXISTS cart_item;",
-	"CREATE TABLE cart_item (cart_id BIGINT NOT NULL AUTO_INCREMENT, item_id BIGINT NOT NULL, quantity NUMERIC DEFAULT 1, FOREIGN KEY (cart_id) REFERENCES cart(cart_id), FOREIGN KEY (item_id) REFERENCES item(item_id));"
+	"CREATE TABLE cart_item (cart_id BIGINT NOT NULL AUTO_INCREMENT, item_id BIGINT NOT NULL, quantity NUMERIC DEFAULT 1, FOREIGN KEY (cart_id) REFERENCES cart(cart_id), FOREIGN KEY (item_id) REFERENCES item(item_id), UNIQUE KEY (cart_id, item_id));"
 ]

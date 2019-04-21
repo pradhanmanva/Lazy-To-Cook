@@ -29,6 +29,7 @@ class ItemListing extends React.Component {
                 previous : null
             }
         }
+        this.cart = {};
         this.defaultCategory = {
             id : "",
             name : "All Categories"
@@ -39,6 +40,8 @@ class ItemListing extends React.Component {
         this.queryCategories = this.queryCategories.bind(this);
         this.goToPreviousPage = this.goToPreviousPage.bind(this);
         this.goToNextPage = this.goToNextPage.bind(this);
+        this.getCart = this.getCart.bind(this);
+        this.addToCart = this.addToCart.bind(this);
     }
 
     handleChange(event) {
@@ -50,6 +53,27 @@ class ItemListing extends React.Component {
                 return prevState;
             });
         } 
+    }
+
+    getCart() {
+        const self = this;
+        fetch(`/api/users/${this.props.match.params.id}/carts`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }).then(function(response) {
+            if (response.status !== 200) {
+                return null;
+            }
+            return response.json();
+        }).then(function(carts) {
+            if (carts && carts.length === 1) {
+                const cart = carts[0];
+                self.cart = cart;
+            }
+        });
     }
 
     queryItems() {
@@ -111,7 +135,6 @@ class ItemListing extends React.Component {
                         hasNext : responseJSON.paging.hasNext,
                         hasPrevious : responseJSON.paging.hasPrevious
                     }
-                    console.log(prev);
                     return prev;
                 });
             }
@@ -179,16 +202,52 @@ class ItemListing extends React.Component {
     componentDidMount() {
         this.queryItems();
         this.queryCategories();
+        this.getCart();
+    }
+
+    addToCart(itemId) {
+        if (this.cart && this.cart.id) {
+            fetch(`/api/users/${this.props.match.params.id}/carts/${this.cart.id}/items`, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body : JSON.stringify({
+                    item_id : itemId,
+                    quantity : 1
+                })
+            }).then(function(response) {
+                if (response.status !== 200) {
+                    return response.text().then(function(error) {
+                        NotificationManager.error(error);
+                    })
+                } else {
+                    NotificationManager.success("Successfully added item to cart.");
+                    return;
+                }
+            })
+        }
     }
 
     render() {
+        const self = this;
         let items = <p style={{"textAlign" : "center"}}><i className="fas fa-search fa-xs"></i> No item available to display.</p>;
         if (this.state.items && this.state.items.length) {
             items = (
                 <ul className="menu-list-container">
                     {
                         this.state.items.map(function(item) {
-                            return <ItemListingEntry key={item.item.id} data={item} />
+                            return (
+                                <li key={item.item.id} className="item-list-entry-container">
+                                    <ItemListingEntry data={item} />
+                                    <div className="item-operation-bar">
+                                        <button name="addToCart" className="item-operation-btn" onClick={()=>{
+                                            self.addToCart(item.item.id)
+                                        }}>Add to Cart</button>
+                                    </div>
+                                </li>
+                            )
                         })
                     }
                 </ul>

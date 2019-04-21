@@ -5,9 +5,12 @@ class CartItemModel extends Model {
                 /* ItemModel */ item,
                 /* string */ quantity) {
         super(id);
-        this.cart_id = id;
         this.item = item;
         this.quantity = quantity;
+    }
+
+    isValid() {
+        return (this.item && this.id && (this.quantity > 0));
     }
 }
 
