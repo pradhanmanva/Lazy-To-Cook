@@ -6,6 +6,7 @@ const AddressModel = require('../models/AddressModel');
 const USER_TABLE = require('../tables/UserTable');
 const ADDRESS_TABLE = require('../tables/AddressTable');
 const USER_AUTH_TABLE = require('../tables/UserAuthenticationTable');
+const CART_TABLE = require('../tables/CartTable');
 
 const bcrypt = require('bcrypt');
 
@@ -54,6 +55,13 @@ class UserHandler {
         }).then(function (result) {
             authenticationColumnValues[USER_TABLE.COLUMNS.ID] = String(result.results.insertId);
             return dbUtil.query(result.connection, authenticationInsertQuery, authenticationColumnValues);
+        }).then(function (result) {
+            const createCartQuery = `INSERT INTO ${CART_TABLE.NAME} SET ?`;
+            const cartColumnValues = {
+                [CART_TABLE.COLUMNS.NAME] : `cart_${authenticationColumnValues[USER_TABLE.COLUMNS.ID]}`,
+                [CART_TABLE.COLUMNS.USER] : authenticationColumnValues[USER_TABLE.COLUMNS.ID]
+            }
+            return dbUtil.query(result.connection, createCartQuery, cartColumnValues);
         }).then(function (result) {
             return dbUtil.commitTransaction(result.connection, result.results);
         }).then(function (result) {

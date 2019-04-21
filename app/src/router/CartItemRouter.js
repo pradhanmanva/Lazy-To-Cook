@@ -21,7 +21,7 @@ class CartItemRouter extends CartRouter {
         const self = this;
         const userId = request.params["user_id"];
         const cartId = request.params["cart_id"];
-        if (!request.isAuthenticated() || (AppUtil.isAdmin(request) && !AppUtil.isOwner(request, userId))) {
+        if (!request.isAuthenticated() || AppUtil.isAdmin(request) || (AppUtil.isUser(request) && !AppUtil.isOwner(request, userId))) {
             return AppUtil.denyAccess(response);
         }
         const cartModel = new CartModel(cartId.toString(), null, new UserModel(userId, null, null, null, null, null, null));

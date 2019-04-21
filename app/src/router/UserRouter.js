@@ -26,7 +26,6 @@ class UserRouter extends Router {
         new UserHandler().fetch(userModel).then(function (foundUser) {
             if (foundUser) {
                 foundUser = foundUser.toJSON(true);
-                console.log(foundUser);
                 foundUser = self.addHateoas(foundUser);
                 response.status(200).json(foundUser).end();
             }

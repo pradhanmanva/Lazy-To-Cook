@@ -4,6 +4,7 @@ import Navbar from "../commons/Navbar";
 import {BrowserRouter, Route, Link} from "react-router-dom";
 import ItemListing from "../item/listing/ItemListing";
 import User from "./User";
+import CartHome from "./cart/CartHome";
 
 class UserHome extends AuthenticatedRoutes {
     render() {
@@ -44,8 +45,8 @@ class UserHome extends AuthenticatedRoutes {
                         <div>
                             <Route exact path={`${this.props.match.path}`} component={User} />
                             <Route exact path={`${this.props.match.path}/menu`} component={ItemListing} />
-                            {/* <Route path={`${this.props.match.path}/outlets`} component={OutletHome} />
-                            <Route path={`${this.props.match.path}/categories`} component={CategoryHome} /> */}
+                            {/* {/* <Route path={`${this.props.match.path}/outlets`} component={OutletHome} /> */}
+                            <Route path={`${this.props.match.path}/cart`} component={CartHome} /> */}
                         </div>
                     </BrowserRouter>
                     </div>

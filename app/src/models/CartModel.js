@@ -5,8 +5,7 @@ class CartModel extends Model {
                 /* string */ cart_name,
                 /* UserModel */ user) {
         super(id);
-        this.cart_id = id;
-        this.cart_name = cart_name;
+        this.name = cart_name;
         this.user = user;
     }
 }
