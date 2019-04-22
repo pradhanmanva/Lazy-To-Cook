@@ -18,9 +18,14 @@ class RestaurantHandler {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
+                return dbUtil.beginTransaction(connection);
+                
+            }).then(function(connection) {
                 return dbUtil.query(connection, selectQuery, restaurant.id);
+            }).then(function(result) {
+                return dbUtil.commitTransaction(result.connection, result.results);
             }).then(function (result) {
-                return result.results.map(function (result, index, arr) {
+                return result.map(function (result, index, arr) {
                     return new RestaurantModel(String(result[RESTAURANT_TABLE.COLUMNS.ID]), result[RESTAURANT_TABLE.COLUMNS.NAME], String(result[RESTAURANT_TABLE.COLUMNS.CONTACT]), result[RESTAURANT_TABLE.COLUMNS.EMAIL], result[RESTAURANT_TABLE.COLUMNS.WEBSITE], result[RESTAURANT_TABLE.COLUMNS.IS_DELETED]);
                 })[0];
             });
@@ -74,10 +79,15 @@ class RestaurantHandler {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
+                return dbUtil.beginTransaction(connection);
+                
+            }).then(function(connection) {
                 return dbUtil.query(connection, selectQuery, authCredentials.username);
+            }).then(function(result) {
+                return dbUtil.commitTransaction(result.connection, result.results);
             }).then(function (result) {
-                if (result && result.results && result.results.length && bcrypt.compareSync(authCredentials.password, result.results[0][RESTAURANT_AUTH_TABLE.COLUMNS.PASSWORD])) {
-                    return result.results[0][RESTAURANT_AUTH_TABLE.COLUMNS.ID].toString();
+                if (result && result && result.length && bcrypt.compareSync(authCredentials.password, result[0][RESTAURANT_AUTH_TABLE.COLUMNS.PASSWORD])) {
+                    return result[0][RESTAURANT_AUTH_TABLE.COLUMNS.ID].toString();
                 }
                 throw new Error("Invalid credentials.");
             });
@@ -99,7 +109,12 @@ class RestaurantHandler {
             if (!connection) {
                 throw Error('connection not available.');
             }
+            return dbUtil.beginTransaction(connection);
+            
+        }).then(function(connection) {
             return dbUtil.query(connection, updateQuery, columnValues);
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
         }).then(function (result) {
             return restaurant;
         });
@@ -112,7 +127,11 @@ class RestaurantHandler {
             if (!connection) {
                 throw Error('connection not available.');
             }
+            return dbUtil.beginTransaction(connection);
+        }).then(function(connection) {
             return dbUtil.query(connection, deleteQuery, restaurant.id);
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
         });
     }
 

@@ -34,9 +34,13 @@ class ItemListingHandler {
             if (!connection) {
                 throw Error('connection not available.');
             }
+            return dbUtil.beginTransaction(connection);
+        }).then(function(connection) {
             return dbUtil.query(connection, selectQuery);
-        }).then(function (result) {
-            return result.results.map(function (item) {
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
+        }).then(function (results) {
+            return results.map(function (item) {
                 return {
                     is_in_cart : (item[CARTITEM_TABLE.COLUMNS.ID] != null),
                     item: new ItemModel(item[ITEM_TABLE.COLUMNS.ID], item[ITEM_TABLE.COLUMNS.NAME], item[ITEM_TABLE.COLUMNS.DESCRIPTION], item[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(item[CATEGORY_TABLE.COLUMNS.ID], item[CATEGORY_TABLE.COLUMNS.NAME])),
@@ -89,10 +93,14 @@ class ItemListingHandler {
             if (!connection) {
                 throw Error('connection not available.');
             }
+            return dbUtil.beginTransaction(connection);
+        }).then(function(connection) {
             return dbUtil.query(connection, selectQuery);
-        }).then(function (result) {
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
+        }).then(function (results) {
             let pagingData = {
-                hasMore : result.results.length > 0
+                hasMore : results.length > 0
             }
             if (pagingData.hasMore) {
                 pagingData.next = offset + 1;

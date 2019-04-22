@@ -45,9 +45,6 @@ class UserHandler {
             }
             return dbUtil.beginTransaction(connection);
         }).then(function (connection) {
-            if (!connection) {
-                throw Error('connection not available.');
-            }
             return dbUtil.query(connection, addressInsertQuery, addressColumnValues);
         }).then(function (result) {
             columnValues[USER_TABLE.COLUMNS.ADDRESS] = String(result.results.insertId);
@@ -64,7 +61,7 @@ class UserHandler {
             return dbUtil.query(result.connection, createCartQuery, cartColumnValues);
         }).then(function (result) {
             return dbUtil.commitTransaction(result.connection, result.results);
-        }).then(function (result) {
+        }).then(function () {
             user.id = authenticationColumnValues[USER_TABLE.COLUMNS.ID];
             user.address.id = columnValues[USER_TABLE.COLUMNS.ADDRESS];
             return user;
@@ -79,10 +76,14 @@ class UserHandler {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
+                return dbUtil.beginTransaction(connection);
+            }).then(function(connection){
                 return dbUtil.query(connection, selectQuery, authCredentials.user.email);
             }).then(function (result) {
-                if (result && result.results && result.results.length && bcrypt.compareSync(authCredentials.password, result.results[0][USER_AUTH_TABLE.COLUMNS.PASSWORD])) {
-                    return result.results[0][USER_AUTH_TABLE.COLUMNS.ID].toString();
+                return dbUtil.commitTransaction(result.connection, result.results);
+            }).then(function (result) {
+                if (result && result && result.length && bcrypt.compareSync(authCredentials.password, result[0][USER_AUTH_TABLE.COLUMNS.PASSWORD])) {
+                    return result[0][USER_AUTH_TABLE.COLUMNS.ID].toString();
                 }
                 throw new Error("Invalid credentials.");
             });
@@ -98,9 +99,13 @@ class UserHandler {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
+                return dbUtil.beginTransaction(connection);                
+            }).then(function(connection) {
                 return dbUtil.query(connection, selectQuery, user.id);
-            }).then(function (result) {
-                return result.results.map(function (result, index, arr) {
+            }).then(function(result) {
+                return dbUtil.commitTransaction(result.connection, result.results);
+            }).then(function (results) {
+                return results.map(function (result, index, arr) {
                     const address = new AddressModel(result[ADDRESS_TABLE.COLUMNS.ID], result[ADDRESS_TABLE.COLUMNS.LINE1], result[ADDRESS_TABLE.COLUMNS.LINE2], result[ADDRESS_TABLE.COLUMNS.CITY], result[ADDRESS_TABLE.COLUMNS.STATE], result[ADDRESS_TABLE.COLUMNS.ZIPCODE]); 
                     return new UserModel(String(result[USER_TABLE.COLUMNS.ID]), result[USER_TABLE.COLUMNS.FIRSTNAME], result[USER_TABLE.COLUMNS.MIDDLENAME], result[USER_TABLE.COLUMNS.LASTNAME], result[USER_TABLE.COLUMNS.DOB], result[USER_TABLE.COLUMNS.EMAIL], address, result[USER_TABLE.COLUMNS.IS_DELETED]);
                 })[0];
@@ -118,6 +123,8 @@ class UserHandler {
                 throw Error('connection not available.');
             }
             return dbUtil.query(connection, deleteQuery, user.id);
+        }).then(function(result){
+            dbUtil.releaseConnection(result.connection);
         });
     }
 

@@ -15,9 +15,13 @@ class CategoryHandler {
             if (!connection) {
                 throw Error('connection not available.');
             }
+            return dbUtil.beginTransaction(connection);
+        }).then(function(connection) {
             return dbUtil.query(connection, selectQuery);
         }).then(function(result) {
-            return result.results.map(function(category) {
+            return dbUtil.commitTransaction(result.connection, result.results);
+        }).then(function(results) {
+            return results.map(function(category) {
                 const restaurant = new RestaurantModel(category[RESTAURANT_TABLE.COLUMNS.ID], category[RESTAURANT_TABLE.COLUMNS.NAME]);
                 return new CategoryModel(category[CATEGORY_TABLE.COLUMNS.ID], category[CATEGORY_TABLE.COLUMNS.NAME], restaurant);
             });

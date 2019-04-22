@@ -18,9 +18,13 @@ class RestaurantItemCategoryHandler {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
+                return dbUtil.beginTransaction(connection);
+            }).then(function(connection) {
                 return dbUtil.query(connection, selectQuery, restaurant.id);
+            }).then(function(result){
+                return dbUtil.commitTransaction(result.connection, result.results);
             }).then(function (result) {
-                return result.results.map(function (result, index, arr) {
+                return result.map(function (result, index, arr) {
                     return new RestaurantItemCategoryModel(
                         String(result[CATEGORY_TABLE.COLUMNS.ID]),
                         result[CATEGORY_TABLE.COLUMNS.NAME],
@@ -39,9 +43,14 @@ class RestaurantItemCategoryHandler {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
+                return dbUtil.beginTransaction(connection);
+                
+            }).then(function(connection) {
                 return dbUtil.query(connection, selectQuery, [category.id, category.restaurant.id]);
+            }).then(function(result) {
+                return dbUtil.commitTransaction(result.connection, result.results);
             }).then(function (result) {
-                const categories = result.results.map(function (result, index, arr) {
+                const categories = result.map(function (result, index, arr) {
                     return new RestaurantItemCategoryModel(String(result[CATEGORY_TABLE.COLUMNS.ID]), result[CATEGORY_TABLE.COLUMNS.NAME], new RestaurantModel(result[CATEGORY_TABLE.COLUMNS.RESTAURANT], null, null, null, null));
                 });
                 if (categories && categories.length) {
@@ -65,6 +74,8 @@ class RestaurantItemCategoryHandler {
             if (!connection) {
                 return Promise.reject(new Error('Some internal error occurred.'));
             }
+            return dbUtil.beginTransaction(connection);
+        }).then(function(connection) {
             return dbUtil.query(connection, nonDeletedRestaurantSelectQuery, category.restaurant.id);
         }).then(function (result) {
             if (!result || !result.results || result.results.length === 0) {
@@ -75,8 +86,10 @@ class RestaurantItemCategoryHandler {
             } else {
                 return dbUtil.query(result.connection, insertQuery, columnValues);
             }
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
         }).then(function (result) {
-            return new RestaurantItemCategoryModel(String(result.results.insertId), category.name, category.restaurant);
+            return new RestaurantItemCategoryModel(String(result.insertId), category.name, category.restaurant);
         });
     }
 
@@ -92,9 +105,14 @@ class RestaurantItemCategoryHandler {
             if (!connection) {
                 throw Error('connection not available.');
             }
+            return dbUtil.beginTransaction(connection);
+            
+        }).then(function(connection) {
             return dbUtil.query(connection, updateQuery, columnValues);
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
         }).then(function (result) {
-            if (result.results.affectedRows === 0) {
+            if (result.affectedRows === 0) {
                 return Promise.reject(new Error("Invalid operation: Cannot update category of non-existent restaurant."));
             }
             return category;
@@ -109,9 +127,14 @@ class RestaurantItemCategoryHandler {
             if (!connection) {
                 throw Error('connection not available.');
             }
+            return dbUtil.beginTransaction(connection);
+            
+        }).then(function(connection) {
             return dbUtil.query(connection, deleteQuery, [category.id, category.restaurant.id]);
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
         }).then(function (result) {
-            if (result.results.affectedRows === 0) {
+            if (result.affectedRows === 0) {
                 return Promise.reject(new Error("Invalid operation: Cannot delete category of non-existent restaurant."));
             }
         });

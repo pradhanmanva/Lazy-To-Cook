@@ -20,9 +20,14 @@ class OutletHandler {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
+                return dbUtil.beginTransaction(connection);
+                
+            }).then(function(connection) {
                 return dbUtil.query(connection, selectQuery, restaurant.id);
+            }).then(function(result) {
+                return dbUtil.commitTransaction(result.connection, result.results);
             }).then(function (result) {
-                return result.results.map(function (result, index, arr) {
+                return result.map(function (result, index, arr) {
                     const address = new AddressModel(
                         result[OUTLET_TABLE.COLUMNS.ADDRESS],
                         result[ADDRESS_TABLE.COLUMNS.LINE1],
@@ -55,9 +60,13 @@ class OutletHandler {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
+                return dbUtil.beginTransaction(connection);
+            }).then(function(connection) {
                 return dbUtil.query(connection, selectQuery, [outlet.id, outlet.restaurant.id]);
+            }).then(function(result) {
+                return dbUtil.commitTransaction(result.connection, result.results);
             }).then(function (result) {
-                return result.results.map(function (result, index, arr) {
+                return result.map(function (result, index, arr) {
                     const address = new AddressModel(
                         result[OUTLET_TABLE.COLUMNS.ADDRESS],
                         result[ADDRESS_TABLE.COLUMNS.LINE1],
@@ -202,9 +211,13 @@ class OutletHandler {
             if (!connection) {
                 throw Error('connection not available.');
             }
+            return dbUtil.beginTransaction(connection);
+        }).then(function(connection) {
             return dbUtil.query(connection, deleteQuery, [outlet.id, outlet.restaurant.id]);
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
         }).then(function (result) {
-            if (result.results.affectedRows === 0) {
+            if (result.affectedRows === 0) {
                 return Promise.reject(new Error("Invalid Operation: Either no outlet is found or delete on non-existent restaurant."));
             }
         });

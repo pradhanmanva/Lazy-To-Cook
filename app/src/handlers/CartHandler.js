@@ -19,9 +19,13 @@ class CartHandler {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
+                return dbUtil.beginTransaction(connection);
+            }).then(function(connection) {
                 return dbUtil.query(connection, selectQuery, user.id);
-            }).then(function (result) {
-                return result.results.map(function (result, index, arr) {
+            }).then(function(result) {
+                return dbUtil.commitTransaction(result.connection, result.results);
+            }).then(function (results) {
+                return results.map(function (result, index, arr) {
                     return new CartModel(new String(result[CART_TABLE.COLUMNS.ID]),
                         result[CART_TABLE.COLUMNS.NAME], null);
                 });

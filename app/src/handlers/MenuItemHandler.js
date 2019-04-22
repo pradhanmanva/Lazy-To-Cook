@@ -25,9 +25,13 @@ class MenuItemHandler {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
+                return dbUtil.beginTransaction(connection);
+            }).then(function(connection) {
                 return dbUtil.query(connection, selectQuery, [outlet.id, outlet.restaurant.id]);
-            }).then(function (result) {
-                return result.results.map(function (result, index, arr) {
+            }).then(function(result) {
+                return dbUtil.commitTransaction(result.connection, result.results);
+            }).then(function (results) {
+                return results.map(function (result, index, arr) {
                     return new ItemModel(result[ITEM_TABLE.COLUMNS.ID].toString(), result[ITEM_TABLE.COLUMNS.NAME], result[ITEM_TABLE.COLUMNS.DESCRIPTION], result[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(result[CATEGORY_TABLE.COLUMNS.ID], result[CATEGORY_TABLE.COLUMNS.NAME], null));
                 });
             });
@@ -44,9 +48,13 @@ class MenuItemHandler {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
+                return dbUtil.beginTransaction(connection);
+            }).then(function(connection) {
                 return dbUtil.query(connection, selectQuery, [item.id, outlet.id, outlet.restaurant.id]);
-            }).then(function (result) {
-                return result.results.map(function (result, index, arr) {
+            }).then(function(result) {
+                return dbUtil.commitTransaction(result.connection, result.results);
+            }).then(function (results) {
+                return results.map(function (result, index, arr) {
                     return new ItemModel(result[ITEM_TABLE.COLUMNS.ID].toString(), result[ITEM_TABLE.COLUMNS.NAME], result[ITEM_TABLE.COLUMNS.DESCRIPTION], result[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(result[CATEGORY_TABLE.COLUMNS.ID], result[CATEGORY_TABLE.COLUMNS.NAME], null));
                 })[0];
             });
@@ -122,6 +130,8 @@ class MenuItemHandler {
             if (!connection) {
                 throw Error('connection not available.');
             }
+            return dbUtil.beginTransaction(connection);
+        }).then(function(connection) {
             /**
              * This is tricky. We should allow a "non-deleted" item to be updated only if it is updated through 
              * a "non-deleted" outlet belonging to a "non-deleted" restaurant.
@@ -138,6 +148,8 @@ class MenuItemHandler {
             }
         }).then(function (result) {
             return dbUtil.query(result.connection, itemUpdateQuery, itemColumnValues);
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
         }).then(function (result) {
             if (dp) {
                 const itemImageFileName = `${item.id}${path.extname(dp.originalname)}`;
@@ -154,13 +166,14 @@ class MenuItemHandler {
             if (!connection) {
                 throw Error('connection not available.');
             }
+            return dbUtil.beginTransaction(connection);
+        }).then(function(connection) {
             /**
              * This is tricky. We should allow the item to be updated only if it is updated through a non-deleted outlet 
              * belonging to a non-deleted restaurant.
              */
             const outletValidationQuery = `SELECT * FROM ${ITEMOUTLET_TABLE.NAME} INNER JOIN ${OUTLET_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.OUTLET}=${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} INNER JOIN ${ITEM_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} INNER JOIN ${RESTAURANT_TABLE.NAME} ON ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID} WHERE ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} = ? AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.IS_DELETED} = false AND ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false`
             return dbUtil.query(connection, outletValidationQuery, [item.id, outlet.id, outlet.restaurant.id]);
-
         }).then(function (result) {
             if (!result || !result.results || result.results.length === 0) {
                 return dbUtil.rollbackTransaction(result.connection).then(function () {
@@ -170,6 +183,8 @@ class MenuItemHandler {
             return result;
         }).then(function (result) {
             return dbUtil.query(result.connection, deleteQuery, item.id);
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
         });
     }
 }

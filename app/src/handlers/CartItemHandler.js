@@ -27,9 +27,13 @@ class CartItemHandler {
                 if (!connection) {
                     throw Error('connection not available.');
                 }
+                return dbUtil.beginTransaction(connection);
+            }).then(function(connection) {
                 return dbUtil.query(connection, selectQuery, cart.id);
-            }).then(function (result) {
-                return result.results.map(function (result, index, arr) {
+            }).then(function(result) {
+                return dbUtil.commitTransaction(result.connection, result.results);
+            }).then(function (results) {
+                return results.map(function (result, index, arr) {
                     return new CartItemModel(
                         result[CARTITEM_TABLE.COLUMNS.ID].toString(),
                         new ItemModel(result[ITEM_TABLE.COLUMNS.ID].toString(), result[ITEM_TABLE.COLUMNS.NAME], result[ITEM_TABLE.COLUMNS.DESCRIPTION], result[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(result[CATEGORY_TABLE.COLUMNS.ID],result[CATEGORY_TABLE.COLUMNS.NAME],result[CATEGORY_TABLE.COLUMNS.RESTAURANT])),
@@ -116,7 +120,11 @@ class CartItemHandler {
             if (!connection) {
                 throw Error('connection not available.');
             }
+            return dbUtil.beginTransaction(connection);
+        }).then(function(connection) {
             return dbUtil.query(connection, deleteQuery, deleteColumnValues);
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
         });
     }
 }
