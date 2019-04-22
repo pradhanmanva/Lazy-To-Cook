@@ -95,20 +95,32 @@ class CartHome extends AuthenticatedRoutes {
     changeQuantity(itemId, delta) {
         if (itemId) {
             const self = this;
-            this.setState((prevState)=>{
-                prevState.items.map(function(item) {
-                    if (item.item.id == itemId) {
-                        if (item.quantity + delta <= 0) {
-                            if (window.confirm("Do you wish to remove this item from cart?")) {
-                                self.removeFromCart(itemId);
-                            }
-                        } else {
-                            item.quantity += delta;
-                        }
+            const currentQuantity = this.state.items.filter(function(item) {
+                if (item.item.id == itemId) {
+                    return item;
+                }
+            })[0].quantity;
+            if (currentQuantity + delta <= 0) {
+                if (window.confirm("Do you wish to remove this item from cart?")) {
+                    self.removeFromCart(itemId);
+                }
+            } else {
+                fetch(`/api/users/${this.props.match.params.id}/carts/${this.state.cart.id}/items/${itemId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body : JSON.stringify({quantity:currentQuantity+delta})
+                }).then(function(response) {
+                    if (response.status !== 200) {
+                        NotificationManager.error("Some error occurred");
+                        return;
+                    } else {
+                        self.setState(self.fetchItems);
                     }
-                });    
-                return prevState;
-            });
+                })
+            }
         }
     }
 

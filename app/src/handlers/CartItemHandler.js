@@ -127,6 +127,32 @@ class CartItemHandler {
             return dbUtil.commitTransaction(result.connection, result.results);
         });
     }
+
+    update(cart /* : CartModel */, cartItem /* CartItemModel */) {
+        if (!cartItem || !cartItem.id || !cart || !cart.user || !cart.user.id || !cartItem.quantity || !cartItem.item) {
+            throw new Error("Insufficient input.");
+        }
+
+        const updateQuery = `UPDATE ${CARTITEM_TABLE.NAME} INNER JOIN ${CART_TABLE.NAME} ON ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ID}=${CART_TABLE.NAME}.${CART_TABLE.COLUMNS.ID} INNER JOIN ${USER_TABLE.NAME} ON ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.ID}=${CART_TABLE.NAME}.${CART_TABLE.COLUMNS.USER} SET ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.QUANTITY} = ? WHERE ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ID} = ? AND ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ITEM} = ? AND ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.ID} = ? AND ${USER_TABLE.NAME}.${USER_TABLE.COLUMNS.IS_DELETED} = false`;
+        const updateColumnValues = [
+            cartItem.quantity,
+            cartItem.id,
+            cartItem.item.id,
+            cart.user.id
+        ]
+        const dbUtil = new DBUtil();
+        
+        return dbUtil.getConnection().then(function (connection) {
+            if (!connection) {
+                throw Error('connection not available.');
+            }
+            return dbUtil.beginTransaction(connection);
+        }).then(function(connection) {
+            return dbUtil.query(connection, updateQuery, updateColumnValues);
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
+        });
+    }
 }
 
 module.exports = CartItemHandler;
