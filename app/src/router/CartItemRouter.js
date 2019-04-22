@@ -44,14 +44,6 @@ class CartItemRouter extends CartRouter {
     }
 
     /**
-     * GET /api/users/:user_id/carts/:cart_id/items/:id
-     */
-    get(id, request, response) {
-        response.send(`Get item ${id} of cart ${cartId} of user ${userId}`);
-        response.end();
-    }
-
-    /**
      * POST /api/users/:user_id/carts/:cart_id/items
      * 
      * @requires request.body {
