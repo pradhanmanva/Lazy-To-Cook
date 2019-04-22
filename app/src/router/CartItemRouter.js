@@ -48,7 +48,7 @@ class CartItemRouter extends CartRouter {
      * 
      * @requires request.body {
      *   item_id : "",
-     *   quantity : ""
+     *   quantity : numeric
      * }* 
      */
     add(request, response) {
@@ -84,10 +84,33 @@ class CartItemRouter extends CartRouter {
     }
 
     /**
-     * PUT /api/users/:user_id/carts/:cart_id/items
+     * PUT /api/users/:user_id/carts/:cart_id/items/:id
+     * 
+     * @requires request.body {
+     *   quantity : numeric
+     * } 
      */
     update(id, request, response) {
+        const userId = request.params["user_id"];
+        const cartId = request.params["cart_id"];
+        const itemId = request.params["id"];
+        if (!request.isAuthenticated() || !AppUtil.isUser(request) || !AppUtil.isOwner(request, userId)) {
+            return AppUtil.denyAccess(response);
+        }
 
+        const cartItemModel = new CartItemModel(cartId.toString(), new ItemModel(itemId.toString(), null, null, null, null), request.body.quantity);
+        const cartModel = new CartModel(cartId.toString(), null, new UserModel(userId.toString(), null, null, null, null, null, null, null));
+
+        if (!cartItemModel.isValid()) {
+            return AppUtil.badRequest(response);
+        }
+
+        new CartItemHandler().update(cartModel, cartItemModel).then(function(result) {
+            response.status(200).send("Success").end();
+        }).catch(function(error) {
+            console.error(error);
+            response.status(500).send("Error occurred while deleting item from cart. Please check logs for details.").end();
+        });
     }
 
     /**

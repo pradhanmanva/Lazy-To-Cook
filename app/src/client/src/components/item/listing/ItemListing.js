@@ -287,7 +287,7 @@ class ItemListing extends React.Component {
                                     {
                                         item.is_in_cart ? 
                                             (
-                                                <button name="addToCart" className="item-operation-btn danger-btn" onClick={(event)=>{self.removeFromCart(item.item.id);}}>
+                                                <button name="removeFromCart" className="item-operation-btn danger-btn" onClick={(event)=>{self.removeFromCart(item.item.id);}}>
                                                     Remove from Cart
                                                 </button>
                                             ) : 
