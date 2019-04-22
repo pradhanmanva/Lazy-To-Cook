@@ -60,8 +60,9 @@ lazyToCookApp.get("/api/items", function (request, response) {
     if (!request.isAuthenticated() || !AppUtil.isUser(request)) {
         return AppUtil.denyAccess(response);
     }
+    const userId = AppUtil.getLoggedInUserId(request);
     const itemListingHandler = new ItemListingHandler();
-    itemListingHandler.fetchAll(request.query).then(function (items) {
+    itemListingHandler.fetchAll(userId, request.query).then(function (items) {
         items = items.map(function (item) {
             return {
                 is_in_cart : item.is_in_cart,
@@ -74,7 +75,7 @@ lazyToCookApp.get("/api/items", function (request, response) {
         });
         return items;
     }).then(function(itemsToSend) {
-        itemListingHandler.hasMoreItems(request.query).then(function(nextPageData) {
+        itemListingHandler.hasMoreItems(userId, request.query).then(function(nextPageData) {
             const page = (request.query && request.query.page && !isNaN(request.query.page)) ? parseInt(request.query.page) : 1;
             let paging = {
                 hasPrevious : (page > 1),

@@ -44,6 +44,10 @@ class AppUtil {
     static badRequest(response) {
         return response.status(400).send("Invalid input.").end();
     }
+
+    static getLoggedInUserId(request) {
+        return request.user.user_id;
+    }
 }
 
 module.exports = AppUtil;

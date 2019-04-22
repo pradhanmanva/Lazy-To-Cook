@@ -11,12 +11,15 @@ const RESTAURANT_TABLE = require('../tables/RestaurantTable');
 const ITEM_TABLE = require("../tables/ItemTable");
 const ITEMOUTLET_TABLE = require("../tables/ItemOutletTable");
 const CARTITEM_TABLE = require("../tables/CartItemTable");
+const CART_TABLE = require("../tables/CartTable");
+
+const ITEMLISTING_QUERY = `SELECT * FROM ${ITEMOUTLET_TABLE.NAME} INNER JOIN ${CART_TABLE.NAME} ON ${CART_TABLE.NAME}.${CART_TABLE.COLUMNS.USER}= ? LEFT JOIN ${CARTITEM_TABLE.NAME} ON ${CART_TABLE.NAME}.${CART_TABLE.COLUMNS.ID}=${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ID} AND ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ITEM}=${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} INNER JOIN ${OUTLET_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.OUTLET}=${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} INNER JOIN ${ITEM_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} INNER JOIN ${CATEGORY_TABLE.NAME} ON ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.CATEGORY} = ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} INNER JOIN ${RESTAURANT_TABLE.NAME} ON ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID} = ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} WHERE ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.IS_DELETED} = false AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.IS_DELETED} = false AND ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false`;
 
 class ItemListingHandler {
     constructor() {
     }
 
-    fetchAll(filter) {
+    fetchAll(userId, filter) {
         let filterQuery = this._getFilterQuery(filter);
         let offset = 0;
         let numberOfRows = 10;
@@ -29,14 +32,15 @@ class ItemListingHandler {
         }
         const pagingQuery = `LIMIT ${offset * numberOfRows}, ${numberOfRows}`;
         const dbUtil = new DBUtil();
-        const selectQuery = `SELECT * FROM ${ITEMOUTLET_TABLE.NAME} LEFT JOIN ${CARTITEM_TABLE.NAME} ON ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ITEM}=${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} INNER JOIN ${OUTLET_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.OUTLET}=${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} INNER JOIN ${ITEM_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} INNER JOIN ${CATEGORY_TABLE.NAME} ON ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.CATEGORY} = ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} INNER JOIN ${RESTAURANT_TABLE.NAME} ON ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID} = ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} WHERE ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.IS_DELETED} = false AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.IS_DELETED} = false AND ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false ${filterQuery} ${pagingQuery}`;
+        // const selectQuery = `SELECT * FROM ${ITEMOUTLET_TABLE.NAME} INNER JOIN ${CART_TABLE.NAME} ON ${CART_TABLE.NAME}.${CART_TABLE.COLUMNS.USER}= ? LEFT JOIN ${CARTITEM_TABLE.NAME} ON ${CART_TABLE.NAME}.${CART_TABLE.COLUMNS.ID}=${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ID} AND ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ITEM}=${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} INNER JOIN ${OUTLET_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.OUTLET}=${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} INNER JOIN ${ITEM_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} INNER JOIN ${CATEGORY_TABLE.NAME} ON ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.CATEGORY} = ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} INNER JOIN ${RESTAURANT_TABLE.NAME} ON ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID} = ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} WHERE ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.IS_DELETED} = false AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.IS_DELETED} = false AND ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false ${filterQuery} ${pagingQuery}`;
+        const selectQuery = `${ITEMLISTING_QUERY} ${filterQuery} ${pagingQuery}`;
         return dbUtil.getConnection().then(function (connection) {
             if (!connection) {
                 throw Error('connection not available.');
             }
             return dbUtil.beginTransaction(connection);
         }).then(function(connection) {
-            return dbUtil.query(connection, selectQuery);
+            return dbUtil.query(connection, selectQuery, userId);
         }).then(function(result) {
             return dbUtil.commitTransaction(result.connection, result.results);
         }).then(function (results) {
@@ -75,7 +79,7 @@ class ItemListingHandler {
         return filterQuery;
     }
 
-    hasMoreItems(filter) {
+    hasMoreItems(userId, filter) {
         let filterQuery = this._getFilterQuery(filter);
         let offset = 1;
         let numberOfRows = 10;
@@ -88,14 +92,14 @@ class ItemListingHandler {
         }
         const pagingQuery = `LIMIT ${offset * numberOfRows}, ${numberOfRows}`;
         const dbUtil = new DBUtil();
-        const selectQuery = `SELECT * FROM ${ITEMOUTLET_TABLE.NAME} INNER JOIN ${OUTLET_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.OUTLET}=${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.ID} INNER JOIN ${ITEM_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM} = ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} INNER JOIN ${CATEGORY_TABLE.NAME} ON ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.CATEGORY} = ${CATEGORY_TABLE.NAME}.${CATEGORY_TABLE.COLUMNS.ID} INNER JOIN ${RESTAURANT_TABLE.NAME} ON ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.ID} = ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.RESTAURANT} WHERE ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.IS_DELETED} = false AND ${OUTLET_TABLE.NAME}.${OUTLET_TABLE.COLUMNS.IS_DELETED} = false AND ${RESTAURANT_TABLE.NAME}.${RESTAURANT_TABLE.COLUMNS.IS_DELETED} = false ${filterQuery} ${pagingQuery}`;
+        const selectQuery = `${ITEMLISTING_QUERY} ${filterQuery} ${pagingQuery}`;
         return dbUtil.getConnection().then(function (connection) {
             if (!connection) {
                 throw Error('connection not available.');
             }
             return dbUtil.beginTransaction(connection);
         }).then(function(connection) {
-            return dbUtil.query(connection, selectQuery);
+            return dbUtil.query(connection, selectQuery, userId);
         }).then(function(result) {
             return dbUtil.commitTransaction(result.connection, result.results);
         }).then(function (results) {

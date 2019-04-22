@@ -27,9 +27,10 @@ class ItemListing extends React.Component {
                 hasNext : false,
                 next : null,
                 previous : null
-            }
+            },
+            cart : {}
         }
-        this.cart = {};
+
         this.defaultCategory = {
             id : "",
             name : "All Categories"
@@ -72,7 +73,10 @@ class ItemListing extends React.Component {
         }).then(function(carts) {
             if (carts && carts.length === 1) {
                 const cart = carts[0];
-                self.cart = cart;
+                self.setState((prevState) => {
+                    prevState.cart = cart;
+                    return prevState;  
+                });
             }
         });
     }
@@ -201,15 +205,15 @@ class ItemListing extends React.Component {
     }
 
     componentDidMount() {
+        this.getCart();
         this.queryItems();
         this.queryCategories();
-        this.getCart();
     }
 
     addToCart(itemId) {
         const self = this;
-        if (this.cart && this.cart.id) {
-            fetch(`/api/users/${this.props.match.params.id}/carts/${this.cart.id}/items`, {
+        if (this.state.cart && this.state.cart.id) {
+            fetch(`/api/users/${this.props.match.params.id}/carts/${this.state.cart.id}/items`, {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -243,8 +247,8 @@ class ItemListing extends React.Component {
 
     removeFromCart(itemId) {
         const self = this;
-        if (this.cart && this.cart.id) {
-            fetch(`/api/users/${this.props.match.params.id}/carts/${this.cart.id}/items/${itemId}`, {
+        if (this.state.cart && this.state.cart.id) {
+            fetch(`/api/users/${this.props.match.params.id}/carts/${this.state.cart.id}/items/${itemId}`, {
                 method: 'DELETE',
                 headers: {
                     'Accept': 'application/json',
@@ -285,6 +289,8 @@ class ItemListing extends React.Component {
                                     <ItemListingEntry data={item} />
                                     <div className="item-operation-bar">
                                     {
+                                        self.state.cart && self.state.cart.id ?
+                                        (
                                         item.is_in_cart ? 
                                             (
                                                 <button name="removeFromCart" className="item-operation-btn danger-btn" onClick={(event)=>{self.removeFromCart(item.item.id);}}>
@@ -296,6 +302,7 @@ class ItemListing extends React.Component {
                                                     Add to Cart
                                                 </button>
                                             )
+                                        ) : ""
                                     }
                                     </div>
                                 </li>
