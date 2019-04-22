@@ -59,7 +59,7 @@ class ItemListingHandler {
         let filterQuery = "";
         if (filter) {
             if (filter.item || filter.category) {
-                filterQuery = "WHERE ";
+                filterQuery = "AND ";
                 let itemQuery = "", categoryQuery = "";
                 if (filter.item) {
                     itemQuery = `${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.NAME} LIKE '%${filter.item}%'`;
