@@ -14,9 +14,11 @@ class CartHome extends AuthenticatedRoutes {
         super(props);
         this.state = {
             cart : {},
-            items : []
+            items : [],
+            amount : {}
         }
         this.fetchItems = this.fetchItems.bind(this);
+        this.fetchCartDetails = this.fetchCartDetails.bind(this);
         this.removeFromCart = this.removeFromCart.bind(this);
         this.changeQuantity = this.changeQuantity.bind(this);
     }
@@ -40,7 +42,30 @@ class CartHome extends AuthenticatedRoutes {
                 const cart = carts[0];
                 self.setState({
                     cart : cart
-                }, self.fetchItems);    
+                }, self.fetchCartDetails);
+            }
+        });
+    }
+
+    fetchCartDetails() {
+        const self = this;
+        fetch(`/api/users/${this.props.match.params.id}/carts/${this.state.cart.id}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            }
+        }).then(function(response) {
+            if (response.status !== 200) {
+                return null;
+            }
+            return response.json();
+        }).then(function(cartDetail) {
+            if (cartDetail) {
+                self.setState({
+                    cart : cartDetail.cart,
+                    amount : cartDetail.amount
+                }, self.fetchItems);
             }
         });
     }
@@ -62,7 +87,7 @@ class CartHome extends AuthenticatedRoutes {
                     })
                 } else {
                     NotificationManager.success("Item removed from cart.");
-                    self.setState(self.fetchItems);
+                    self.setState(self.fetchCartDetails);
                     return;
                 }
             })
@@ -117,7 +142,7 @@ class CartHome extends AuthenticatedRoutes {
                         NotificationManager.error("Some error occurred");
                         return;
                     } else {
-                        self.setState(self.fetchItems);
+                        self.setState(self.fetchCartDetails);
                     }
                 })
             }
@@ -162,9 +187,43 @@ class CartHome extends AuthenticatedRoutes {
         return (
             <div className="restaurant-detail-container">
                 <section className="list-container">
+                    <button className="submit-btn float-right">Place Order</button>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <p><b>Order Subtotal</b></p>
+                                </td>
+                                <td>:</td>
+                                <td>
+                                    ${this.state.amount.sub_total}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><b>Tax</b></p>
+                                </td>
+                                <td>:</td>
+                                <td>
+                                    ${this.state.amount.sales_tax}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <h3><b>Order Total</b></h3>
+                                </td>
+                                <td>:</td>
+                                <td>
+                                    <h3>${this.state.amount.total}</h3>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h3>Items in cart</h3>
                     <div>
                         {items}
                     </div>
+                    <button className="submit-btn">Place Order</button>
                 </section>
                 <NotificationContainer />
             </div>
