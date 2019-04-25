@@ -32,7 +32,8 @@
 }
 
 .filter-search-btn {
-    background: transparent;
+    background: #ececec;
+    color: #565656;
     outline: none;
     border: none;
     font-size: 20px;
@@ -59,6 +60,7 @@
 
 .filter-page-container {
     width : 10%;
+    text-align: center;
 }
 
 .paging-btn {

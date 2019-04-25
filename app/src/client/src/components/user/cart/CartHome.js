@@ -15,7 +15,7 @@ class CartHome extends AuthenticatedRoutes {
         this.state = {
             cart : {},
             items : [],
-            amount : {}
+            amount : null
         }
         this.fetchItems = this.fetchItems.bind(this);
         this.fetchCartDetails = this.fetchCartDetails.bind(this);
@@ -96,7 +96,6 @@ class CartHome extends AuthenticatedRoutes {
 
     fetchItems() {
         const self = this;
-        console.log(this.props.match.params.id);
         fetch(`/api/users/${this.props.match.params.id}/carts/${this.state.cart.id}/items`, {
             method: 'GET',
             headers: {
@@ -155,6 +154,7 @@ class CartHome extends AuthenticatedRoutes {
         if (this.state.items && this.state.items.length) {
             items = (
                 <ul className="menu-list-container">
+                    <h3>Items in cart</h3>
                     {
                         this.state.items.map(function(item) {
                             const itemTransformed = {
@@ -184,46 +184,53 @@ class CartHome extends AuthenticatedRoutes {
                 </ul>
             )
         }
+
+        let amount = "";
+        if (this.state.amount) {
+            amount = (
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <p><b>Order Subtotal</b></p>
+                            </td>
+                            <td>:</td>
+                            <td>
+                                ${this.state.amount.sub_total}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p><b>Tax</b></p>
+                            </td>
+                            <td>:</td>
+                            <td>
+                                ${this.state.amount.sales_tax}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h3><b>Order Total</b></h3>
+                            </td>
+                            <td>:</td>
+                            <td>
+                                <h3>${this.state.amount.total}</h3>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            )
+        }
+
         return (
             <div className="restaurant-detail-container">
                 <section className="list-container">
-                    <button className="submit-btn float-right">Place Order</button>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <p><b>Order Subtotal</b></p>
-                                </td>
-                                <td>:</td>
-                                <td>
-                                    ${this.state.amount.sub_total}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <p><b>Tax</b></p>
-                                </td>
-                                <td>:</td>
-                                <td>
-                                    ${this.state.amount.sales_tax}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <h3><b>Order Total</b></h3>
-                                </td>
-                                <td>:</td>
-                                <td>
-                                    <h3>${this.state.amount.total}</h3>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <h3>Items in cart</h3>
+                    {this.state.amount ? <button className="submit-btn float-right">Place Order</button> : ""}
+                    {amount}
                     <div>
                         {items}
                     </div>
-                    <button className="submit-btn">Place Order</button>
+                    {this.state.amount ? <button className="submit-btn">Place Order</button> : ""}
                 </section>
                 <NotificationContainer />
             </div>

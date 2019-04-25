@@ -343,7 +343,7 @@ class ItemListing extends React.Component {
                                             }
                                         </select>
                                     </td>
-                                    <td className="filter-container filter-search-container"><button type="submit" name="search" onClick={this.handleSearch} className="filter-search-btn"><i className="fas fa-search"></i></button></td>
+                                    <td className="filter-container filter-search-container"><button type="submit" name="search" onClick={this.handleSearch} title="Search items" className="filter-search-btn"><i className="fas fa-search"></i></button></td>
                                     <td className="filter-container filter-page-container">
                                         {this.state.paging.hasPrevious ? <button className="paging-btn" onClick={this.goToPreviousPage}><i className="fas fa-caret-left"></i></button> : ""}&nbsp;
                                         Page {this.state.paging.current}&nbsp;

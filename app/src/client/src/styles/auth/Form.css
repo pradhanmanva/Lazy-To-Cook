@@ -16,15 +16,18 @@
 }
 
 .submit-btn {
-    padding: 15px 30px;
+    padding: 12px 30px;
     margin: 0 10px;
     border: none;
     cursor: pointer;
-    background-color: #585858;
+    background-color: #292929;
     color: white;
 }
 
 .trash-btn {
     background-color: #c50000;
     margin: 10px 0;
+}
+.trash-btn:hover {
+    background-color: #e00505;
 }
