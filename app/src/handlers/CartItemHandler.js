@@ -36,7 +36,7 @@ class CartItemHandler {
                 return results.map(function (result, index, arr) {
                     return new CartItemModel(
                         result[CARTITEM_TABLE.COLUMNS.ID].toString(),
-                        new ItemModel(result[ITEM_TABLE.COLUMNS.ID].toString(), result[ITEM_TABLE.COLUMNS.NAME], result[ITEM_TABLE.COLUMNS.DESCRIPTION], result[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(result[CATEGORY_TABLE.COLUMNS.ID],result[CATEGORY_TABLE.COLUMNS.NAME],result[CATEGORY_TABLE.COLUMNS.RESTAURANT])),
+                        new ItemModel(result[ITEM_TABLE.COLUMNS.ID].toString(), result[ITEM_TABLE.COLUMNS.NAME], result[ITEM_TABLE.COLUMNS.DESCRIPTION], result[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(result[CATEGORY_TABLE.COLUMNS.ID],result[CATEGORY_TABLE.COLUMNS.NAME],result[CATEGORY_TABLE.COLUMNS.RESTAURANT]), result[ITEM_TABLE.COLUMNS.IMAGE]),
                         result[CARTITEM_TABLE.COLUMNS.QUANTITY]
                     );
                 });

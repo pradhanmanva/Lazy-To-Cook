@@ -163,7 +163,8 @@ class CartHome extends AuthenticatedRoutes {
                                     "name" : item.item.name,
                                     "description" : item.item.description,
                                     "price": item.item.price,
-                                    "category" : item.item.category
+                                    "category" : item.item.category,
+                                    "image" : item.item.image
                                 }
                             }
 
