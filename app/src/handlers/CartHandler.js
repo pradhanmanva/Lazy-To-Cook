@@ -2,6 +2,7 @@ const CartModel = require("../models/CartModel");
 const UserModel = require("../models/UserModel");
 
 const DBUtil = require("../utils/DBUtil");
+const OrderUtil = require("../utils/OrderUtil");
 
 const CART_TABLE = require("../tables/CartTable");
 const USER_TABLE = require("../tables/UserTable");
@@ -59,17 +60,15 @@ class CartHandler {
             }).then(function(result) {
                 return dbUtil.commitTransaction(result.connection, result.results);
             }).then(function (results) {
-                const sub_total = results.reduce(function(sum, result) {
-                    return sum + parseFloat((parseFloat(result[ITEM_TABLE.COLUMNS.PRICE]) * parseInt(result[CARTITEM_TABLE.COLUMNS.QUANTITY])))
-                }, 0);
-                const sales_tax = parseFloat((sub_total * (0.0825)).toFixed(2));
+                const amount = OrderUtil.calculateOrderAmount(results.map(function(result){
+                    return {
+                        price : parseFloat(result[ITEM_TABLE.COLUMNS.PRICE]),
+                        quantity : parseInt(result[CARTITEM_TABLE.COLUMNS.QUANTITY])
+                    }
+                }))
                 return {
                     cart : new CartModel(cart.id, null, null),
-                    amount : {
-                        sub_total : sub_total,
-                        sales_tax : sales_tax,
-                        total : (sub_total + sales_tax)
-                    }
+                    amount : amount
                 }
             });
         }
