@@ -47,7 +47,7 @@ class ItemListingHandler {
             return results.map(function (item) {
                 return {
                     is_in_cart : (item[CARTITEM_TABLE.COLUMNS.ID] != null),
-                    item: new ItemModel(item[ITEM_TABLE.COLUMNS.ID], item[ITEM_TABLE.COLUMNS.NAME], item[ITEM_TABLE.COLUMNS.DESCRIPTION], item[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(item[CATEGORY_TABLE.COLUMNS.ID], item[CATEGORY_TABLE.COLUMNS.NAME])),
+                    item: new ItemModel(item[ITEM_TABLE.COLUMNS.ID], item[ITEM_TABLE.COLUMNS.NAME], item[ITEM_TABLE.COLUMNS.DESCRIPTION], item[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(item[CATEGORY_TABLE.COLUMNS.ID], item[CATEGORY_TABLE.COLUMNS.NAME]), item[ITEM_TABLE.COLUMNS.IMAGE]),
                     restaurant: new RestaurantModel(item[RESTAURANT_TABLE.COLUMNS.ID], item[RESTAURANT_TABLE.COLUMNS.NAME], item[RESTAURANT_TABLE.COLUMNS.CONTACT], item[RESTAURANT_TABLE.COLUMNS.EMAIL], item[RESTAURANT_TABLE.COLUMNS.WEBSITE]),
                     outlets: [new OutletModel(item[OUTLET_TABLE.COLUMNS.ID], item[OUTLET_TABLE.COLUMNS.NAME], null, null, null)]
                 }

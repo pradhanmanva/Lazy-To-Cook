@@ -32,7 +32,7 @@ class MenuItemHandler {
                 return dbUtil.commitTransaction(result.connection, result.results);
             }).then(function (results) {
                 return results.map(function (result, index, arr) {
-                    return new ItemModel(result[ITEM_TABLE.COLUMNS.ID].toString(), result[ITEM_TABLE.COLUMNS.NAME], result[ITEM_TABLE.COLUMNS.DESCRIPTION], result[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(result[CATEGORY_TABLE.COLUMNS.ID], result[CATEGORY_TABLE.COLUMNS.NAME], null));
+                    return new ItemModel(result[ITEM_TABLE.COLUMNS.ID].toString(), result[ITEM_TABLE.COLUMNS.NAME], result[ITEM_TABLE.COLUMNS.DESCRIPTION], result[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(result[CATEGORY_TABLE.COLUMNS.ID], result[CATEGORY_TABLE.COLUMNS.NAME], null), result[ITEM_TABLE.COLUMNS.IMAGE]);
                 });
             });
         }
@@ -55,7 +55,7 @@ class MenuItemHandler {
                 return dbUtil.commitTransaction(result.connection, result.results);
             }).then(function (results) {
                 return results.map(function (result, index, arr) {
-                    return new ItemModel(result[ITEM_TABLE.COLUMNS.ID].toString(), result[ITEM_TABLE.COLUMNS.NAME], result[ITEM_TABLE.COLUMNS.DESCRIPTION], result[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(result[CATEGORY_TABLE.COLUMNS.ID], result[CATEGORY_TABLE.COLUMNS.NAME], null));
+                    return new ItemModel(result[ITEM_TABLE.COLUMNS.ID].toString(), result[ITEM_TABLE.COLUMNS.NAME], result[ITEM_TABLE.COLUMNS.DESCRIPTION], result[ITEM_TABLE.COLUMNS.PRICE], new RestaurantItemCategoryModel(result[CATEGORY_TABLE.COLUMNS.ID], result[CATEGORY_TABLE.COLUMNS.NAME], null), result[ITEM_TABLE.COLUMNS.IMAGE]);
                 })[0];
             });
         }
@@ -101,7 +101,13 @@ class MenuItemHandler {
             if (dp) {
                 const itemImageFileName = `${result.results.insertId}${path.extname(dp.originalname)}`;
                 fs.writeFileSync(`${__dirname}/../../assets/images/${itemImageFileName}`, dp.buffer, 'ascii');
+                const updateImageQuery = `UPDATE ${ITEM_TABLE.NAME} SET ${ITEM_TABLE.COLUMNS.IMAGE} = ? WHERE ${ITEM_TABLE.COLUMNS.ID} = ?`;
+                const updateImageColumnValues = [itemImageFileName, result.results.insertId];
+                item.image = itemImageFileName;
+                return dbUtil.query(result.connection, updateImageQuery, updateImageColumnValues);
             }
+            return result;
+        }).then(function(result) {
             return dbUtil.query(result.connection, itemOutletInsertQuery, itemOutletColumnValues);
         }).then(function (result) {
             item.id = itemOutletColumnValues[ITEMOUTLET_TABLE.COLUMNS.ITEM];
@@ -148,13 +154,19 @@ class MenuItemHandler {
             }
         }).then(function (result) {
             return dbUtil.query(result.connection, itemUpdateQuery, itemColumnValues);
-        }).then(function(result) {
-            return dbUtil.commitTransaction(result.connection, result.results);
         }).then(function (result) {
             if (dp) {
                 const itemImageFileName = `${item.id}${path.extname(dp.originalname)}`;
                 fs.writeFileSync(`${__dirname}/../../assets/images/${itemImageFileName}`, dp.buffer, 'ascii');
+                const updateImageQuery = `UPDATE ${ITEM_TABLE.NAME} SET ${ITEM_TABLE.COLUMNS.IMAGE} = ? WHERE ${ITEM_TABLE.COLUMNS.ID} = ?`;
+                const updateImageColumnValues = [itemImageFileName, item.id];
+                item.image = itemImageFileName;
+                return dbUtil.query(result.connection, updateImageQuery, updateImageColumnValues);
             }
+            return result;
+        }).then(function(result) {
+            return dbUtil.commitTransaction(result.connection, result.results);
+        }).then(function(result) {
             return item;
         });
     }

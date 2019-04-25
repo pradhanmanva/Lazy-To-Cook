@@ -12,7 +12,7 @@ export default (props) => {
     return (
         <div className="item-list-entry-details">
             <div className="item-list-entry-image">
-                <ItemImage url={`/images/${props.data.item.id}.png`} />
+                <ItemImage url={`/images/${props.data.item.image}`} />
             </div>
             <div>
                 <div>
