@@ -1,5 +1,5 @@
 import React from "react";
-import Price from "./Price";
+import Price from "../../commons/Price";
 import ItemImage from "../ItemImage";
 import "../../../styles/item/listing/ItemListingEntry.css";
 import ItemCategoryTab from "./ItemCategoryTab";

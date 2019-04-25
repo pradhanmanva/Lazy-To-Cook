@@ -1,5 +1,5 @@
 import React from "react";
-import "../../../styles/item/listing/Price.css";
+import "../../styles/commons/Price.css";
 
 export default (props) => {
     const notation = props.type === "USD" ? "$" : props.type;
