@@ -13,10 +13,10 @@ class CartHome extends AuthenticatedRoutes {
     constructor(props) {
         super(props);
         this.state = {
-            cart : {},
-            items : [],
-            amount : null
-        }
+            cart: {},
+            items: [],
+            amount: null
+        };
         this.fetchItems = this.fetchItems.bind(this);
         this.fetchCartDetails = this.fetchCartDetails.bind(this);
         this.removeFromCart = this.removeFromCart.bind(this);
@@ -32,16 +32,16 @@ class CartHome extends AuthenticatedRoutes {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
-        }).then(function(response) {
+        }).then(function (response) {
             if (response.status !== 200) {
                 return null;
             }
             return response.json();
-        }).then(function(carts) {
+        }).then(function (carts) {
             if (carts && carts.length) {
                 const cart = carts[0];
                 self.setState({
-                    cart : cart
+                    cart: cart
                 }, self.fetchCartDetails);
             }
         });
@@ -55,16 +55,16 @@ class CartHome extends AuthenticatedRoutes {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
-        }).then(function(response) {
+        }).then(function (response) {
             if (response.status !== 200) {
                 return null;
             }
             return response.json();
-        }).then(function(cartDetail) {
+        }).then(function (cartDetail) {
             if (cartDetail) {
                 self.setState({
-                    cart : cartDetail.cart,
-                    amount : cartDetail.amount
+                    cart: cartDetail.cart,
+                    amount: cartDetail.amount
                 }, self.fetchItems);
             }
         });
@@ -80,15 +80,14 @@ class CartHome extends AuthenticatedRoutes {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 }
-            }).then(function(response) {
+            }).then(function (response) {
                 if (response.status !== 200) {
-                    return response.text().then(function(error) {
+                    return response.text().then(function (error) {
                         NotificationManager.error(error);
                     })
                 } else {
                     NotificationManager.success("Item removed from cart.");
                     self.setState(self.fetchCartDetails);
-                    return;
                 }
             })
         }
@@ -102,15 +101,15 @@ class CartHome extends AuthenticatedRoutes {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
-        }).then(function(response) {
+        }).then(function (response) {
             if (response.status !== 200) {
                 return null;
             }
             return response.json();
-        }).then(function(cartFromResponse) {
+        }).then(function (cartFromResponse) {
             if (cartFromResponse) {
                 self.setState({
-                    items : cartFromResponse
+                    items: cartFromResponse
                 });
             }
         })
@@ -119,8 +118,8 @@ class CartHome extends AuthenticatedRoutes {
     changeQuantity(itemId, delta) {
         if (itemId) {
             const self = this;
-            const currentQuantity = this.state.items.filter(function(item) {
-                if (item.item.id == itemId) {
+            const currentQuantity = this.state.items.filter(function (item) {
+                if (item.item.id === itemId) {
                     return item;
                 }
             })[0].quantity;
@@ -135,8 +134,8 @@ class CartHome extends AuthenticatedRoutes {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
                     },
-                    body : JSON.stringify({quantity:currentQuantity+delta})
-                }).then(function(response) {
+                    body: JSON.stringify({quantity: currentQuantity + delta})
+                }).then(function (response) {
                     if (response.status !== 200) {
                         NotificationManager.error("Some error occurred");
                         return;
@@ -150,31 +149,40 @@ class CartHome extends AuthenticatedRoutes {
 
     render() {
         const self = this;
-        let items = <p style={{"textAlign" : "center"}}>No item in cart. Check out <a href={`/app/user/${this.props.match.params.id}/menu`}>what's cooking</a>.</p>;
+        let items = <p style={{"textAlign": "center"}}>No item in cart. Check out <a
+            href={`/app/user/${this.props.match.params.id}/menu`}>what's cooking</a>.</p>;
         if (this.state.items && this.state.items.length) {
             items = (
                 <ul className="menu-list-container">
                     <h3>Items in cart</h3>
                     {
-                        this.state.items.map(function(item) {
+                        this.state.items.map(function (item) {
                             const itemTransformed = {
-                                "item" :{
-                                    "id" : item.item.id,
-                                    "name" : item.item.name,
-                                    "description" : item.item.description,
+                                "item": {
+                                    "id": item.item.id,
+                                    "name": item.item.name,
+                                    "description": item.item.description,
                                     "price": item.item.price,
-                                    "category" : item.item.category,
-                                    "image" : item.item.image
+                                    "category": item.item.category,
+                                    "image": item.item.image
                                 }
-                            }
+                            };
 
                             return (
                                 <li className="item-list-entry-container">
-                                    <ItemListingEntry key={itemTransformed.id} data={itemTransformed} />
+                                    <ItemListingEntry key={itemTransformed.id} data={itemTransformed}/>
                                     <div className="item-operation-bar">
-                                        <QuantityComponent quantity={item.quantity} onDecrease={()=>{self.changeQuantity(item.item.id, -1)}} onIncrease={()=>{self.changeQuantity(item.item.id, 1)}} />
+                                        <QuantityComponent quantity={item.quantity} onDecrease={() => {
+                                            self.changeQuantity(item.item.id, -1)
+                                        }} onIncrease={() => {
+                                            self.changeQuantity(item.item.id, 1)
+                                        }}/>
                                         &nbsp;
-                                        <button name="removeFromCart" className="remove-from-cart-btn item-operation-btn danger-btn" onClick={(event)=>{self.removeFromCart(item.item.id);}}>
+                                        <button name="removeFromCart"
+                                                className="remove-from-cart-btn item-operation-btn danger-btn"
+                                                onClick={(event) => {
+                                                    self.removeFromCart(item.item.id);
+                                                }}>
                                             Remove from Cart
                                         </button>
                                     </div>
@@ -191,33 +199,33 @@ class CartHome extends AuthenticatedRoutes {
             amount = (
                 <table>
                     <tbody>
-                        <tr>
-                            <td>
-                                <p><b>Order Subtotal</b></p>
-                            </td>
-                            <td>:</td>
-                            <td>
-                                ${this.state.amount.sub_total}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><b>Tax</b></p>
-                            </td>
-                            <td>:</td>
-                            <td>
-                                ${this.state.amount.sales_tax}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <h3><b>Order Total</b></h3>
-                            </td>
-                            <td>:</td>
-                            <td>
-                                <h3>${this.state.amount.total}</h3>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td>
+                            <p><b>Order Subtotal</b></p>
+                        </td>
+                        <td>:</td>
+                        <td>
+                            ${this.state.amount.sub_total}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p><b>Tax</b></p>
+                        </td>
+                        <td>:</td>
+                        <td>
+                            ${this.state.amount.sales_tax}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h3><b>Order Total</b></h3>
+                        </td>
+                        <td>:</td>
+                        <td>
+                            <h3>${this.state.amount.total}</h3>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             )
@@ -233,10 +241,10 @@ class CartHome extends AuthenticatedRoutes {
                     </div>
                     {this.state.amount ? <button className="submit-btn">Place Order</button> : ""}
                 </section>
-                <NotificationContainer />
+                <NotificationContainer/>
             </div>
         );
     }
-  }
+}
 
 export default CartHome;

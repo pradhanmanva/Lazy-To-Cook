@@ -2,7 +2,7 @@ import React from "react";
 import "../../../styles/restaurant/Restaurant.css";
 import "../../../styles/auth/Form.css";
 import "../../../styles/ContentArea.css";
-import { NotificationManager, NotificationContainer } from "react-notifications";
+import {NotificationManager, NotificationContainer} from "react-notifications";
 import ItemListingEntry from "./ItemListingEntry";
 import "../../../styles/item/listing/ItemListing.css";
 import ItemCategoryTab from "./ItemCategoryTab";
@@ -11,30 +11,30 @@ class ItemListing extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            items : [],
-            filter : {
-                item : "",
-                category : ""
+            items: [],
+            filter: {
+                item: "",
+                category: ""
             },
-            categories : [],
-            currentFilter : {
-                item : "",
-                category : ""
+            categories: [],
+            currentFilter: {
+                item: "",
+                category: ""
             },
-            paging : {
-                current : 1,
-                hasPrevious : false,
-                hasNext : false,
-                next : null,
-                previous : null
+            paging: {
+                current: 1,
+                hasPrevious: false,
+                hasNext: false,
+                next: null,
+                previous: null
             },
-            cart : {}
-        }
+            cart: {}
+        };
 
         this.defaultCategory = {
-            id : "",
-            name : "All Categories"
-        }
+            id: "",
+            name: "All Categories"
+        };
         this.handleChange = this.handleChange.bind(this);
         this.handleSearch = this.handleSearch.bind(this);
         this.queryItems = this.queryItems.bind(this);
@@ -54,7 +54,7 @@ class ItemListing extends React.Component {
                 prevState.filter[field.split("_")[1]] = value;
                 return prevState;
             });
-        } 
+        }
     }
 
     getCart() {
@@ -65,17 +65,17 @@ class ItemListing extends React.Component {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
-        }).then(function(response) {
+        }).then(function (response) {
             if (response.status !== 200) {
                 return null;
             }
             return response.json();
-        }).then(function(carts) {
+        }).then(function (carts) {
             if (carts && carts.length === 1) {
                 const cart = carts[0];
                 self.setState((prevState) => {
                     prevState.cart = cart;
-                    return prevState;  
+                    return prevState;
                 });
             }
         });
@@ -97,12 +97,12 @@ class ItemListing extends React.Component {
         this.setState((prevState) => {
             let newState = {
                 ...prevState,
-                currentFilter : {
+                currentFilter: {
                     ...prevState.filter
                 }
-            }
+            };
             if (prevState.filter.category && prevState.filter.category.length) {
-                let selectedCategory = prevState.categories.filter(function(category) {
+                let selectedCategory = prevState.categories.filter(function (category) {
                     return (category.id.toString() === prevState.filter.category.toString())
                 });
                 if (selectedCategory && selectedCategory.length) {
@@ -119,27 +119,27 @@ class ItemListing extends React.Component {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
-        }).then(function(response) {
+        }).then(function (response) {
             if (!response || response.status !== 200) {
                 if (response.status === 400) {
-                    response.text().then(function(message){
+                    response.text().then(function (message) {
                         NotificationManager.error(message);
                     });
                 }
             } else {
                 return response.json();
             }
-        }).then(function(responseJSON) {
-            if(responseJSON) {
+        }).then(function (responseJSON) {
+            if (responseJSON) {
                 self.setState((prev) => {
                     prev.items = responseJSON.items;
-                    prev.paging =  {
+                    prev.paging = {
                         ...prev.paging,
-                        next : responseJSON.paging.next,
-                        previous : responseJSON.paging.previous,
-                        hasNext : responseJSON.paging.hasNext,
-                        hasPrevious : responseJSON.paging.hasPrevious
-                    }
+                        next: responseJSON.paging.next,
+                        previous: responseJSON.paging.previous,
+                        hasNext: responseJSON.paging.hasNext,
+                        hasPrevious: responseJSON.paging.hasPrevious
+                    };
                     return prev;
                 });
             }
@@ -154,25 +154,25 @@ class ItemListing extends React.Component {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             }
-        }).then(function(response) {
+        }).then(function (response) {
             if (!response || response.status !== 200) {
                 if (response.status === 400) {
-                    response.text().then(function(message){
+                    response.text().then(function (message) {
                         NotificationManager.error(message);
                     });
                 }
             } else {
                 return response.json();
             }
-        }).then(function(categories) {
-            if(categories) {
+        }).then(function (categories) {
+            if (categories) {
                 categories.unshift(self.defaultCategory);
                 self.setState({
-                    categories : categories
+                    categories: categories
                 });
                 self.setState({
-                    filter : {
-                        category : self.defaultCategory.id
+                    filter: {
+                        category: self.defaultCategory.id
                     }
                 })
             }
@@ -185,7 +185,7 @@ class ItemListing extends React.Component {
             this.setState((prevState) => {
                 prevState.paging.current = prevState.paging.previous;
                 return prevState;
-            },this.queryItems);
+            }, this.queryItems);
         }
     }
 
@@ -195,7 +195,7 @@ class ItemListing extends React.Component {
             this.setState((prevState) => {
                 prevState.paging.current = prevState.paging.next;
                 return prevState;
-            },this.queryItems);
+            }, this.queryItems);
         }
     }
 
@@ -219,27 +219,27 @@ class ItemListing extends React.Component {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
-                body : JSON.stringify({
-                    item_id : itemId,
-                    quantity : 1
+                body: JSON.stringify({
+                    item_id: itemId,
+                    quantity: 1
                 })
-            }).then(function(response) {
+            }).then(function (response) {
                 if (response.status !== 200) {
-                    return response.text().then(function(error) {
+                    return response.text().then(function (error) {
                         NotificationManager.error(error);
                     })
                 } else {
                     NotificationManager.success("Successfully added item to cart.");
-                    self.setState((prevState)=> {
-                        prevState.items = prevState.items.map(function(item) {
-                            if (item.item.id == itemId) {
+                    self.setState((prevState) => {
+                        prevState.items = prevState.items.map(function (item) {
+                            if (item.item.id === itemId) {
                                 item.is_in_cart = !item.is_in_cart;
                             }
                             return item;
-                        })
+                        });
                         return prevState;
                     });
-                    return;
+
                 }
             })
         }
@@ -254,20 +254,20 @@ class ItemListing extends React.Component {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 }
-            }).then(function(response) {
+            }).then(function (response) {
                 if (response.status !== 200) {
-                    return response.text().then(function(error) {
+                    return response.text().then(function (error) {
                         NotificationManager.error(error);
                     })
                 } else {
                     NotificationManager.success("Item removed from cart.");
-                    self.setState((prevState)=> {
-                        prevState.items = prevState.items.map(function(item) {
-                            if (item.item.id == itemId) {
+                    self.setState((prevState) => {
+                        prevState.items = prevState.items.map(function (item) {
+                            if (item.item.id === itemId) {
                                 item.is_in_cart = !item.is_in_cart;
                             }
                             return item;
-                        })
+                        });
                         return prevState;
                     });
                     return;
@@ -278,32 +278,40 @@ class ItemListing extends React.Component {
 
     render() {
         const self = this;
-        let items = <p style={{"textAlign" : "center"}}><i className="fas fa-search fa-xs"></i> No item available to display.</p>;
+        let items = <p style={{"textAlign": "center"}}><i className="fas fa-search fa-xs"/> No item available to
+            display.</p>;
         if (this.state.items && this.state.items.length) {
             items = (
                 <ul className="menu-list-container">
                     {
-                        this.state.items.map(function(item) {
+                        this.state.items.map(function (item) {
                             return (
                                 <li key={item.item.id} className="item-list-entry-container">
-                                    <ItemListingEntry data={item} />
+                                    <ItemListingEntry data={item}/>
                                     <div className="item-operation-bar">
-                                    {
-                                        self.state.cart && self.state.cart.id ?
-                                        (
-                                        item.is_in_cart ? 
-                                            (
-                                                <button name="removeFromCart" className="item-operation-btn danger-btn" onClick={(event)=>{self.removeFromCart(item.item.id);}}>
-                                                    Remove from Cart
-                                                </button>
-                                            ) : 
-                                            (
-                                                <button name="addToCart" className="item-operation-btn" onClick={()=>{self.addToCart(item.item.id)}}>
-                                                    Add to Cart
-                                                </button>
-                                            )
-                                        ) : ""
-                                    }
+                                        {
+                                            self.state.cart && self.state.cart.id ?
+                                                (
+                                                    item.is_in_cart ?
+                                                        (
+                                                            <button name="removeFromCart"
+                                                                    className="item-operation-btn danger-btn"
+                                                                    onClick={(event) => {
+                                                                        self.removeFromCart(item.item.id);
+                                                                    }}>
+                                                                Remove from Cart
+                                                            </button>
+                                                        ) :
+                                                        (
+                                                            <button name="addToCart" className="item-operation-btn"
+                                                                    onClick={() => {
+                                                                        self.addToCart(item.item.id)
+                                                                    }}>
+                                                                Add to Cart
+                                                            </button>
+                                                        )
+                                                ) : ""
+                                        }
                                     </div>
                                 </li>
                             )
@@ -316,41 +324,61 @@ class ItemListing extends React.Component {
         let itemFilter = null;
         let categoryFilter = null;
         if (this.state.currentFilter.item && this.state.currentFilter.item.length) {
-            itemFilter = <ItemCategoryTab name={`name: ${this.state.currentFilter.item}`} />
+            itemFilter = <ItemCategoryTab name={`name: ${this.state.currentFilter.item}`}/>
         }
         if (this.state.currentFilter.category && this.state.currentFilter.category.length) {
-            categoryFilter = <ItemCategoryTab name={`category: ${this.state.currentFilter.category}`} />
+            categoryFilter = <ItemCategoryTab name={`category: ${this.state.currentFilter.category}`}/>
         }
         let currentFilterContainer = null;
         if (itemFilter || categoryFilter) {
             currentFilterContainer = (<span><b>Showing results for </b> {itemFilter} {categoryFilter}</span>)
         }
-        
+
         return (
             <div className="restaurant-detail-container">
                 <section className="list-container">
-                    <form onSubmit={()=>{return false;}}>
+                    <form onSubmit={() => {
+                        return false;
+                    }}>
                         <table width="100%">
                             <tbody>
-                                <tr>
-                                    <td className="filter-container filter-item-container"><input id="filter_item" className="filter-item filter-field" type="text" name="filter_item" placeholder="Search Items" onChange={this.handleChange} /></td>
-                                    <td className="filter-container filter-category-container">
-                                        <select id="filter-container filter_category" className="filter-category filter-field" name="filter_category" onChange={this.handleChange} >
-                                            {
-                                                this.state.categories.map(function(category) {
-                                                    return <option key={category.id} value={category.id}>{category.name}{category.restaurant ? `, ${category.restaurant.name}` : ""}</option>
-                                                })
-                                            }
-                                        </select>
-                                    </td>
-                                    <td className="filter-container filter-search-container"><button type="submit" name="search" onClick={this.handleSearch} title="Search items" className="filter-search-btn"><i className="fas fa-search"></i></button></td>
-                                    <td className="filter-container filter-page-container">
-                                        {this.state.paging.hasPrevious ? <button className="paging-btn" onClick={this.goToPreviousPage}><i className="fas fa-caret-left"></i></button> : ""}&nbsp;
-                                        Page {this.state.paging.current}&nbsp;
-                                        {this.state.paging.hasNext ? <button className="paging-btn" onClick={this.goToNextPage}><i className="fas fa-caret-right"></i></button> : ""}
-                                    </td>
-                                </tr>
-                                <tr><td>{currentFilterContainer ? currentFilterContainer : ""}</td></tr>
+                            <tr>
+                                <td className="filter-container filter-item-container"><input id="filter_item"
+                                                                                              className="filter-item filter-field"
+                                                                                              type="text"
+                                                                                              name="filter_item"
+                                                                                              placeholder="Search Items"
+                                                                                              onChange={this.handleChange}/>
+                                </td>
+                                <td className="filter-container filter-category-container">
+                                    <select id="filter-container filter_category"
+                                            className="filter-category filter-field" name="filter_category"
+                                            onChange={this.handleChange}>
+                                        {
+                                            this.state.categories.map(function (category) {
+                                                return <option key={category.id}
+                                                               value={category.id}>{category.name}{category.restaurant ? `, ${category.restaurant.name}` : ""}</option>
+                                            })
+                                        }
+                                    </select>
+                                </td>
+                                <td className="filter-container filter-search-container">
+                                    <button type="submit" name="search" onClick={this.handleSearch} title="Search items"
+                                            className="filter-search-btn"><i className="fas fa-search"/></button>
+                                </td>
+                                <td className="filter-container filter-page-container">
+                                    {this.state.paging.hasPrevious ?
+                                        <button className="paging-btn" onClick={this.goToPreviousPage}><i
+                                            className="fas fa-caret-left"/></button> : ""}&nbsp;
+                                    Page {this.state.paging.current}&nbsp;
+                                    {this.state.paging.hasNext ?
+                                        <button className="paging-btn" onClick={this.goToNextPage}><i
+                                            className="fas fa-caret-right"/></button> : ""}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{currentFilterContainer ? currentFilterContainer : ""}</td>
+                            </tr>
                             </tbody>
                         </table>
                     </form>
@@ -358,7 +386,7 @@ class ItemListing extends React.Component {
                         {items}
                     </div>
                 </section>
-                <NotificationContainer />
+                <NotificationContainer/>
             </div>
         );
     }
