@@ -9,7 +9,7 @@ class AuthenticationForm extends Component {
         super(props);
         this.state = {
             user_type: props.type,
-            isSignup : (props.method === "signin")
+            isSignup : (props.method === "register")
         };
         this.handleChange = this.handleChange.bind(this);
       }
@@ -63,14 +63,14 @@ class AuthenticationForm extends Component {
                         <input type="hidden" name="user_type" value="user" checked={this.state.user_type === "user"} /> User
                     </span>
                 </div>
-                <div className="radio-selection auth-type-selection">
+                {/* <div className="radio-selection auth-type-selection">
                     <span name="isSignup"  className={`${(this.state.isSignup ? "selected" : "")} selection left-border-curved`} onClick={this.handleChange}>
                         <input type="hidden" name="isSignup" value="true" checked={this.state.isSignup} /> Sign Up
                     </span>
                     <span name="isSignup" className={`${(!this.state.isSignup ? "selected" : "")} selection right-border-curved`} onClick={this.handleChange}>
                         <input type="hidden" name="isSignup" value="false" checked={!this.state.isSignup} /> Sign In
                     </span>
-                </div>
+                </div> */}
                 <div className="auth-form">
                 {form}
                 </div>

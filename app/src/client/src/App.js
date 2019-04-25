@@ -31,14 +31,13 @@ class App extends Component {
 
 const LandingPage = ({location}) => {
   const queryParameters = queryString.parse(location.search);
-  console.log(queryParameters);
   
   return (
     <div>
       <Navbar isLoggedIn={false}></Navbar>
       <AuthenticationHome 
-        type={queryParameters.type ? queryParameters.type : "admin"} 
-        method={queryParameters.method ? queryParameters.method : "register"} />
+        type={queryParameters.type ? queryParameters.type : "user"} 
+        method={queryParameters.method ? queryParameters.method : "signin"} />
     </div>
   );
 }

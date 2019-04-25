@@ -20,7 +20,7 @@ class RestaurantSignup extends Signup {
     render() {
         return (
             <div>
-                <h4>Restaurant Sign up</h4>
+                <h2>Restaurant Sign up</h2>
                 <form onSubmit={this.handleSubmit}>
                     <div className="field-row">
                         <label>

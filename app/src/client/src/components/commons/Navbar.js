@@ -28,11 +28,13 @@ class Navbar extends Component {
 
     render() {
         const logoutButton = this.props.shouldShowLogout ? <button className="logout-btn" name="logout" onClick={this.logout}>Logout</button> : "";
+        const entryButtons = this.props.shouldShowLogout ? "" : (<p className="logout-btn"><a href="/app/?method=signin" className="logout-btn">Sign In</a><a href="/app/?method=register" className="logout-btn">Register</a></p>);
         return (
             <div>
                 <nav className="Navbar-container">
                     <Logo />
                     {logoutButton}
+                    {entryButtons}
                 </nav>
                 {this.props.children}
             </div>
