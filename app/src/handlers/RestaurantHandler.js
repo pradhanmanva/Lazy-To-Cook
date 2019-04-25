@@ -68,6 +68,10 @@ class RestaurantHandler {
         }).then(function (result) {
             restaurant.id = authenticationColumnValues[RESTAURANT_AUTH_TABLE.COLUMNS.ID];
             return restaurant;
+        }).catch(function(result) {
+            if(result.error.code === 'ER_DUP_ENTRY') {
+                return Promise.reject(new Error("Username already exists."));
+            }
         });
     }
 

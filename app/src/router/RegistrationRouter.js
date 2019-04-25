@@ -32,6 +32,9 @@ class RegistrationRouter {
             return AppUtil.badRequest(response);
         }
         new RestaurantHandler().register(authCredentials).then(function (insertedRestaraunt) {
+            if (insertedRestaraunt && insertedRestaraunt instanceof Error) {
+                return Promise.reject(insertedRestaraunt);
+            }
             if (insertedRestaraunt) {
                 insertedRestaraunt = insertedRestaraunt.toJSON();
             } else {
@@ -40,7 +43,7 @@ class RegistrationRouter {
             response.status(200).json(insertedRestaraunt).end();
         }).catch(function (error) {
             console.error(error);
-            response.status(500).send("Error occurred while creating a restaurant. Please check logs for details.").end();
+            response.status(500).send(error.message).end();
         });
     }
 
@@ -71,6 +74,9 @@ class RegistrationRouter {
             return AppUtil.badRequest(response);
         }
         new UserHandler().register(authCredentials).then(function (insertedUser) {
+            if (insertedUser && insertedUser instanceof Error) {
+                return Promise.reject(insertedUser);
+            }
             if (insertedUser) {
                 insertedUser = insertedUser.toJSON();
             } else {
@@ -79,7 +85,7 @@ class RegistrationRouter {
             response.status(200).json(insertedUser).end();
         }).catch(function (error) {
             console.error(error);
-            response.status(500).send("Error occurred while creating a user. Please check logs for details.").end();
+            response.status(500).send(error.message).end();
         });
     }
 

@@ -65,6 +65,10 @@ class UserHandler {
             user.id = authenticationColumnValues[USER_TABLE.COLUMNS.ID];
             user.address.id = columnValues[USER_TABLE.COLUMNS.ADDRESS];
             return user;
+        }).catch(function(result) {
+            if(result.error.code === 'ER_DUP_ENTRY') {
+                return Promise.reject(new Error("Email Address already exists."));
+            }
         });
     }
 
