@@ -47,7 +47,7 @@ class UserModel extends Model {
             middle_name: this.middleName,
             dob: this.dateOfBirth,
             email: this.email,
-            address: this.address.toJSON(),
+            address: this.address && this.address.toJSON(),
             full_name: this.fullName()
         }
         if (shouldIncludeIsDeleted && this.is_deleted) {

@@ -4,5 +4,6 @@
   "item": "items",
   "cart": "carts",
   "user": "users",
-  "category": "categories"
+  "category": "categories",
+  "order" : "orders"
 }

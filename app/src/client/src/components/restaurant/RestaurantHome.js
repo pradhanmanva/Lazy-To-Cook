@@ -6,6 +6,7 @@ import CategoryHome from "./category/CategoryHome";
 import { BrowserRouter, Route, Link } from "react-router-dom";
 import Navbar from "../commons/Navbar";
 import "../../styles/restaurant/RestaurantHome.css";
+import OrderHome from "../orders/OrderHome";
 
 class RestaurantHome extends AuthenticatedRoutes {
     constructor(props) {
@@ -40,12 +41,19 @@ class RestaurantHome extends AuthenticatedRoutes {
                                         <div>Categories</div>
                                     </Link>
                                 </li>
+                                <li className="nav-tray-item">
+                                    <Link to={`${this.props.match.url}/orders`}>
+                                    <i className="fas fa-history nav-tray-item-icon"></i>
+                                        <div>Orders</div>
+                                    </Link>
+                                </li>
                             </ul>
                         </nav>
                         <div>
                             <Route exact path={`${this.props.match.path}`} component={Restaurant} />
                             <Route path={`${this.props.match.path}/outlets`} component={OutletHome} />
                             <Route path={`${this.props.match.path}/categories`} component={CategoryHome} />
+                            <Route path={`${this.props.match.path}/orders`} component={OrderHome} />
                         </div>
                     </BrowserRouter>
                     </div>

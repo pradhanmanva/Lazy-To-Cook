@@ -3,7 +3,7 @@
     left: 360px;
     top: 60px;
     bottom: 40px;
-    width: 100%;
+    right: 0;
     padding: 10px;
     overflow-y: auto;
 }

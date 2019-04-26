@@ -7,6 +7,7 @@ const MenuItemRouter = require("./router/MenuItemRouter");
 const UserRouter = require("./router/UserRouter");
 const CartRouter = require("./router/CartRouter");
 const CartItemRouter = require("./router/CartItemRouter");
+const RestaurantOrderRouter = require("./router/RestaurantOrderRouter");
 
 const lazyToCookApp = express();
 const HOST = "localhost";
@@ -53,6 +54,7 @@ new UserRouter(lazyToCookApp).wire();
 new CartRouter(lazyToCookApp).wire();
 new CartItemRouter(lazyToCookApp).wire();
 new RestaurantItemCategoryRouter(lazyToCookApp).wire();
+new RestaurantOrderRouter(lazyToCookApp).wire();
 
 
 const ItemListingHandler = require("./handlers/ItemListingHandler");
