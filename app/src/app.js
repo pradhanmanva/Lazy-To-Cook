@@ -67,7 +67,7 @@ lazyToCookApp.get("/api/items", function (request, response) {
     itemListingHandler.fetchAll(userId, request.query).then(function (items) {
         items = items.map(function (item) {
             return {
-                is_in_cart : item.is_in_cart,
+                is_in_cart: item.is_in_cart,
                 item: item.item.toJSON(),
                 restaurant: item.restaurant.toJSON(),
                 outlets: item.outlets.map(function (outlet) {
@@ -76,35 +76,35 @@ lazyToCookApp.get("/api/items", function (request, response) {
             }
         });
         return items;
-    }).then(function(itemsToSend) {
-        itemListingHandler.hasMoreItems(userId, request.query).then(function(nextPageData) {
+    }).then(function (itemsToSend) {
+        itemListingHandler.hasMoreItems(userId, request.query).then(function (nextPageData) {
             const page = (request.query && request.query.page && !isNaN(request.query.page)) ? parseInt(request.query.page) : 1;
             let paging = {
-                hasPrevious : (page > 1),
-                hasNext : nextPageData.hasMore,
-                rows_per_page : nextPageData.rowsPerPage
+                hasPrevious: (page > 1),
+                hasNext: nextPageData.hasMore,
+                rows_per_page: nextPageData.rowsPerPage
             };
             paging.next = nextPageData.hasMore ? nextPageData.next : page;
             paging.previous = paging.hasPrevious ? page - 1 : page;
 
             const result = {
-                items : itemsToSend,
-                paging : paging
-            }
+                items: itemsToSend,
+                paging: paging
+            };
             response.send(result).end();
         });
     });
 });
 
 const CategoryHandler = require("./handlers/CategoryHandler");
-lazyToCookApp.get("/api/categories", function(request, response) {
+lazyToCookApp.get("/api/categories", function (request, response) {
     if (!request.isAuthenticated() || !AppUtil.isUser(request)) {
         return AppUtil.denyAccess(response);
     }
-    new CategoryHandler().fetchAll().then(function(categories) {
-        categories = categories.map(function(category) {
+    new CategoryHandler().fetchAll().then(function (categories) {
+        categories = categories.map(function (category) {
             return category.toJSON();
-        })
+        });
         response.send(categories).end();
     })
 });
