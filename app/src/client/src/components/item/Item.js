@@ -3,6 +3,7 @@ import "../../styles/auth/Form.css";
 import "../../styles/item/Item.css";
 import ItemImage from "./ItemImage";
 import {NotificationContainer, NotificationManager} from 'react-notifications';
+import Validators from '../../../src/utils/FieldValidators'
 
 class Item extends Component {
 
@@ -91,6 +92,7 @@ class Item extends Component {
     handleChange(event) {
         const field = event.target.name;
         const value = event.target.value;
+
         if (field === "category") {
             this.setState((prevState) => {
                 prevState.item.category = {
@@ -100,10 +102,42 @@ class Item extends Component {
             });
             return;
         }
+
         this.setState((prevState) => {
             prevState.item[field] = value;
             return prevState;
         });
+
+
+        if (value === '') {
+            this.setState((prevState) => ({
+                validationStatus: {
+                    ...prevState.validationStatus,
+                    [field]: "Cannot be empty"
+                }
+            }));
+        } else {
+            let error = false;
+            if (field === 'price' && !Validators.isPrice(value)) {
+                console.log(value);
+                this.setState((prevState) => ({
+                    validationStatus: {
+                        ...prevState.validationStatus,
+                        [field]: "Enter the decimal number."
+                    }
+                }));
+                error = true;
+            }
+            if (!error) {
+                this.setState((prevState) => ({
+                    validationStatus: {
+                        ...prevState.validationStatus,
+                        [field]: ""
+                    }
+                }));
+            }
+        }
+
     }
 
     handleSubmit(event) {
