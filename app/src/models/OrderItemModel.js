@@ -1,6 +1,6 @@
 const Model = require("../framework/Model");
 
-class RestaurantOrderItemModel extends Model {
+class OrderItemModel extends Model {
     constructor(/* ItemModel */ item,
                 /* integer */ quantity) {
         super();
@@ -9,4 +9,4 @@ class RestaurantOrderItemModel extends Model {
     }
 }
 
-module.exports = RestaurantOrderItemModel;
+module.exports = OrderItemModel;

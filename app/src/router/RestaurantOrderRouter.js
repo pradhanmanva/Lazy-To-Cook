@@ -3,7 +3,7 @@ const RestaurantRouter = require("./RestaurantRouter");
 const OutletModel = require('../models/OutletModel');
 const AddressModel = require('../models/AddressModel');
 const RestaurantModel = require('../models/RestaurantModel');
-const OrderModel = require("../models/RestaurantOrderModel");
+const OrderModel = require("../models/OrderModel");
 const RestaurantOrderHandler = require('../handlers/RestaurantOrderHandler');
 
 const AppUtil = require("../utils/AppUtil");

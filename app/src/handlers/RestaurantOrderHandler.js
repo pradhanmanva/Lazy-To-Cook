@@ -1,8 +1,8 @@
 const OutletModel = require("../models/OutletModel");
 const UserModel = require("../models/UserModel");
 const ItemModel = require("../models/ItemModel");
-const RestaurantOrderModel = require("../models/RestaurantOrderModel");
-const RestaurantOrderItemModel = require("../models/RestaurantOrderItemModel");
+const RestaurantOrderModel = require("../models/OrderModel");
+const RestaurantOrderItemModel = require("../models/OrderItemModel");
 
 const DBUtil = require("../utils/DBUtil");
 
@@ -10,8 +10,8 @@ const OUTLET_TABLE = require('../tables/OutletTable');
 const ADDRESS_TABLE = require('../tables/AddressTable');
 const USER_TABLE = require('../tables/UserTable');
 const RESTAURANT_TABLE = require('../tables/RestaurantTable');
-const ORDER_TABLE = require("../tables/RestaurantOrderTable");
-const ORDERITEM_TABLE = require("../tables/RestaurantOrderItemTable");
+const ORDER_TABLE = require("../tables/OrderTable");
+const ORDERITEM_TABLE = require("../tables/OrderItemTable");
 
 const ORDER_STATUS = require("../models/OrderStatus");
 
