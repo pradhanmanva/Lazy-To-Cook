@@ -18,13 +18,13 @@
 	"CREATE TABLE category (category_id BIGINT NOT NULL AUTO_INCREMENT, category_name TEXT NOT NULL, restaurant_id BIGINT NOT NULL, is_deleted BOOLEAN NOT NULL DEFAULT false, PRIMARY KEY (category_id), FOREIGN KEY (restaurant_id) REFERENCES restaurant(restaurant_id) ON DELETE CASCADE);",
 
 	"DROP TABLE IF EXISTS item;",
-	"CREATE TABLE item (item_id BIGINT NOT NULL AUTO_INCREMENT, item_name TEXT NOT NULL, description TEXT NOT NULL, price DOUBLE(10,2) NOT NULL, category_id BIGINT, is_deleted BOOLEAN NOT NULL DEFAULT false, PRIMARY KEY (item_id), FOREIGN KEY (category_id) REFERENCES category(category_id) ON DELETE SET NULL);",
+	"CREATE TABLE item (item_id BIGINT NOT NULL AUTO_INCREMENT, item_name TEXT NOT NULL, description TEXT NOT NULL, image VARCHAR(100) DEFAULT NULL, price DOUBLE(10,2) NOT NULL, category_id BIGINT, is_deleted BOOLEAN NOT NULL DEFAULT false, PRIMARY KEY (item_id), FOREIGN KEY (category_id) REFERENCES category(category_id) ON DELETE SET NULL);",
 
 	"DROP TABLE IF EXISTS item_outlet;",
 	"CREATE TABLE item_outlet (item_id BIGINT NOT NULL AUTO_INCREMENT, outlet_id BIGINT NOT NULL, FOREIGN KEY (item_id) REFERENCES item(item_id) ON DELETE CASCADE, FOREIGN KEY (outlet_id) REFERENCES outlet(outlet_id) ON DELETE CASCADE);",
 
 	"DROP TABLE IF EXISTS user;",
-	"CREATE TABLE user (user_id BIGINT NOT NULL AUTO_INCREMENT, first_name VARCHAR(50) NOT NULL, middle_name VARCHAR(50) DEFAULT '', last_name VARCHAR(50) DEFAULT '', address BIGINT NOT NULL, date_of_birth VARCHAR(10), email_address VARCHAR(100) NOT NULL UNIQUE, PRIMARY KEY(user_id), FOREIGN KEY (address) REFERENCES address(address_id));",
+	"CREATE TABLE user (user_id BIGINT NOT NULL AUTO_INCREMENT, first_name VARCHAR(50) NOT NULL, middle_name VARCHAR(50) DEFAULT '', last_name VARCHAR(50) DEFAULT '', address BIGINT NOT NULL, date_of_birth VARCHAR(10), email_address VARCHAR(100) NOT NULL UNIQUE, is_deleted BOOLEAN NOT NULL DEFAULT false, PRIMARY KEY(user_id), FOREIGN KEY (address) REFERENCES address(address_id));",
 
 	"DROP TABLE IF EXISTS user_authentication;",
 	"CREATE TABLE user_authentication (user_id BIGINT NOT NULL AUTO_INCREMENT, password TEXT NOT NULL, FOREIGN KEY (user_id) REFERENCES user(user_id));",

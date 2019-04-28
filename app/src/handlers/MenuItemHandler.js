@@ -157,13 +157,23 @@ class MenuItemHandler {
         }).then(function (result) {
             if (dp) {
                 const itemImageFileName = `${item.id}${path.extname(dp.originalname)}`;
-                fs.writeFileSync(`${__dirname}/../../assets/images/${itemImageFileName}`, dp.buffer, 'ascii');
-                const updateImageQuery = `UPDATE ${ITEM_TABLE.NAME} SET ${ITEM_TABLE.COLUMNS.IMAGE} = ? WHERE ${ITEM_TABLE.COLUMNS.ID} = ?`;
-                const updateImageColumnValues = [itemImageFileName, item.id];
-                item.image = itemImageFileName;
-                return dbUtil.query(result.connection, updateImageQuery, updateImageColumnValues);
+                return new Promise(function (resolve, reject) {
+                    console.log("Storing item image in filesystem...");
+                    fs.writeFile(`${__dirname}/../../assets/images/${itemImageFileName}`, dp.buffer, 'ascii', function(error) {
+                        if (error) {
+                            reject(result);
+                        }
+                        resolve(result);
+                    });    
+                }).then(function(result) {
+                    const updateImageQuery = `UPDATE ${ITEM_TABLE.NAME} SET ${ITEM_TABLE.COLUMNS.IMAGE} = ? WHERE ${ITEM_TABLE.COLUMNS.ID} = ?`;
+                    const updateImageColumnValues = [itemImageFileName, item.id];
+                    item.image = itemImageFileName;
+                    return dbUtil.query(result.connection, updateImageQuery, updateImageColumnValues);
+                });
+            } else {
+                return result;
             }
-            return result;
         }).then(function(result) {
             return dbUtil.commitTransaction(result.connection, result.results);
         }).then(function(result) {
