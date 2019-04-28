@@ -144,7 +144,9 @@ class CartHome extends AuthenticatedRoutes {
                     NotificationManager.error(error);
                 })
             } else {
-                self.fetchItems();
+                return response.json().then(function(order) {
+                    window.location = `/app/user/${self.props.match.params.id}/orders/${order.id}`;
+                })
             }
         })
     }

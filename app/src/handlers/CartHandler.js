@@ -50,7 +50,7 @@ class CartHandler {
                 return dbUtil.query(connection, selectQuery, [cart.id, cart.user.id]);
             }).then(function(result){
                 if (result.results && result.results.length) {
-                    const itemsQuery = `SELECT ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.PRICE}, ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.QUANTITY} FROM ${ITEM_TABLE.NAME} INNER JOIN ${CARTITEM_TABLE.NAME} ON ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ITEM}=${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} WHERE ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ID} = ?`;
+                    const itemsQuery = `SELECT ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.PRICE}, ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.QUANTITY} FROM ${ITEM_TABLE.NAME} INNER JOIN ${CARTITEM_TABLE.NAME} ON ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.ITEM}=${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} WHERE ${CARTITEM_TABLE.NAME}.${CARTITEM_TABLE.COLUMNS.CART} = ?`;
                     return dbUtil.query(result.connection, itemsQuery, cart.id);
                 } else {
                     return dbUtil.rollbackTransaction(result.connection).then(function () {

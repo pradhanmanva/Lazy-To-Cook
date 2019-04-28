@@ -86,7 +86,6 @@ class DBUtil {
     query(connection, query, value) /* : returns Promise */ {
         return new Promise(function (resolve, reject) {
             connection.query(query, value, function (error, results, fields) {
-                console.log(mysql.format(query, value));
                 console.log("Running query...");
                 if (error) {
                     console.error(error);

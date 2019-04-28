@@ -4,6 +4,7 @@ class OrderUtil {
     }
 
     static calculateOrderAmount(items) {
+        console.log(items);
         const sub_total = items.reduce(function(sum, item) {
             return sum + parseFloat(item.price * item.quantity)
         }, 0);
