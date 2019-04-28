@@ -19,7 +19,12 @@ class Item extends Component {
                 }
             },
             isEditMode: true,
-            categories: []
+            categories: [],
+            validationStatus: {
+                name: "Cannot be empty",
+                description: "",
+                price: "Cannot be empty"
+            }
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -164,19 +169,23 @@ class Item extends Component {
                             <label>Display Image</label>
                             <input type="file" name="item_dp" value={this.state.item.item_dp}
                                    onChange={this.handleChange}/>
+
                         </div>
                         <div className="field-row">
                             <label>Name</label>
                             <input type="text" name="name" value={this.state.item.name} onChange={this.handleChange}/>
+                            <span className="validation">{this.state.validationStatus.name}</span>
                         </div>
                         <div className="field-row">
                             <label>Description</label>
                             <input type="text" name="description" value={this.state.item.description}
                                    onChange={this.handleChange}/>
+                            <span className="validation">{this.state.validationStatus.description}</span>
                         </div>
                         <div className="field-row">
                             <label>Price</label>
                             <input type="text" name="price" value={this.state.item.price} onChange={this.handleChange}/>
+                            <span className="validation">{this.state.validationStatus.price}</span>
                         </div>
                         <div className="field-row">
                             <label>Category</label>

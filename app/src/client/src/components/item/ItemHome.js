@@ -78,5 +78,3 @@ class ItemHome extends AuthenticatedRoutes {
 }
 
 export default ItemHome;
-//TODO:: item page validation, restaurant page, profile page, user page, outlet edit page,
-// item edit page, outlet add page, item add page, category edit, category add

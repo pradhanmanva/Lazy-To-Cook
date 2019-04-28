@@ -67,7 +67,7 @@ class Signup extends Component {
                     [fieldChanged]: "Cannot be empty"
                 }
             }));
-        } else if (changedValue !== "") {
+        } else {
             let error = false;
             if (fieldChanged === "contact" && !Validators.isPhone(changedValue)) {
                 this.setState((prevState) => ({

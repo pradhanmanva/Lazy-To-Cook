@@ -1,18 +1,21 @@
-import React , {Component} from 'react';
+import React, {Component} from 'react';
 import "../../../styles/restaurant/outlet/Outlet.css";
 import "../../../styles/auth/Form.css";
-import { NotificationManager, NotificationContainer } from 'react-notifications';
+import {NotificationContainer, NotificationManager} from 'react-notifications';
 
 class Category extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            category : {
-                name : ""
+            category: {
+                name: ""
             },
-            isEditMode : true
-        }        
+            isEditMode: true,
+            validationStatus: {
+                name: 'Cannot be empty'
+            }
+        };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -22,7 +25,7 @@ class Category extends Component {
         const restaurantId = this.props.match.params.id;
         const categoryId = this.props.match.params.category_id;
         this.setState({
-            isEditMode : !!this.props.match.params.category_id
+            isEditMode: !!this.props.match.params.category_id
         });
         if (restaurantId && categoryId) {
             fetch(`/api/restaurants/${restaurantId}/categories/${categoryId}`, {
@@ -31,15 +34,15 @@ class Category extends Component {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 }
-            }).then(function(response) {
+            }).then(function (response) {
                 if (response.status !== 200) {
                     return null;
                 }
                 return response.json();
-            }).then(function(category) {
+            }).then(function (category) {
                 if (category) {
                     self.setState({
-                        category : category
+                        category: category
                     });
                 }
             });
@@ -54,6 +57,20 @@ class Category extends Component {
             prevState.category[field] = value;
             return prevState;
         });
+
+        if (value !== '') {
+            this.setState((prevState) => ({
+                validationStatus: {
+                    name: ''
+                }
+            }));
+        } else {
+            this.setState((prevState) => ({
+                validationStatus: {
+                    name: 'Cannot be empty'
+                }
+            }));
+        }
     }
 
     handleSubmit(event) {
@@ -74,14 +91,14 @@ class Category extends Component {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 },
-                body : JSON.stringify(self.state.category)
-            }).then(function(response) {
+                body: JSON.stringify(self.state.category)
+            }).then(function (response) {
                 if (response.status !== 200) {
-                    response.text().then(function(message){
+                    response.text().then(function (message) {
                         NotificationManager.error(message);
                     });
                 } else {
-                    window.location = `/app/admin/${restaurantId}/categories${self.state.isEditMode ? "/"+self.props.match.params.category_id+"/edit" : ""}`;
+                    window.location = `/app/admin/${restaurantId}/categories${self.state.isEditMode ? "/" + self.props.match.params.category_id + "/edit" : ""}`;
                 }
             });
         } else if (event.target.name === "cancel") {
@@ -92,16 +109,21 @@ class Category extends Component {
     render() {
         let outletDetails = "";
         let category = this.state.category;
-        
+
         if (category && Object.keys(category).length) {
             outletDetails = (
-                <form onSubmit={()=>{return false;}}>
+                <form onSubmit={() => {
+                    return false;
+                }}>
                     <div className="field-row">
                         <label>Name</label>
-                        <input type="text" name="name" value={category.name} onChange={this.handleChange} />
+                        <input type="text" name="name" value={category.name} onChange={this.handleChange}/>
+                        <span className="validation">{this.state.validationStatus.name}</span>
                     </div>
-                    <input name="submit" className="submit-btn" type="submit" value={this.state.isEditMode ? "Update" : "Create"} onClick={this.handleSubmit} />
-                    <input name="cancel" className="submit-btn" type="submit" value="Cancel" onClick={this.handleSubmit} />
+                    <input name="submit" className="submit-btn" type="submit"
+                           value={this.state.isEditMode ? "Update" : "Create"} onClick={this.handleSubmit}/>
+                    <input name="cancel" className="submit-btn" type="submit" value="Cancel"
+                           onClick={this.handleSubmit}/>
                 </form>
             );
         }
@@ -109,7 +131,7 @@ class Category extends Component {
             <div className="outlet-form-container">
                 <h1>{this.state.isEditMode ? "Edit" : "Add"} Category</h1>
                 <section>{outletDetails}</section>
-                <NotificationContainer />
+                <NotificationContainer/>
             </div>
         );
     }

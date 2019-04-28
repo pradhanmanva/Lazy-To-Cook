@@ -1,7 +1,8 @@
-import React, {Component} from 'react';
+import React, {Component} from "react";
 import "../../../styles/restaurant/outlet/Outlet.css";
 import "../../../styles/auth/Form.css";
 import {NotificationContainer, NotificationManager} from "react-notifications";
+import Validators from "../../../utils/FieldValidators";
 
 class Outlet extends Component {
 
@@ -21,15 +22,13 @@ class Outlet extends Component {
             },
             isEditMode: true,
             validationStatus: {
-                name: "Cannot be empty",
-                contact: "Cannot be empty",
-                address: {
-                    line1: "Cannot be empty",
-                    line2: "",
-                    city: "Cannot be empty",
-                    state: "Cannot be empty",
-                    zipcode: "Cannot be empty"
-                }
+                name: "",
+                contact: "",
+                line1: "",
+                line2: "",
+                city: "",
+                state: "",
+                zipcode: ""
             }
         };
         this.handleChange = this.handleChange.bind(this);
@@ -46,10 +45,10 @@ class Outlet extends Component {
         });
         if (restaurantId && outletId) {
             fetch(`/api/restaurants/${restaurantId}/outlets/${outletId}`, {
-                method: 'GET',
+                method: "GET",
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
                 }
             }).then(function (response) {
                 if (response.status !== 200) {
@@ -70,12 +69,56 @@ class Outlet extends Component {
         const self = this;
         const field = event.target.name;
         const value = event.target.value;
-        switch (field) {
-            case "name":
-                if (value === '') {
 
+        if (value === "") {
+            this.setState((prevState) => ({
+                validationStatus: {
+                    ...prevState.validationStatus,
+                    [field]: "Cannot be empty"
                 }
-                break;
+            }));
+        } else {
+            let error = false;
+            if (field === "contact" && !Validators.isPhone(value)) {
+                this.setState((prevState) => ({
+                    validationStatus: {
+                        ...prevState.validationStatus,
+                        [field]: "Enter only 10 Digits."
+                    }
+                }));
+                error = true;
+            }
+            if (field === "state" && !Validators.isUSState(value)) {
+                this.setState((prevState) => ({
+                    validationStatus: {
+                        ...prevState.validationStatus,
+                        [field]: "Enter full state name."
+                    }
+                }));
+                error = true;
+            }
+            if (field === "zipcode" && !Validators.isZipcode(value)) {
+                this.setState((prevState) => ({
+                    validationStatus: {
+                        ...prevState.validationStatus,
+                        [field]: "Enter 5 digit US Zipcode."
+                    }
+                }));
+                error = true;
+            }
+
+
+            if (!error) {
+                this.setState((prevState) => ({
+                    validationStatus: {
+                        ...prevState.validationStatus,
+                        [field]: ""
+                    }
+                }));
+            }
+        }
+
+        switch (field) {
             case "line1":
             case "line2":
             case "city":
@@ -114,8 +157,8 @@ class Outlet extends Component {
             fetch(url, {
                 method: method,
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
                 },
                 body: JSON.stringify(self.state.outlet)
             }).then(function (response) {
@@ -135,7 +178,6 @@ class Outlet extends Component {
     render() {
         let outletDetails = "";
         let outlet = this.state.outlet;
-
         if (outlet && Object.keys(outlet).length) {
             outletDetails = (
                 <form onSubmit={() => {
@@ -155,21 +197,26 @@ class Outlet extends Component {
                         <h4>Mailing Address</h4>
                         <div className="field-row">
                             <label>Line 1</label>
-                            <input type="text" name="line1" value={outlet.address.line1} onChange={this.handleChange}/>
+                            <input type="text" name="line1" value={outlet.address.line1}
+                                   onChange={this.handleChange}/>
                             <span className="validation">{this.state.validationStatus.line1}</span>
                         </div>
                         <div className="field-row">
                             <label>Line 2</label>
-                            <input type="text" name="line2" value={outlet.address.line2} onChange={this.handleChange}/>
+                            <input type="text" name="line2" value={outlet.address.line2}
+                                   onChange={this.handleChange}/>
+                            <span className="validation">{this.state.validationStatus.line2}</span>
                         </div>
                         <div className="field-row">
                             <label>City</label>
-                            <input type="text" name="city" value={outlet.address.city} onChange={this.handleChange}/>
+                            <input type="text" name="city" value={outlet.address.city}
+                                   onChange={this.handleChange}/>
                             <span className="validation">{this.state.validationStatus.city}</span>
                         </div>
                         <div className="field-row">
                             <label>State</label>
-                            <input type="text" name="state" value={outlet.address.state} onChange={this.handleChange}/>
+                            <input type="text" name="state" value={outlet.address.state}
+                                   onChange={this.handleChange}/>
                             <span className="validation">{this.state.validationStatus.state}</span>
                         </div>
                         <div className="field-row">
