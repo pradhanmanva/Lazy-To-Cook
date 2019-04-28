@@ -38,7 +38,8 @@ class Order extends Component {
             }).then(function(order) {
                 if (order) {
                     self.setState({
-                        order : order
+                        order : order.order,
+                        amount : order.amount
                     });
                 }
             });
@@ -79,12 +80,49 @@ class Order extends Component {
         if (this.isEditable) {
             orderStatus = <OrderStatus current={this.state.order.status} makeProgress={this.makeProgress} isProgressable={true} />
         }
+        let amount = "";
+        if (this.state.amount) {
+            amount = (
+                <table>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <p><b>Order Subtotal</b></p>
+                        </td>
+                        <td>:</td>
+                        <td>
+                            ${this.state.amount.sub_total}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <p><b>Tax</b></p>
+                        </td>
+                        <td>:</td>
+                        <td>
+                            ${this.state.amount.sales_tax}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <h3><b>Order Total</b></h3>
+                        </td>
+                        <td>:</td>
+                        <td>
+                            <h3>${this.state.amount.total}</h3>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            )
+        }
         return (
             <div className="outlet-form-container">
                 <section>
                     <h2>Order Number: {this.state.order.id}</h2>
                     <p>Placed on {this.state.order.date} by <b>{this.state.order.user && this.state.order.user.full_name}</b> at the <b>{this.state.order.outlet && this.state.order.outlet.name}</b> outlet</p>
                     {orderStatus}
+                    {amount}
                     <ul className="order-item-list">
                         <h4>Items on order</h4>
                         {this.state.order.items && this.state.order.items.map(function(item) {

@@ -55,7 +55,7 @@ class RestaurantOrderRouter extends RestaurantRouter {
         const orderModel = new OrderModel(orderId.toString(), null, null, null, null);
         new RestaurantOrderHandler().fetch(orderModel, restaurantModel).then(function (order) {
             if (order) {
-                order = order.toJSON();
+                order.order = order.order.toJSON();
                 // outlet = self.addHateoas(outlet);
             } else {
                 order = {}

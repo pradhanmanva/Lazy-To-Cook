@@ -18,6 +18,8 @@ const USER_TABLE = require("../tables/UserTable");
 
 const ORDER_STATUS = require("../models/OrderStatus");
 
+const OrderUtil = require("../utils/OrderUtil");
+
 class UserOrderHandler {
     constructor() {
     }
@@ -63,17 +65,26 @@ class UserOrderHandler {
                 return dbUtil.commitTransaction(result.connection, result.results);
             }).then(function (result) {
                 const item = result[0];
-                return new OrderModel(
-                    item[ORDER_TABLE.COLUMNS.ID],
-                    item[ORDER_TABLE.COLUMNS.DATE],
-                    new UserModel(item[ORDER_TABLE.COLUMNS.USER],item[USER_TABLE.COLUMNS.FIRSTNAME], item[USER_TABLE.COLUMNS.MIDDLENAME], item[USER_TABLE.COLUMNS.LASTNAME], null, null, null, null),
-                    new OutletModel(item[ORDER_TABLE.COLUMNS.OUTLET], item[OUTLET_TABLE.COLUMNS.NAME], null, null, null),
-                    item[ORDER_TABLE.COLUMNS.STATUS],
-                    result.map(function (item, index, arr) {
-                        return new OrderItemModel(
-                            new ItemModel(null, item[ORDERITEM_TABLE.COLUMNS.ITEMNAME], item[ORDERITEM_TABLE.COLUMNS.DESCRIPTION], item[ORDERITEM_TABLE.COLUMNS.PRICE], null, null),
-                            item[ORDERITEM_TABLE.COLUMNS.QUANTITY]).toJSON();
-                    }));
+                const amount = OrderUtil.calculateOrderAmount(result.map(function(result){
+                    return {
+                        price : parseFloat(result[ORDERITEM_TABLE.COLUMNS.PRICE]),
+                        quantity : parseInt(result[ORDERITEM_TABLE.COLUMNS.QUANTITY])
+                    }
+                }))
+                return {
+                    order : new OrderModel(
+                        item[ORDER_TABLE.COLUMNS.ID],
+                        item[ORDER_TABLE.COLUMNS.DATE],
+                        new UserModel(item[ORDER_TABLE.COLUMNS.USER],item[USER_TABLE.COLUMNS.FIRSTNAME], item[USER_TABLE.COLUMNS.MIDDLENAME], item[USER_TABLE.COLUMNS.LASTNAME], null, null, null, null),
+                        new OutletModel(item[ORDER_TABLE.COLUMNS.OUTLET], item[OUTLET_TABLE.COLUMNS.NAME], null, null, null),
+                        item[ORDER_TABLE.COLUMNS.STATUS],
+                        result.map(function (item, index, arr) {
+                            return new OrderItemModel(
+                                new ItemModel(null, item[ORDERITEM_TABLE.COLUMNS.ITEMNAME], item[ORDERITEM_TABLE.COLUMNS.DESCRIPTION], item[ORDERITEM_TABLE.COLUMNS.PRICE], null, null),
+                                item[ORDERITEM_TABLE.COLUMNS.QUANTITY]).toJSON();
+                        })),
+                    amount : amount
+                }
             });
         }
         throw new Error('Error: Cannot GET order.');

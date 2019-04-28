@@ -59,7 +59,7 @@ class UserOrderRouter extends UserRouter {
         const orderModel = new OrderModel(orderId.toString(), null, userModel, null, null, null);
         new UserOrderHandler().fetch(orderModel).then(function (order) {
             if (order) {
-                order = order.toJSON();
+                order.order = order.order.toJSON();
             } else {
                 order = {}
             }

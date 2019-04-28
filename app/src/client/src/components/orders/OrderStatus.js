@@ -2,23 +2,23 @@ import React from "react";
 import "../../styles/commons/Price.css";
 const ORDER_STATUS = {
     "received" : {
-        text : "Received",
+        text : "Order Received",
         color : "#999"
     },
     "accepted" : {
-        text : "Accepted",
+        text : "Order Accepted",
         color : "#ff4b00"
     },
     "ready" : {
-        text: "Ready",
+        text: "Order Ready",
         color : "#ff9d00"
     },
     "out_for_delivery" : {
-        text: "Out for Delivery",
+        text: "Order Out for Delivery",
         color: "#8dff00"
     },
     "delivered" : {
-        text: "Delivered",
+        text: "Order Delivered",
         color: "#00ff00"
     }
 }
