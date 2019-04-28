@@ -12,7 +12,7 @@ class OrderModel extends Model {
         this.user = user;
         this.outlet = outlet;
         this.status = status;
-        this.items = items || [];
+        this.items = items || null;
     }
 }
 

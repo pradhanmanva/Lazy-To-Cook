@@ -11,12 +11,14 @@ class OrderHome extends AuthenticatedRoutes {
         this.state = {
             orders : []
         }
+        this.isEditable = !this.props.match.url.includes("user");
     }
 
     componentDidMount() {
         super.componentDidMount();
         const self = this;
-        fetch(`/api/restaurants/${this.props.match.params.id}/orders`, {
+        const sourceEntity = this.props.match.url.includes("user") ? "users" : "restaurants";
+        fetch(`/api/${sourceEntity}/${this.props.match.params.id}/orders`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -38,6 +40,10 @@ class OrderHome extends AuthenticatedRoutes {
 
     render() {
         const self = this;
+        let subRoute = <Route exact path={`${this.props.match.path}/:order_id`} component={Order} />
+        if (this.isEditable) {
+            subRoute = <Route exact path={`${this.props.match.path}/:order_id/edit`} component={Order} />;
+        }
         return (
             <div className="outlet-list-tray">   
                 <BrowserRouter forceRefresh={true} basename="/app">    
@@ -49,7 +55,7 @@ class OrderHome extends AuthenticatedRoutes {
                         {this.state.orders.map(function(order, index) {
                             return (
                                 <li className="outlet-list-item" key={order.id} >
-                                    <NavLink className="outlet-list-item-detail float-left" to={`${self.props.match.url}/${order.id}/edit`}>
+                                    <NavLink className="outlet-list-item-detail float-left" to={`${self.props.match.url}/${order.id}${self.isEditable ? "/edit" : ""}`}>
                                         <h3>Order Number: {order.id}</h3>
                                         <p>{order.date}</p>
                                         <OrderStatus current={order.status} />
@@ -60,10 +66,7 @@ class OrderHome extends AuthenticatedRoutes {
                         })}
                     </ul>
                     <div>
-                        {/* <Route path={`${this.props.match.path}/:outlet_id/items`} component={ItemHome} /> */}
-                        <Route exact path={`${this.props.match.path}/:order_id/edit`} component={Order} />
-                        {/* <Route exact path={`${this.props.match.path}/:category_id/delete`} component={DeleteCategory} /> */}
-                        {/* <Route exact path={`${this.props.match.path}/add`} component={Category} /> */}
+                        {subRoute}
                     </div>
                 </BrowserRouter>    
             </div>

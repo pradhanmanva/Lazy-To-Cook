@@ -21,6 +21,7 @@ class CartHome extends AuthenticatedRoutes {
         this.fetchCartDetails = this.fetchCartDetails.bind(this);
         this.removeFromCart = this.removeFromCart.bind(this);
         this.changeQuantity = this.changeQuantity.bind(this);
+        this.placeOrder = this.placeOrder.bind(this);
     }
 
     componentDidMount() {
@@ -115,11 +116,44 @@ class CartHome extends AuthenticatedRoutes {
         })
     }
 
+    placeOrder() {
+        const self = this;
+        let data = {            
+            items : self.state.items.map(function(item) {
+                console.log(item);
+                return {
+                    id : item.item.id,
+                    outlet : {
+                        id : item.outlet.id
+                    },
+                    quantity : item.quantity
+                }
+            })
+        }
+
+        fetch(`/api/users/${this.props.match.params.id}/orders`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body : JSON.stringify(data)
+        }).then(function (response) {
+            if (response.status !== 200) {
+                return response.text().then(function (error) {
+                    NotificationManager.error(error);
+                })
+            } else {
+                self.fetchItems();
+            }
+        })
+    }
+
     changeQuantity(itemId, delta) {
         if (itemId) {
             const self = this;
             const currentQuantity = this.state.items.filter(function (item) {
-                if (item.item.id === itemId) {
+                if (item.id === itemId) {
                     return item;
                 }
             })[0].quantity;
@@ -165,7 +199,8 @@ class CartHome extends AuthenticatedRoutes {
                                     "price": item.item.price,
                                     "category": item.item.category,
                                     "image": item.item.image
-                                }
+                                },
+                                "outlets" : [item.outlet]
                             };
 
                             return (
@@ -173,15 +208,15 @@ class CartHome extends AuthenticatedRoutes {
                                     <ItemListingEntry key={itemTransformed.id} data={itemTransformed}/>
                                     <div className="item-operation-bar">
                                         <QuantityComponent quantity={item.quantity} onDecrease={() => {
-                                            self.changeQuantity(item.item.id, -1)
+                                            self.changeQuantity(item.id, -1)
                                         }} onIncrease={() => {
-                                            self.changeQuantity(item.item.id, 1)
+                                            self.changeQuantity(item.id, 1)
                                         }}/>
                                         &nbsp;
                                         <button name="removeFromCart"
                                                 className="remove-from-cart-btn item-operation-btn danger-btn"
                                                 onClick={(event) => {
-                                                    self.removeFromCart(item.item.id);
+                                                    self.removeFromCart(item.id);
                                                 }}>
                                             Remove from Cart
                                         </button>
@@ -234,12 +269,12 @@ class CartHome extends AuthenticatedRoutes {
         return (
             <div className="restaurant-detail-container">
                 <section className="list-container">
-                    {this.state.amount ? <button className="submit-btn float-right">Place Order</button> : ""}
+                    {this.state.amount ? <button className="submit-btn float-right" onClick={this.placeOrder}>Place Order</button> : ""}
                     {amount}
                     <div>
                         {items}
                     </div>
-                    {this.state.amount ? <button className="submit-btn">Place Order</button> : ""}
+                    {this.state.amount ? <button className="submit-btn" onClick={this.placeOrder}>Place Order</button> : ""}
                 </section>
                 <NotificationContainer/>
             </div>

@@ -8,6 +8,7 @@ const UserRouter = require("./router/UserRouter");
 const CartRouter = require("./router/CartRouter");
 const CartItemRouter = require("./router/CartItemRouter");
 const RestaurantOrderRouter = require("./router/RestaurantOrderRouter");
+const UserOrderRouter = require("./router/UserOrderRouter");
 
 const lazyToCookApp = express();
 const HOST = "localhost";
@@ -55,7 +56,7 @@ new CartRouter(lazyToCookApp).wire();
 new CartItemRouter(lazyToCookApp).wire();
 new RestaurantItemCategoryRouter(lazyToCookApp).wire();
 new RestaurantOrderRouter(lazyToCookApp).wire();
-
+new UserOrderRouter(lazyToCookApp).wire();
 
 const ItemListingHandler = require("./handlers/ItemListingHandler");
 lazyToCookApp.get("/api/items", function (request, response) {
