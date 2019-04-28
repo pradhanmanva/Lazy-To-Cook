@@ -8,6 +8,8 @@ export default (props) => {
     let seller = "";
     if (props.data.outlets && props.data.outlets.length && props.data.restaurant && props.data.restaurant.name) {
         seller = <span>Sold by <b>{props.data.outlets[0].name} - {props.data.restaurant.name}</b></span>
+    } else if (props.data.outlets && props.data.outlets.length) {
+        seller = <span>Sold by <b>{props.data.outlets[0].name}</b></span>
     }
     return (
         <div className="item-list-entry-details">

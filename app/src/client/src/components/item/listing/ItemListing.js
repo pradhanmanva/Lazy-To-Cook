@@ -43,7 +43,6 @@ class ItemListing extends React.Component {
         this.goToNextPage = this.goToNextPage.bind(this);
         this.getCart = this.getCart.bind(this);
         this.addToCart = this.addToCart.bind(this);
-        this.removeFromCart = this.removeFromCart.bind(this);
     }
 
     handleChange(event) {
@@ -210,7 +209,7 @@ class ItemListing extends React.Component {
         this.queryCategories();
     }
 
-    addToCart(itemId) {
+    addToCart(itemId, outletId) {
         const self = this;
         if (this.state.cart && this.state.cart.id) {
             fetch(`/api/users/${this.props.match.params.id}/carts/${this.state.cart.id}/items`, {
@@ -221,6 +220,7 @@ class ItemListing extends React.Component {
                 },
                 body: JSON.stringify({
                     item_id: itemId,
+                    outlet_id : outletId,
                     quantity: 1
                 })
             }).then(function (response) {
@@ -245,36 +245,6 @@ class ItemListing extends React.Component {
         }
     }
 
-    removeFromCart(itemId) {
-        const self = this;
-        if (this.state.cart && this.state.cart.id) {
-            fetch(`/api/users/${this.props.match.params.id}/carts/${this.state.cart.id}/items/${itemId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                }
-            }).then(function (response) {
-                if (response.status !== 200) {
-                    return response.text().then(function (error) {
-                        NotificationManager.error(error);
-                    })
-                } else {
-                    NotificationManager.success("Item removed from cart.");
-                    self.setState((prevState) => {
-                        prevState.items = prevState.items.map(function (item) {
-                            if (item.item.id === itemId) {
-                                item.is_in_cart = !item.is_in_cart;
-                            }
-                            return item;
-                        });
-                        return prevState;
-                    });
-                    return;
-                }
-            })
-        }
-    }
 
     render() {
         const self = this;
@@ -294,18 +264,12 @@ class ItemListing extends React.Component {
                                                 (
                                                     item.is_in_cart ?
                                                         (
-                                                            <button name="removeFromCart"
-                                                                    className="item-operation-btn danger-btn"
-                                                                    onClick={(event) => {
-                                                                        self.removeFromCart(item.item.id);
-                                                                    }}>
-                                                                Remove from Cart
-                                                            </button>
+                                                            <span>Already in cart</span>
                                                         ) :
                                                         (
                                                             <button name="addToCart" className="item-operation-btn"
                                                                     onClick={() => {
-                                                                        self.addToCart(item.item.id)
+                                                                        self.addToCart(item.item.id, item.outlets[0].id)
                                                                     }}>
                                                                 Add to Cart
                                                             </button>
