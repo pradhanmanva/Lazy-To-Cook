@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import "../../styles/item/DeleteItem.css";
 import "../../styles/auth/Form.css";
-import { NotificationManager, NotificationContainer } from "react-notifications";
+import {NotificationContainer, NotificationManager} from "react-notifications";
 
 class DeleteItem extends Component {
 
@@ -19,17 +19,17 @@ class DeleteItem extends Component {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 }
-            }).then(function(response) {
+            }).then(function (response) {
                 if (response.status !== 200) {
-                    response.text().then(function(error) {
+                    response.text().then(function (error) {
                         NotificationManager.error(error);
-                    })
-                    return null;   
+                    });
+                    return null;
                 }
-                window.location = `/app/admin/${self.props.match.params.id}/outlets/${self.props.match.params.outlet_id}/items`; 
+                window.location = `/app/admin/${self.props.match.params.id}/outlets/${self.props.match.params.outlet_id}/items`;
             });
         } else if (event.target.name === "cancel") {
-            window.location = `/app/admin/${self.props.match.params.id}/outlets/${self.props.match.params.outlet_id}/items`; 
+            window.location = `/app/admin/${self.props.match.params.id}/outlets/${self.props.match.params.outlet_id}/items`;
         }
     }
 
@@ -40,7 +40,7 @@ class DeleteItem extends Component {
                 <p>Do you still want to delete item?</p>
                 <button name="submit" className="submit-btn" onClick={this.handleSubmit}>Delete</button>
                 <button name="cancel" className="submit-btn" onClick={this.handleSubmit}>Cancel</button>
-                <NotificationContainer />
+                <NotificationContainer/>
             </div>
         );
     }

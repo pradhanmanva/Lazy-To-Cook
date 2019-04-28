@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import "../../../styles/restaurant/outlet/DeleteOutlet.css";
 import "../../../styles/auth/Form.css";
-import { NotificationManager } from "react-notifications";
+import {NotificationManager} from "react-notifications";
 
 class DeleteOutlet extends Component {
 
@@ -19,15 +19,15 @@ class DeleteOutlet extends Component {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 }
-            }).then(function(response) {
+            }).then(function (response) {
                 if (response.status !== 200) {
                     NotificationManager.error("Error occurred while deleting outlet.");
-                    return null;   
+                    return null;
                 }
-                window.location = `/app/admin/${self.props.match.params.id}/outlets`; 
+                window.location = `/app/admin/${self.props.match.params.id}/outlets`;
             });
         } else if (event.target.name === "cancel") {
-            window.location = `/app/admin/${self.props.match.params.id}/outlets`; 
+            window.location = `/app/admin/${self.props.match.params.id}/outlets`;
         }
     }
 

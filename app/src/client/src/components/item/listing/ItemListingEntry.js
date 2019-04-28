@@ -12,15 +12,15 @@ export default (props) => {
     return (
         <div className="item-list-entry-details">
             <div className="item-list-entry-image">
-                <ItemImage url={`/images/${props.data.item.image}`} />
+                <ItemImage url={`/images/${props.data.item.image}`}/>
             </div>
             <div>
                 <div>
                     <h2 className="item-list-entry-name">{props.data.item.name}</h2>
-                    <ItemCategoryTab name={props.data.item.category.name} />
+                    <ItemCategoryTab name={props.data.item.category.name}/>
                 </div>
                 <p className="item-list-entry-description">{props.data.item.description}</p>
-                <Price amount={props.data.item.price} type="USD" />
+                <Price amount={props.data.item.price} type="USD"/>
                 <p>
                     {seller}
                 </p>
@@ -29,7 +29,6 @@ export default (props) => {
         </div>
     )
 }
-
 
 
 // {

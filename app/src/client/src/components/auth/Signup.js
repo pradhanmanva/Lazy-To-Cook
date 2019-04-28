@@ -45,7 +45,7 @@ class Signup extends Component {
         }
     }
 
-    handleChange(event, element) {
+    handleChange(event) {
         const fieldChanged = event.target.name;
         const changedValue = event.target.value;
 

@@ -1,26 +1,26 @@
-import React , {Component} from 'react';
+import React, {Component} from 'react';
 import "../../styles/auth/Form.css";
 import "../../styles/item/Item.css";
 import ItemImage from "./ItemImage";
-import { NotificationManager, NotificationContainer } from 'react-notifications';
+import {NotificationContainer, NotificationManager} from 'react-notifications';
 
 class Item extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            item : {
-                name : "",
-                description : "",
-                item_dp : "",
-                price : "",
-                category : {
-                    id : ""
+            item: {
+                name: "",
+                description: "",
+                item_dp: "",
+                price: "",
+                category: {
+                    id: ""
                 }
             },
-            isEditMode : true,
-            categories : []
-        }
+            isEditMode: true,
+            categories: []
+        };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -31,7 +31,7 @@ class Item extends Component {
         const outletId = this.props.match.params.outlet_id;
         const itemId = this.props.match.params.item_id;
         this.setState({
-            isEditMode : !!this.props.match.params.item_id
+            isEditMode: !!this.props.match.params.item_id
         });
         if (restaurantId && outletId && itemId) {
             fetch(`/api/restaurants/${restaurantId}/outlets/${outletId}/items/${itemId}`, {
@@ -40,15 +40,15 @@ class Item extends Component {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 }
-            }).then(function(response) {
+            }).then(function (response) {
                 if (response.status !== 200) {
                     return null;
                 }
                 return response.json();
-            }).then(function(item) {
+            }).then(function (item) {
                 if (item) {
                     self.setState({
-                        item : item
+                        item: item
                     });
                     console.log(self.state.item)
                 }
@@ -61,20 +61,20 @@ class Item extends Component {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
                 }
-            }).then(function(response){
+            }).then(function (response) {
                 if (response.status !== 200) {
                     return null;
                 }
                 return response.json();
-            }).then(function(categories) {
+            }).then(function (categories) {
                 if (categories) {
                     self.setState({
-                        categories : categories
+                        categories: categories
                     });
                     if (!self.state.isEditMode) {
                         self.setState({
-                            item : {
-                                category : categories[0]
+                            item: {
+                                category: categories[0]
                             }
                         })
                     }
@@ -89,7 +89,7 @@ class Item extends Component {
         if (field === "category") {
             this.setState((prevState) => {
                 prevState.item.category = {
-                    id : value
+                    id: value
                 };
                 return prevState;
             });
@@ -105,7 +105,7 @@ class Item extends Component {
         event.preventDefault();
 
         let formData = new FormData();
-        if(this.state.isEditMode) {
+        if (this.state.isEditMode) {
             formData.append("id", this.state.item.id);
         }
         formData.append("name", this.state.item.name);
@@ -127,20 +127,20 @@ class Item extends Component {
                 url += `/${itemId}`;
                 method = "PUT";
             }
-            
+
             fetch(url, {
                 method: method,
                 headers: {
                     'Accept': 'application/json'
                 },
-                body : formData
-            }).then(function(response) {
+                body: formData
+            }).then(function (response) {
                 if (response.status !== 200) {
-                    response.text().then(function(message) {
+                    response.text().then(function (message) {
                         NotificationManager.error(message);
                     });
                 } else {
-                    window.location = `/app/admin/${restaurantId}/outlets/${outletId}/items${self.state.isEditMode ? "/"+self.props.match.params.item_id+"/edit" : ""}`;
+                    window.location = `/app/admin/${restaurantId}/outlets/${outletId}/items${self.state.isEditMode ? "/" + self.props.match.params.item_id + "/edit" : ""}`;
                 }
             });
         } else if (event.target.name === "cancel") {
@@ -152,39 +152,47 @@ class Item extends Component {
         let itemDetails = "";
         if (this.state.item && Object.keys(this.state.item).length) {
             itemDetails = (
-                <div> 
-                    <div style={{"width" : "600px"}}>
-                        {this.state.isEditMode && this.state.item.image ? <ItemImage url={`/images/${this.state.item.image}`} /> : ""}
+                <div>
+                    <div style={{"width": "600px"}}>
+                        {this.state.isEditMode && this.state.item.image ?
+                            <ItemImage url={`/images/${this.state.item.image}`}/> : ""}
                     </div>
-                    <form onSubmit={()=>{return false;}}>
+                    <form onSubmit={() => {
+                        return false;
+                    }}>
                         <div className="field-row">
                             <label>Display Image</label>
-                            <input type="file" name="item_dp" value={this.state.item.item_dp} onChange={this.handleChange} />
+                            <input type="file" name="item_dp" value={this.state.item.item_dp}
+                                   onChange={this.handleChange}/>
                         </div>
                         <div className="field-row">
                             <label>Name</label>
-                            <input type="text" name="name" value={this.state.item.name} onChange={this.handleChange} />
+                            <input type="text" name="name" value={this.state.item.name} onChange={this.handleChange}/>
                         </div>
                         <div className="field-row">
                             <label>Description</label>
-                            <input type="text" name="description" value={this.state.item.description} onChange={this.handleChange} />
+                            <input type="text" name="description" value={this.state.item.description}
+                                   onChange={this.handleChange}/>
                         </div>
                         <div className="field-row">
                             <label>Price</label>
-                            <input type="text" name="price" value={this.state.item.price} onChange={this.handleChange} />
+                            <input type="text" name="price" value={this.state.item.price} onChange={this.handleChange}/>
                         </div>
                         <div className="field-row">
                             <label>Category</label>
-                            <select name="category" value={this.state.item.category ? this.state.item.category.id : ""} onChange={this.handleChange}>
+                            <select name="category" value={this.state.item.category ? this.state.item.category.id : ""}
+                                    onChange={this.handleChange}>
                                 {
-                                    this.state.categories.map(function(category, index){
+                                    this.state.categories.map(function (category, index) {
                                         return <option key={category.id} value={category.id}>{category.name}</option>;
                                     })
                                 }
                             </select>
                         </div>
-                        <input className="submit-btn" name="submit" type="submit" value={this.state.isEditMode ? "Update" : "Create"} onClick={this.handleSubmit} />
-                        <input className="submit-btn" name="cancel" type="submit" value="Cancel" onClick={this.handleSubmit} />
+                        <input className="submit-btn" name="submit" type="submit"
+                               value={this.state.isEditMode ? "Update" : "Create"} onClick={this.handleSubmit}/>
+                        <input className="submit-btn" name="cancel" type="submit" value="Cancel"
+                               onClick={this.handleSubmit}/>
                     </form>
                 </div>
             );
@@ -193,7 +201,7 @@ class Item extends Component {
             <div className="item-form-container">
                 <h1>{this.state.isEditMode ? "Edit" : "Add"} Item</h1>
                 <section>{itemDetails}</section>
-                <NotificationContainer />
+                <NotificationContainer/>
             </div>
         );
     }
