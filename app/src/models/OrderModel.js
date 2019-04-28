@@ -1,6 +1,6 @@
 const Model = require("../framework/Model");
 
-class RestaurantOrderModel extends Model {
+class OrderModel extends Model {
     constructor(/* string */ id,
                 /* string */ date,
                 /* UserModel */ user,
@@ -12,8 +12,8 @@ class RestaurantOrderModel extends Model {
         this.user = user;
         this.outlet = outlet;
         this.status = status;
-        this.items = items || [];
+        this.items = items || null;
     }
 }
 
-module.exports = RestaurantOrderModel;
+module.exports = OrderModel;

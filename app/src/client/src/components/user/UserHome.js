@@ -5,6 +5,7 @@ import {BrowserRouter, Route, Link} from "react-router-dom";
 import ItemListing from "../item/listing/ItemListing";
 import User from "./User";
 import CartHome from "./cart/CartHome";
+import OrderHome from "../orders/OrderHome";
 
 class UserHome extends AuthenticatedRoutes {
     render() {
@@ -45,8 +46,8 @@ class UserHome extends AuthenticatedRoutes {
                         <div>
                             <Route exact path={`${this.props.match.path}`} component={User} />
                             <Route exact path={`${this.props.match.path}/menu`} component={ItemListing} />
-                            {/* {/* <Route path={`${this.props.match.path}/outlets`} component={OutletHome} /> */}
-                            <Route path={`${this.props.match.path}/cart`} component={CartHome} /> */}
+                            <Route exact path={`${this.props.match.path}/cart`} component={CartHome} /> */}
+                            <Route path={`${this.props.match.path}/orders`} component={OrderHome} /> */}
                         </div>
                     </BrowserRouter>
                     </div>

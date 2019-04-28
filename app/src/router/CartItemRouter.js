@@ -7,7 +7,7 @@ const CartModel = require("../models/CartModel");
 const CartItemModel = require("../models/CartItemModel");
 const UserModel = require('../models/UserModel');
 const ItemModel = require('../models/ItemModel');
-
+const OutletModel = require("../models/OutletModel");
 const CartItemHandler = require("../handlers/CartItemHandler");
 
 class CartItemRouter extends CartRouter {
@@ -26,7 +26,7 @@ class CartItemRouter extends CartRouter {
         if (!request.isAuthenticated() || AppUtil.isAdmin(request) || (AppUtil.isUser(request) && !AppUtil.isOwner(request, userId))) {
             return AppUtil.denyAccess(response);
         }
-        const cartModel = new CartModel(cartId.toString(), null, new UserModel(userId, null, null, null, null, null, null));
+        const cartModel = new CartModel(cartId.toString(), null, new UserModel(userId.toString(), null, null, null, null, null, null));
         new CartItemHandler().fetchAll(cartModel).then(function (items) {
             if (items) {
                 items = items.map(function (item, index, arr) {
@@ -48,6 +48,7 @@ class CartItemRouter extends CartRouter {
      * 
      * @requires request.body {
      *   item_id : "",
+     *   outlet_id : "",
      *   quantity : numeric
      * }* 
      */
@@ -56,13 +57,16 @@ class CartItemRouter extends CartRouter {
         if (!request.isAuthenticated() || !AppUtil.isUser(request) || !AppUtil.isOwner(request, userId)) {
             return AppUtil.denyAccess(response);
         }
+        if (!request.body.outlet_id) {
+            return response.status(500).send("Outlet ID is required.").end();
+        }
         const cartId = request.params["cart_id"];
         const cartModel = new CartModel(cartId.toString(), null, new UserModel(userId.toString()));
-        const cartItemModel = new CartItemModel(cartId.toString(), new ItemModel(request.body.item_id.toString(), null, null, null, null), request.body.quantity);
+        const cartItemModel = new CartItemModel(null, new ItemModel(request.body.item_id.toString(), null, null, null, null), cartModel, new OutletModel(request.body.outlet_id.toString(),null, null, null, null), request.body.quantity);
         if (!cartItemModel.isValid()) {
             return AppUtil.badRequest(response);
         }
-        new CartItemHandler().insert(cartModel, cartItemModel).then(function (insertedItemOrError) {
+        new CartItemHandler().insert(cartItemModel).then(function (insertedItemOrError) {
             if (insertedItemOrError instanceof Error) {
                 return Promise.reject(insertedItemOrError);
             } else {
@@ -98,14 +102,14 @@ class CartItemRouter extends CartRouter {
             return AppUtil.denyAccess(response);
         }
 
-        const cartItemModel = new CartItemModel(cartId.toString(), new ItemModel(itemId.toString(), null, null, null, null), request.body.quantity);
         const cartModel = new CartModel(cartId.toString(), null, new UserModel(userId.toString(), null, null, null, null, null, null, null));
+        const cartItemModel = new CartItemModel(itemId.toString(), null, cartModel, null, request.body.quantity);
 
         if (!cartItemModel.isValid()) {
             return AppUtil.badRequest(response);
         }
 
-        new CartItemHandler().update(cartModel, cartItemModel).then(function(result) {
+        new CartItemHandler().update(cartItemModel).then(function(result) {
             response.status(200).send("Success").end();
         }).catch(function(error) {
             console.error(error);
@@ -119,17 +123,17 @@ class CartItemRouter extends CartRouter {
     delete(id, request, response) {
         const userId = request.params["user_id"];
         const cartId = request.params["cart_id"];
-        const itemId = request.params["id"];
+        const itemId = request.params["id"]; // this id is cart_item_id primary key
         if (!request.isAuthenticated() || !AppUtil.isUser(request) || !AppUtil.isOwner(request, userId)) {
             return AppUtil.denyAccess(response);
         }
 
-        const cartItemModel = new CartItemModel(cartId.toString(), new ItemModel(itemId.toString(), null, null, null, null), 1);
         const cartModel = new CartModel(cartId.toString(), null, new UserModel(userId.toString(), null, null, null, null, null, null, null));
+        const cartItemModel = new CartItemModel(itemId.toString(), null, cartModel, null, 1);
         if (!cartItemModel.isValid()) {
             return AppUtil.badRequest(response);
         }
-        new CartItemHandler().delete(cartModel, cartItemModel).then(function(result) {
+        new CartItemHandler().delete(cartItemModel).then(function(result) {
             response.status(200).send("Success").end();
         }).catch(function(error) {
             console.error(error);

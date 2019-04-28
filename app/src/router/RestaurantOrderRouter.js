@@ -3,7 +3,7 @@ const RestaurantRouter = require("./RestaurantRouter");
 const OutletModel = require('../models/OutletModel');
 const AddressModel = require('../models/AddressModel');
 const RestaurantModel = require('../models/RestaurantModel');
-const OrderModel = require("../models/RestaurantOrderModel");
+const OrderModel = require("../models/OrderModel");
 const RestaurantOrderHandler = require('../handlers/RestaurantOrderHandler');
 
 const AppUtil = require("../utils/AppUtil");
@@ -55,7 +55,7 @@ class RestaurantOrderRouter extends RestaurantRouter {
         const orderModel = new OrderModel(orderId.toString(), null, null, null, null);
         new RestaurantOrderHandler().fetch(orderModel, restaurantModel).then(function (order) {
             if (order) {
-                order = order.toJSON();
+                order.order = order.order.toJSON();
                 // outlet = self.addHateoas(outlet);
             } else {
                 order = {}

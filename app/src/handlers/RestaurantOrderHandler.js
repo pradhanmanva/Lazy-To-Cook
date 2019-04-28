@@ -1,8 +1,8 @@
 const OutletModel = require("../models/OutletModel");
 const UserModel = require("../models/UserModel");
 const ItemModel = require("../models/ItemModel");
-const RestaurantOrderModel = require("../models/RestaurantOrderModel");
-const RestaurantOrderItemModel = require("../models/RestaurantOrderItemModel");
+const RestaurantOrderModel = require("../models/OrderModel");
+const RestaurantOrderItemModel = require("../models/OrderItemModel");
 
 const DBUtil = require("../utils/DBUtil");
 
@@ -10,10 +10,12 @@ const OUTLET_TABLE = require('../tables/OutletTable');
 const ADDRESS_TABLE = require('../tables/AddressTable');
 const USER_TABLE = require('../tables/UserTable');
 const RESTAURANT_TABLE = require('../tables/RestaurantTable');
-const ORDER_TABLE = require("../tables/RestaurantOrderTable");
-const ORDERITEM_TABLE = require("../tables/RestaurantOrderItemTable");
+const ORDER_TABLE = require("../tables/OrderTable");
+const ORDERITEM_TABLE = require("../tables/OrderItemTable");
 
 const ORDER_STATUS = require("../models/OrderStatus");
+
+const OrderUtil = require("../utils/OrderUtil");
 
 class RestaurantOrderHandler {
     constructor() {
@@ -62,19 +64,27 @@ class RestaurantOrderHandler {
                 return dbUtil.commitTransaction(result.connection, result.results);
             }).then(function (result) {
                 const item = result[0];
-                const restaurantOrderModel = new RestaurantOrderModel(
-                    item[ORDER_TABLE.COLUMNS.ID],
-                    item[ORDER_TABLE.COLUMNS.DATE],
-                    new UserModel(item[ORDER_TABLE.COLUMNS.USER],item[USER_TABLE.COLUMNS.FIRSTNAME], item[USER_TABLE.COLUMNS.MIDDLENAME], item[USER_TABLE.COLUMNS.LASTNAME], null, null, null, null),
-                    new OutletModel(item[ORDER_TABLE.COLUMNS.OUTLET], item[OUTLET_TABLE.COLUMNS.NAME], null, null, null),
-                    item[ORDER_TABLE.COLUMNS.STATUS],
-                    result.map(function (item, index, arr) {
-                        const restaurantOrderItemModel = new RestaurantOrderItemModel(
-                            new ItemModel(null, item[ORDERITEM_TABLE.COLUMNS.ITEMNAME], item[ORDERITEM_TABLE.COLUMNS.DESCRIPTION], item[ORDERITEM_TABLE.COLUMNS.PRICE], null, null),
-                            item[ORDERITEM_TABLE.COLUMNS.QUANTITY]);
-                        return restaurantOrderItemModel.toJSON();
-                    }));
-                return restaurantOrderModel;
+                const amount = OrderUtil.calculateOrderAmount(result.map(function(result){
+                    return {
+                        price : parseFloat(result[ORDERITEM_TABLE.COLUMNS.PRICE]),
+                        quantity : parseInt(result[ORDERITEM_TABLE.COLUMNS.QUANTITY])
+                    }
+                }))
+                return {
+                    order : new RestaurantOrderModel(
+                        item[ORDER_TABLE.COLUMNS.ID],
+                        item[ORDER_TABLE.COLUMNS.DATE],
+                        new UserModel(item[ORDER_TABLE.COLUMNS.USER],item[USER_TABLE.COLUMNS.FIRSTNAME], item[USER_TABLE.COLUMNS.MIDDLENAME], item[USER_TABLE.COLUMNS.LASTNAME], null, null, null, null),
+                        new OutletModel(item[ORDER_TABLE.COLUMNS.OUTLET], item[OUTLET_TABLE.COLUMNS.NAME], null, null, null),
+                        item[ORDER_TABLE.COLUMNS.STATUS],
+                        result.map(function (item, index, arr) {
+                            const restaurantOrderItemModel = new RestaurantOrderItemModel(
+                                new ItemModel(null, item[ORDERITEM_TABLE.COLUMNS.ITEMNAME], item[ORDERITEM_TABLE.COLUMNS.DESCRIPTION], item[ORDERITEM_TABLE.COLUMNS.PRICE], null, null),
+                                item[ORDERITEM_TABLE.COLUMNS.QUANTITY]);
+                            return restaurantOrderItemModel.toJSON();
+                        })),
+                    amount : amount
+                }
             });
         }
         throw new Error('Error: Cannot GET order.');
