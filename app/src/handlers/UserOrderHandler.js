@@ -100,7 +100,7 @@ class UserOrderHandler {
             return item.item.id;
         });
 
-        const itemsValidationQuery = `SELECT * FROM ${ITEM_TABLE.NAME} LEFT JOIN ${ITEMOUTLET_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM}=${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} WHERE ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} IN (?)`;
+        const itemsValidationQuery = `SELECT * FROM ${ITEM_TABLE.NAME} LEFT JOIN ${ITEMOUTLET_TABLE.NAME} ON ${ITEMOUTLET_TABLE.NAME}.${ITEMOUTLET_TABLE.COLUMNS.ITEM}=${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} WHERE ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.ID} IN (?) AND ${ITEM_TABLE.NAME}.${ITEM_TABLE.COLUMNS.IS_DELETED}=false`;
         const itemsValidationColumnValues = [itemIds]
 
         const orderInsertionQuery = `INSERT INTO ${ORDER_TABLE.NAME} SET ?`;
@@ -126,7 +126,7 @@ class UserOrderHandler {
             isNotValid = isNotValid || (new Set(result.results.map((item)=>{return item[ITEMOUTLET_TABLE.COLUMNS.OUTLET];})).size != 1);
             if ( isNotValid ) {
                 return dbUtil.rollbackTransaction(result.connection).then(function () {
-                    return Promise.reject(new Error(`Invalid Operation: Either invalid item or cannot order items from multiple outlets.`));
+                    return Promise.reject(new Error(`Invalid Operation: Either some of the item(s) in the order are not available or cannot order items from multiple outlets.`));
                 });
             } else {
                 items = result.results.map((item)=> {
