@@ -100,7 +100,11 @@ class MenuItemHandler {
             itemOutletColumnValues[ITEMOUTLET_TABLE.COLUMNS.ITEM] = result.results.insertId.toString();
             if (dp) {
                 const itemImageFileName = `${result.results.insertId}${path.extname(dp.originalname)}`;
-                fs.writeFileSync(`${__dirname}/../../assets/images/${itemImageFileName}`, dp.buffer, 'ascii');
+                const imageStorePath = path.join(__dirname, "..", "..","assets","images") 
+                if (!fs.existsSync(imageStorePath)){
+                    fs.mkdirSync(imageStorePath,{recursive:true});
+                }
+                fs.writeFileSync(path.join(imageStorePath,itemImageFileName), dp.buffer, 'ascii');
                 const updateImageQuery = `UPDATE ${ITEM_TABLE.NAME} SET ${ITEM_TABLE.COLUMNS.IMAGE} = ? WHERE ${ITEM_TABLE.COLUMNS.ID} = ?`;
                 const updateImageColumnValues = [itemImageFileName, result.results.insertId];
                 item.image = itemImageFileName;
@@ -159,7 +163,11 @@ class MenuItemHandler {
                 const itemImageFileName = `${item.id}${path.extname(dp.originalname)}`;
                 return new Promise(function (resolve, reject) {
                     console.log("Storing item image in filesystem...");
-                    fs.writeFile(`${__dirname}/../../assets/images/${itemImageFileName}`, dp.buffer, 'ascii', function(error) {
+                    const imageStorePath = path.join(__dirname, "..", "..","assets","images") 
+                    if (!fs.existsSync(imageStorePath)){
+                        fs.mkdirSync(imageStorePath,{recursive:true});
+                    }
+                    fs.writeFile(path.join(imageStorePath,itemImageFileName), dp.buffer, 'ascii', function(error) {
                         if (error) {
                             reject(result);
                         }
