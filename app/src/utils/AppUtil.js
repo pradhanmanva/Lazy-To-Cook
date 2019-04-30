@@ -48,6 +48,12 @@ class AppUtil {
     static getLoggedInUserId(request) {
         return request.user.user_id;
     }
+
+    static getLocaleDateString(date) {
+        let dateFromDB = new String(date).split(/[- :]/);
+        const convertedDate = new Date(Date.UTC(dateFromDB[0], dateFromDB[1]-1, dateFromDB[2], dateFromDB[3], dateFromDB[4], dateFromDB[5]));
+        return(`${convertedDate.toLocaleString().split(", ")[0]} ${convertedDate.toLocaleString().split(", ")[1]}`);
+    }
 }
 
 module.exports = AppUtil;

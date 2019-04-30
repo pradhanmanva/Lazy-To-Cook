@@ -19,6 +19,7 @@ const USER_TABLE = require("../tables/UserTable");
 const ORDER_STATUS = require("../models/OrderStatus");
 
 const OrderUtil = require("../utils/OrderUtil");
+const AppUtil = require("../utils/AppUtil");
 
 class UserOrderHandler {
     constructor() {
@@ -41,7 +42,7 @@ class UserOrderHandler {
                 return result.map(function (result, index, arr) {
                     return new OrderModel(
                                 result[ORDER_TABLE.COLUMNS.ID],
-                                result[ORDER_TABLE.COLUMNS.DATE],
+                                AppUtil.getLocaleDateString(result[ORDER_TABLE.COLUMNS.DATE]),
                                 new UserModel(result[ORDER_TABLE.COLUMNS.USER],result[USER_TABLE.COLUMNS.FIRSTNAME], result[USER_TABLE.COLUMNS.MIDDLENAME], result[USER_TABLE.COLUMNS.LASTNAME], null, null, null, null),
                                 new OutletModel(result[ORDER_TABLE.COLUMNS.OUTLET], result[OUTLET_TABLE.COLUMNS.NAME], null, null, null),
                                 result[ORDER_TABLE.COLUMNS.STATUS]);
@@ -74,7 +75,7 @@ class UserOrderHandler {
                 return {
                     order : new OrderModel(
                         item[ORDER_TABLE.COLUMNS.ID],
-                        item[ORDER_TABLE.COLUMNS.DATE],
+                        AppUtil.getLocaleDateString(item[ORDER_TABLE.COLUMNS.DATE]),
                         new UserModel(item[ORDER_TABLE.COLUMNS.USER],item[USER_TABLE.COLUMNS.FIRSTNAME], item[USER_TABLE.COLUMNS.MIDDLENAME], item[USER_TABLE.COLUMNS.LASTNAME], null, null, null, null),
                         new OutletModel(item[ORDER_TABLE.COLUMNS.OUTLET], item[OUTLET_TABLE.COLUMNS.NAME], null, null, null),
                         item[ORDER_TABLE.COLUMNS.STATUS],
@@ -162,7 +163,7 @@ class UserOrderHandler {
             return dbUtil.commitTransaction(result.connection, result.results);
         }).then(function(results) {
             const result = results[0];
-            return new OrderModel(result[ORDER_TABLE.COLUMNS.ID], result[ORDER_TABLE.COLUMNS.DATE], null, null, result[ORDER_TABLE.COLUMNS.STATUS], null);
+            return new OrderModel(result[ORDER_TABLE.COLUMNS.ID], AppUtil.getLocaleDateString(result[ORDER_TABLE.COLUMNS.DATE]), null, null, result[ORDER_TABLE.COLUMNS.STATUS], null);
         });
     }
 

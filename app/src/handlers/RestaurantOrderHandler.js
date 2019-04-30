@@ -17,6 +17,8 @@ const ORDER_STATUS = require("../models/OrderStatus");
 
 const OrderUtil = require("../utils/OrderUtil");
 
+const AppUtil = require("../utils/AppUtil");
+
 class RestaurantOrderHandler {
     constructor() {
     }
@@ -38,7 +40,7 @@ class RestaurantOrderHandler {
                 return result.map(function (result, index, arr) {
                     const restaurantOrderModel = new RestaurantOrderModel(
                                 result[ORDER_TABLE.COLUMNS.ID],
-                                result[ORDER_TABLE.COLUMNS.DATE],
+                                AppUtil.getLocaleDateString(result[ORDER_TABLE.COLUMNS.DATE]),
                                 new UserModel(result[ORDER_TABLE.COLUMNS.USER],result[USER_TABLE.COLUMNS.FIRSTNAME], result[USER_TABLE.COLUMNS.MIDDLENAME], result[USER_TABLE.COLUMNS.LASTNAME], null, null, null, null),
                                 new OutletModel(result[ORDER_TABLE.COLUMNS.OUTLET], result[OUTLET_TABLE.COLUMNS.NAME], null, null, null),
                                 result[ORDER_TABLE.COLUMNS.STATUS]);
@@ -73,7 +75,7 @@ class RestaurantOrderHandler {
                 return {
                     order : new RestaurantOrderModel(
                         item[ORDER_TABLE.COLUMNS.ID],
-                        item[ORDER_TABLE.COLUMNS.DATE],
+                        AppUtil.getLocaleDateString(item[ORDER_TABLE.COLUMNS.DATE]),
                         new UserModel(item[ORDER_TABLE.COLUMNS.USER],item[USER_TABLE.COLUMNS.FIRSTNAME], item[USER_TABLE.COLUMNS.MIDDLENAME], item[USER_TABLE.COLUMNS.LASTNAME], null, null, null, null),
                         new OutletModel(item[ORDER_TABLE.COLUMNS.OUTLET], item[OUTLET_TABLE.COLUMNS.NAME], null, null, null),
                         item[ORDER_TABLE.COLUMNS.STATUS],

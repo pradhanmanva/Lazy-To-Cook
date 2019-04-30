@@ -5,7 +5,8 @@ const pool  = mysql.createPool({
     host            : 'localhost',
     user            : 'root',
     password        : 'root',
-    database        : 'lazytocook'
+    database        : 'lazytocook',
+    dateStrings     : true
 });
 class DBUtil {
 
